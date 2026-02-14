@@ -1,9 +1,10 @@
 import { Plus } from 'lucide-react';
 import { Button } from '~/components/ui/button';
+import { ScrollArea } from '../ui/scroll-area';
 
 export const NotesWidget = () => {
   return (
-    <div className="h-full flex flex-col bg-card p-4">
+    <ScrollArea className="h-full flex flex-col bg-card p-4">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold text-foreground">Notes</h2>
         <Button size="icon-sm" variant="ghost" aria-label="Add note">
@@ -29,6 +30,6 @@ export const NotesWidget = () => {
           ))}
         </ul>
       </div>
-    </div>
+    </ScrollArea>
   );
 };

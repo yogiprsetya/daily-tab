@@ -4,6 +4,7 @@ import { Button } from '~/components/ui/button';
 import { ShortcutDialog } from './shortcut-dialog';
 import { ShortcutTile, type Shortcut } from './shortcut-tile';
 import { loadShortcuts, saveShortcuts } from '~/utils/settings';
+import { ScrollArea } from '../ui/scroll-area';
 
 export const ShortcutsWidget = () => {
   const [shortcuts, setShortcuts] = useState<Shortcut[]>(() => loadShortcuts());
@@ -26,7 +27,7 @@ export const ShortcutsWidget = () => {
   };
 
   return (
-    <div className="h-full flex flex-col bg-card p-4">
+    <ScrollArea className="h-full flex flex-col bg-card p-4">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold text-foreground">Shortcuts</h2>
         <div className="flex items-center gap-2">
@@ -91,6 +92,6 @@ export const ShortcutsWidget = () => {
           ))}
         </div>
       </div>
-    </div>
+    </ScrollArea>
   );
 };
