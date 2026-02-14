@@ -1,7 +1,3 @@
-// Minimal settings and data management aligned with PRD.
-// IndexedDB is planned; this is a localStorage-backed placeholder for v0.1.
-// Provides: theme + density persistence and JSON export/import/reset for all stores.
-
 import type {
   Density,
   LayoutState,
@@ -12,6 +8,7 @@ import type { StoredShortcut } from '~/types/shortcuts';
 
 const SETTINGS_KEY = 'dt_settings';
 const SHORTCUTS_KEY = 'dt_shortcuts';
+const NAVBAR_LINKS_KEY = 'dt_navbar_links';
 const TODOS_KEY = 'dt_todos';
 const NOTES_KEY = 'dt_notes';
 const LAYOUT_KEY = 'dt_layout';
@@ -70,6 +67,24 @@ export function saveShortcuts(list: StoredShortcut[]) {
   }
 }
 
+export function loadNavbarLinks(): StoredShortcut[] {
+  try {
+    const raw = localStorage.getItem(NAVBAR_LINKS_KEY) || '[]';
+    const parsed = JSON.parse(raw) as StoredShortcut[];
+    return parsed;
+  } catch {
+    return [];
+  }
+}
+
+export function saveNavbarLinks(list: StoredShortcut[]) {
+  try {
+    localStorage.setItem(NAVBAR_LINKS_KEY, JSON.stringify(list));
+  } catch {
+    // ignore
+  }
+}
+
 export function applyTheme(theme: ThemeSetting) {
   const root = document.documentElement;
   const isDark =
@@ -91,6 +106,7 @@ export function exportAll() {
     schemaVersion: SCHEMA_VERSION,
     settings: JSON.parse(localStorage.getItem(SETTINGS_KEY) || 'null'),
     shortcuts: JSON.parse(localStorage.getItem(SHORTCUTS_KEY) || '[]'),
+    navbarLinks: JSON.parse(localStorage.getItem(NAVBAR_LINKS_KEY) || '[]'),
     todos: JSON.parse(localStorage.getItem(TODOS_KEY) || '[]'),
     notes: JSON.parse(localStorage.getItem(NOTES_KEY) || '[]'),
     layout: JSON.parse(localStorage.getItem(LAYOUT_KEY) || 'null'),
@@ -124,6 +140,8 @@ export async function importAll(jsonText: string) {
     localStorage.setItem(SETTINGS_KEY, JSON.stringify(data.settings));
   if (Array.isArray(data.shortcuts))
     localStorage.setItem(SHORTCUTS_KEY, JSON.stringify(data.shortcuts));
+  if (Array.isArray(data.navbarLinks))
+    localStorage.setItem(NAVBAR_LINKS_KEY, JSON.stringify(data.navbarLinks));
   if (Array.isArray(data.todos))
     localStorage.setItem(TODOS_KEY, JSON.stringify(data.todos));
   if (Array.isArray(data.notes))
@@ -135,6 +153,7 @@ export async function importAll(jsonText: string) {
 export function resetAll() {
   localStorage.removeItem(SETTINGS_KEY);
   localStorage.removeItem(SHORTCUTS_KEY);
+  localStorage.removeItem(NAVBAR_LINKS_KEY);
   localStorage.removeItem(TODOS_KEY);
   localStorage.removeItem(NOTES_KEY);
   localStorage.removeItem(LAYOUT_KEY);

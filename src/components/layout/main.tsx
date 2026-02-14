@@ -2,7 +2,7 @@ import { ShortcutsWidget } from '~/components/widgets/shortcuts';
 import { TodosWidget } from '~/components/widgets/todos';
 import { NotesWidget } from '~/components/widgets/notes';
 import { ResizeHandle } from '~/components/common/resize-handle';
-import { useLayout } from '~/state/useLayout';
+import { useLayout } from '~/state/use-layout';
 
 export const MainLayout = () => {
   const {

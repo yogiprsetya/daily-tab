@@ -1,8 +1,8 @@
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '~/components/ui/button';
-import { ShortcutDialog } from './shortcut-dialog';
-import { ShortcutTile, type Shortcut } from './shortcut-tile';
+import { ShortcutDialog } from '../common/shortcut-dialog';
+import { ShortcutTile, type Shortcut } from '../common/shortcut-tile';
 import { loadShortcuts, saveShortcuts } from '~/utils/settings';
 import { ScrollArea } from '../ui/scroll-area';
 

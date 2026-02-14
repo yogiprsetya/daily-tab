@@ -11,7 +11,7 @@ export type Shortcut = {
 };
 
 const InlineFallbackSvg = (size = 64) => {
-  const svg = `<?xml version='1.0' encoding='UTF-8'?><svg xmlns='http://www.w3.org/2000/svg' width='${size}' height='${size}' viewBox='0 0 ${size} ${size}'><rect width='100%' height='100%' fill='%23e5e7eb'/><text x='50%' y='55%' font-size='28' text-anchor='middle' fill='%236b7280' font-family='Arial'>🌐</text></svg>`;
+  const svg = `<?xml version='1.0' encoding='UTF-8'?><svg xmlns="http://www.w3.org/2000/svg" width='${size}' height='${size}' viewBox='0 0 ${size} ${size}' fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link-icon lucide-link"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>`;
   return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
 };
 

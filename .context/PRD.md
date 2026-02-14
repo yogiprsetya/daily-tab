@@ -77,18 +77,23 @@ Theme & Accessibility (global)
 - Auto-detect system theme on first run; user override stored.
 - WCAG AA contrast; visible focus rings; ARIA roles; respects prefers-reduced-motion.
 
-Data & Storage (IndexedDB)
+Data & Storage (localStorage → IndexedDB in v1.x)
 
-- DB name: daily-tab; versioned schema with migrations.
-- Object stores:
+- Current (v0.1): localStorage with JSON serialization.
+  - Keys: `dt_settings`, `dt_shortcuts`, `dt_navbar_links`, `dt_todos`, `dt_notes`, `dt_layout`.
+  - Planned migration to IndexedDB with versioned schema.
+- DB name (future): daily-tab; versioned schema with migrations.
+- Object stores (future):
   - settings: { id: "global", theme: "dark|light|system", density: "compact|comfortable" (default: compact tuned for comfort), createdAt, updatedAt }
   - shortcuts: { id (uuid), title, url, tags?: string[], pinned?, order, createdAt, updatedAt }
   - todos: { id (uuid), title, status: "todo|done", today?: boolean, order, createdAt, updatedAt }
   - notes: { id (uuid), title?: string, content: string, order: number, createdAt, updatedAt }
-- Indexes:
+  - navbar_links: { id (uuid), title, url, createdAt, updatedAt } [max 5 items]
+- Indexes (future):
   - shortcuts: by order, pinned, tags (multiEntry)
   - todos: by status, order, today
   - notes: by order
+  - navbar_links: by createdAt
 - Export/Import: single JSON file containing all stores; includes schema version.
 - Safeguards: basic size checks for large notes; backup before migration.
 
@@ -104,9 +109,17 @@ Chrome Extension
 Frontend
 
 - Single-page React (Vite). No router.
-- State persisted via IndexedDB (use idb or similar wrapper).
+- State persisted via localStorage (IndexedDB planned for v1.x).
 - Theme via CSS variables; prefers-color-scheme detection.
-- Components: Header, ShortcutWidget, TodoWidget, NotesWidget, Overlay.
+- **State Management**: Custom React hooks in `/src/state/`:
+  - `useSettings()` — theme, density, persist to localStorage.
+  - `useNavbarLinks()` — navbar link CRUD, 5-link max, persist to localStorage.
+  - Similar hooks for todos, notes, and shortcuts planned.
+- **Components**:
+  - Header/Navbar with navbar link display and dialog trigger.
+  - ShortcutsDialog (decoupled) — add/manage navbar links.
+  - Shortcut, Todo, Notes widgets in main layout.
+  - Modular UI primitives from shadcn/ui.
 - Drag-and-drop via native HTML5 or lightweight lib.
 - Performance: debounced writes; batched updates; lazy render where sensible.
 
