@@ -2,13 +2,19 @@
 // IndexedDB is planned; this is a localStorage-backed placeholder for v0.1.
 // Provides: theme + density persistence and JSON export/import/reset for all stores.
 
-import type { Density, Settings, ThemeSetting } from '~/types/settings';
+import type {
+  Density,
+  LayoutState,
+  Settings,
+  ThemeSetting,
+} from '~/types/settings';
 import type { StoredShortcut } from '~/types/shortcuts';
 
 const SETTINGS_KEY = 'dt_settings';
 const SHORTCUTS_KEY = 'dt_shortcuts';
 const TODOS_KEY = 'dt_todos';
 const NOTES_KEY = 'dt_notes';
+const LAYOUT_KEY = 'dt_layout';
 const SCHEMA_VERSION = 1;
 
 function now() {
@@ -87,6 +93,7 @@ export function exportAll() {
     shortcuts: JSON.parse(localStorage.getItem(SHORTCUTS_KEY) || '[]'),
     todos: JSON.parse(localStorage.getItem(TODOS_KEY) || '[]'),
     notes: JSON.parse(localStorage.getItem(NOTES_KEY) || '[]'),
+    layout: JSON.parse(localStorage.getItem(LAYOUT_KEY) || 'null'),
   };
 
   const blob = new Blob([JSON.stringify(payload, null, 2)], {
@@ -121,6 +128,8 @@ export async function importAll(jsonText: string) {
     localStorage.setItem(TODOS_KEY, JSON.stringify(data.todos));
   if (Array.isArray(data.notes))
     localStorage.setItem(NOTES_KEY, JSON.stringify(data.notes));
+  if (data.layout && typeof data.layout === 'object')
+    localStorage.setItem(LAYOUT_KEY, JSON.stringify(data.layout));
 }
 
 export function resetAll() {
@@ -128,4 +137,35 @@ export function resetAll() {
   localStorage.removeItem(SHORTCUTS_KEY);
   localStorage.removeItem(TODOS_KEY);
   localStorage.removeItem(NOTES_KEY);
+  localStorage.removeItem(LAYOUT_KEY);
+}
+
+export function loadLayout(): LayoutState {
+  try {
+    const raw = localStorage.getItem(LAYOUT_KEY);
+
+    if (!raw) return { leftPanelWidth: 66, topWidgetHeight: 65 };
+
+    const parsed = JSON.parse(raw) as LayoutState;
+
+    if (
+      typeof parsed.leftPanelWidth !== 'number' ||
+      typeof parsed.topWidgetHeight !== 'number'
+    )
+      return { leftPanelWidth: 66, topWidgetHeight: 65 };
+
+    return parsed;
+  } catch {
+    return { leftPanelWidth: 66, topWidgetHeight: 65 };
+  }
+}
+
+export function saveLayout(next: Partial<LayoutState>) {
+  try {
+    const current = loadLayout();
+    const merged = { ...current, ...next };
+    localStorage.setItem(LAYOUT_KEY, JSON.stringify(merged));
+  } catch {
+    // ignore
+  }
 }

@@ -1,64 +1,16 @@
-import { useState } from 'react';
 import { ShortcutsWidget } from '~/components/widgets/shortcuts';
 import { TodosWidget } from '~/components/widgets/todos';
 import { NotesWidget } from '~/components/widgets/notes';
 import { ResizeHandle } from '~/components/common/resize-handle';
+import { useLayout } from '~/state/useLayout';
 
 export const MainLayout = () => {
-  const [leftPanelWidth, setLeftPanelWidth] = useState(66); // percentage
-  const [topWidgetHeight, setTopWidgetHeight] = useState(50); // percentage
-
-  const handleLeftPanelResize = (e: React.MouseEvent) => {
-    e.preventDefault();
-    const startX = e.clientX;
-    const startWidth = leftPanelWidth;
-    const container = (e.currentTarget as HTMLElement).parentElement;
-    if (!container) return;
-
-    const containerWidth = container.offsetWidth;
-
-    const handleMouseMove = (moveEvent: MouseEvent) => {
-      const deltaX = moveEvent.clientX - startX;
-      const deltaPercent = (deltaX / containerWidth) * 100;
-      const newWidth = Math.max(40, Math.min(80, startWidth + deltaPercent));
-      setLeftPanelWidth(newWidth);
-    };
-
-    const handleMouseUp = () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-    };
-
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
-  };
-
-  const handleTopWidgetResize = (e: React.MouseEvent) => {
-    e.preventDefault();
-    const startY = e.clientY;
-    const startHeight = topWidgetHeight;
-    const container = (e.currentTarget as HTMLElement).parentElement;
-    if (!container) return;
-
-    const containerHeight = container.offsetHeight;
-
-    const handleMouseMove = (moveEvent: MouseEvent) => {
-      const deltaY = moveEvent.clientY - startY;
-      const deltaPercent = (deltaY / containerHeight) * 100;
-      const newHeight = Math.max(20, Math.min(80, startHeight + deltaPercent));
-      setTopWidgetHeight(newHeight);
-    };
-
-    const handleMouseUp = () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-    };
-
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
-  };
-
-  const rightPanelWidth = 100 - leftPanelWidth;
+  const {
+    leftPanelWidth,
+    topWidgetHeight,
+    handleLeftPanelResize,
+    handleTopWidgetResize,
+  } = useLayout();
 
   return (
     <main className="m-4 rounded-lg overflow-hidden">
@@ -91,7 +43,7 @@ export const MainLayout = () => {
           onMouseDown={handleLeftPanelResize}
         />
 
-        <div style={{ width: `${rightPanelWidth}%` }} className="min-h-0">
+        <div style={{ width: `${100 - leftPanelWidth}%` }} className="min-h-0">
           <TodosWidget />
         </div>
       </div>

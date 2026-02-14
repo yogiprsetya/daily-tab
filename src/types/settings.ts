@@ -1,10 +1,15 @@
-export type ThemeSetting = "light" | "dark" | "system";
-export type Density = "compact" | "comfortable";
+export type ThemeSetting = 'light' | 'dark' | 'system';
+export type Density = 'compact' | 'comfortable';
 
 export type Settings = {
-  id: "global";
+  id: 'global';
   theme: ThemeSetting;
   density: Density;
   createdAt: number;
   updatedAt: number;
+};
+
+export type LayoutState = {
+  leftPanelWidth: number; // percent
+  topWidgetHeight: number; // percent
 };
