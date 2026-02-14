@@ -1,5 +1,5 @@
-import { useEffect, useId, useRef, useState } from "react";
-import { Button } from "~/components/ui/button";
+import { useEffect, useId, useRef, useState } from 'react';
+import { Button } from '~/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -7,7 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuCheckboxItem,
-} from "~/components/ui/dropdown-menu";
+} from '~/components/ui/dropdown-menu';
 import {
   Moon,
   Sun,
@@ -16,7 +16,7 @@ import {
   RotateCcw,
   StretchVertical,
   Settings as SettingsIcon,
-} from "lucide-react";
+} from 'lucide-react';
 import {
   applyDensity,
   applyTheme,
@@ -25,8 +25,8 @@ import {
   loadSettings,
   resetAll,
   saveSettings,
-} from "~/utils/settings";
-import type { Density, ThemeSetting } from "~/types/settings";
+} from '~/utils/settings';
+import type { Density, ThemeSetting } from '~/types/settings';
 
 export const Navbar = () => {
   // Lazy init from stored settings
@@ -43,12 +43,12 @@ export const Navbar = () => {
   }, [theme, density]);
 
   const toggleTheme = () => {
-    const next: ThemeSetting = theme === "dark" ? "light" : "dark";
+    const next: ThemeSetting = theme === 'dark' ? 'light' : 'dark';
     setTheme(next);
   };
 
   const toggleDensity = () => {
-    const next: Density = density === "compact" ? "comfortable" : "compact";
+    const next: Density = density === 'compact' ? 'comfortable' : 'compact';
     setDensity(next);
   };
 
@@ -71,14 +71,14 @@ export const Navbar = () => {
       applyTheme(s.theme);
       applyDensity(s.density);
     } catch (err) {
-      console.error("Import failed", err);
+      console.error('Import failed', err);
     } finally {
-      e.target.value = "";
+      e.target.value = '';
     }
   };
 
   const onReset = () => {
-    if (confirm("Reset all data? This cannot be undone.")) {
+    if (confirm('Reset all data? This cannot be undone.')) {
       resetAll();
       const s = loadSettings();
       setTheme(s.theme);
@@ -88,11 +88,9 @@ export const Navbar = () => {
     }
   };
 
-  // Dropdown closes automatically on item select via Radix
-
   return (
-    <header className="sticky top-0 z-50 w-full bg-background/80 backdrop-blur supports-backdrop-filter:bg-background/70 border-b">
-      <div className="mx-auto flex h-12 w-full items-center justify-end gap-1 px-4">
+    <header className="fixed top-4 right-4 z-50 bg-background/80 backdrop-blur supports-backdrop-filter:bg-background/70 border rounded-3xl shadow">
+      <div className="flex h-12 w-52 items-center justify-end gap-1 px-2">
         {/* Hidden file input for Import */}
         <input
           id={importId}
@@ -118,18 +116,18 @@ export const Navbar = () => {
 
           <DropdownMenuContent sideOffset={6} align="end" className="w-56">
             <DropdownMenuCheckboxItem
-              checked={theme === "dark"}
+              checked={theme === 'dark'}
               onCheckedChange={() => {
                 toggleTheme();
               }}
               aria-label="Toggle dark mode"
             >
-              {theme === "dark" ? <Moon aria-hidden /> : <Sun aria-hidden />}
+              {theme === 'dark' ? <Moon aria-hidden /> : <Sun aria-hidden />}
               <span>Dark mode</span>
             </DropdownMenuCheckboxItem>
 
             <DropdownMenuCheckboxItem
-              checked={density === "comfortable"}
+              checked={density === 'comfortable'}
               onCheckedChange={() => {
                 toggleDensity();
               }}
