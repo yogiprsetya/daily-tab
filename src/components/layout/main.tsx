@@ -8,11 +8,9 @@ import { useLayout } from '~/state/use-layout';
 export const MainLayout = () => {
   const {
     leftPanelWidth,
-    topWidgetHeight,
-    rightPanelHeight,
+    shortcutWidgetHeight,
     handleLeftPanelResize,
-    handleTopWidgetResize,
-    handleRightPanelResize,
+    handleShortcutWidgetResize,
   } = useLayout();
 
   return (
@@ -22,21 +20,27 @@ export const MainLayout = () => {
           style={{ width: `${leftPanelWidth}%` }}
           className="flex flex-col gap-0 min-w-0"
         >
-          <div style={{ height: `${topWidgetHeight}%` }} className="min-h-0">
+          <div
+            style={{ height: `${shortcutWidgetHeight}%` }}
+            className="min-h-0"
+          >
             <ShortcutsWidget />
           </div>
 
           {/* Resize Handle between top and bottom */}
           <ResizeHandle
             isHorizontal={true}
-            onMouseDown={handleTopWidgetResize}
+            onMouseDown={handleShortcutWidgetResize}
           />
 
-          <div
-            style={{ height: `${100 - topWidgetHeight}%` }}
-            className="min-h-0"
-          >
-            <NotesWidget />
+          <div className="flex gap-0 flex-1 min-h-0">
+            <div className="w-1/2 min-w-0">
+              <NotesWidget />
+            </div>
+
+            <div className="w-1/2 min-w-0">
+              <PendingWidget />
+            </div>
           </div>
         </div>
 
@@ -50,22 +54,7 @@ export const MainLayout = () => {
           style={{ width: `${100 - leftPanelWidth}%` }}
           className="flex flex-col gap-0 min-w-0"
         >
-          <div style={{ height: `${rightPanelHeight}%` }} className="min-h-0">
-            <TodosWidget />
-          </div>
-
-          {/* Resize Handle between todos and watch later */}
-          <ResizeHandle
-            isHorizontal={true}
-            onMouseDown={handleRightPanelResize}
-          />
-
-          <div
-            style={{ height: `${100 - rightPanelHeight}%` }}
-            className="min-h-0"
-          >
-            <PendingWidget />
-          </div>
+          <TodosWidget />
         </div>
       </div>
     </main>

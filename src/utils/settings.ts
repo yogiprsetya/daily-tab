@@ -16,8 +16,7 @@ const SCHEMA_VERSION = 1;
 
 const DEFAULT_LAYOUT_STATE = {
   leftPanelWidth: 66,
-  topWidgetHeight: 65,
-  rightPanelHeight: 50,
+  shortcutWidgetHeight: 65,
 };
 
 function now() {
@@ -175,8 +174,7 @@ export function loadLayout(): LayoutState {
 
     if (
       typeof parsed.leftPanelWidth !== 'number' ||
-      typeof parsed.topWidgetHeight !== 'number' ||
-      typeof parsed.rightPanelHeight !== 'number'
+      typeof parsed.shortcutWidgetHeight !== 'number'
     )
       return DEFAULT_LAYOUT_STATE;
 

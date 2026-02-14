@@ -11,6 +11,5 @@ export type Settings = {
 
 export type LayoutState = {
   leftPanelWidth: number;
-  topWidgetHeight: number;
-  rightPanelHeight: number;
+  shortcutWidgetHeight: number;
 };

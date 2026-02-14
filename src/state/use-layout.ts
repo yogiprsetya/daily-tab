@@ -6,17 +6,13 @@ export const useLayout = () => {
     () => loadLayout().leftPanelWidth
   );
 
-  const [topWidgetHeight, setTopWidgetHeight] = useState(
-    () => loadLayout().topWidgetHeight
-  );
-
-  const [rightPanelHeight, setRightPanelHeight] = useState(
-    () => loadLayout().rightPanelHeight
+  const [shortcutWidgetHeight, setShortcutWidgetHeight] = useState(
+    () => loadLayout().shortcutWidgetHeight
   );
 
   useEffect(() => {
-    saveLayout({ leftPanelWidth, topWidgetHeight, rightPanelHeight });
-  }, [leftPanelWidth, topWidgetHeight, rightPanelHeight]);
+    saveLayout({ leftPanelWidth, shortcutWidgetHeight });
+  }, [leftPanelWidth, shortcutWidgetHeight]);
 
   const handleLeftPanelResize = useCallback(
     (e: React.MouseEvent) => {
@@ -46,11 +42,11 @@ export const useLayout = () => {
     [leftPanelWidth]
   );
 
-  const handleTopWidgetResize = useCallback(
+  const handleShortcutWidgetResize = useCallback(
     (e: React.MouseEvent) => {
       e.preventDefault();
       const startY = e.clientY;
-      const startHeight = topWidgetHeight;
+      const startHeight = shortcutWidgetHeight;
       const container = (e.currentTarget as HTMLElement).parentElement;
       if (!container) return;
 
@@ -63,7 +59,7 @@ export const useLayout = () => {
           20,
           Math.min(80, startHeight + deltaPercent)
         );
-        setTopWidgetHeight(newHeight);
+        setShortcutWidgetHeight(newHeight);
       };
 
       const handleMouseUp = () => {
@@ -74,49 +70,13 @@ export const useLayout = () => {
       document.addEventListener('mousemove', handleMouseMove);
       document.addEventListener('mouseup', handleMouseUp);
     },
-    [topWidgetHeight]
-  );
-
-  const handleRightPanelResize = useCallback(
-    (e: React.MouseEvent) => {
-      e.preventDefault();
-      const startY = e.clientY;
-      const startHeight = rightPanelHeight;
-      const container = (e.currentTarget as HTMLElement).parentElement;
-      if (!container) return;
-
-      const containerHeight = container.offsetHeight;
-
-      const handleMouseMove = (moveEvent: MouseEvent) => {
-        const deltaY = moveEvent.clientY - startY;
-        const deltaPercent = (deltaY / containerHeight) * 100;
-        const newHeight = Math.max(
-          20,
-          Math.min(80, startHeight + deltaPercent)
-        );
-        setRightPanelHeight(newHeight);
-      };
-
-      const handleMouseUp = () => {
-        document.removeEventListener('mousemove', handleMouseMove);
-        document.removeEventListener('mouseup', handleMouseUp);
-      };
-
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
-    },
-    [rightPanelHeight]
+    [shortcutWidgetHeight]
   );
 
   return {
     leftPanelWidth,
-    setLeftPanelWidth,
-    topWidgetHeight,
-    setTopWidgetHeight,
-    rightPanelHeight,
-    setRightPanelHeight,
+    shortcutWidgetHeight,
     handleLeftPanelResize,
-    handleTopWidgetResize,
-    handleRightPanelResize,
+    handleShortcutWidgetResize,
   };
 };
