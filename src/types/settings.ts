@@ -10,6 +10,7 @@ export type Settings = {
 };
 
 export type LayoutState = {
-  leftPanelWidth: number; // percent
-  topWidgetHeight: number; // percent
+  leftPanelWidth: number;
+  topWidgetHeight: number;
+  rightPanelHeight: number;
 };

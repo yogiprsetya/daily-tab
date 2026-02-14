@@ -14,6 +14,12 @@ const NOTES_KEY = 'dt_notes';
 const LAYOUT_KEY = 'dt_layout';
 const SCHEMA_VERSION = 1;
 
+const DEFAULT_LAYOUT_STATE = {
+  leftPanelWidth: 66,
+  topWidgetHeight: 65,
+  rightPanelHeight: 50,
+};
+
 function now() {
   return Date.now();
 }
@@ -163,19 +169,20 @@ export function loadLayout(): LayoutState {
   try {
     const raw = localStorage.getItem(LAYOUT_KEY);
 
-    if (!raw) return { leftPanelWidth: 66, topWidgetHeight: 65 };
+    if (!raw) return DEFAULT_LAYOUT_STATE;
 
     const parsed = JSON.parse(raw) as LayoutState;
 
     if (
       typeof parsed.leftPanelWidth !== 'number' ||
-      typeof parsed.topWidgetHeight !== 'number'
+      typeof parsed.topWidgetHeight !== 'number' ||
+      typeof parsed.rightPanelHeight !== 'number'
     )
-      return { leftPanelWidth: 66, topWidgetHeight: 65 };
+      return DEFAULT_LAYOUT_STATE;
 
     return parsed;
   } catch {
-    return { leftPanelWidth: 66, topWidgetHeight: 65 };
+    return DEFAULT_LAYOUT_STATE;
   }
 }
 
