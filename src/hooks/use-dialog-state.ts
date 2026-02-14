@@ -16,7 +16,12 @@ export function useDialogState<T extends Record<string, any>>(
 
   const getDisplayValue = useCallback(
     (key: keyof T, defaultValue: any = '') => {
-      return editing ? editing[key] : (state[key] ?? defaultValue);
+      // Prioritize state changes over editing data
+      // eslint-disable-next-line no-prototype-builtins
+      if (state.hasOwnProperty(key)) {
+        return state[key] ?? defaultValue;
+      }
+      return editing ? editing[key] : defaultValue;
     },
     [editing, state]
   );

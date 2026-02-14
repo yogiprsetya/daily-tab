@@ -49,7 +49,7 @@ export const NotesWidget = () => {
             aria-label="Add note"
             onClick={() => setOpen(true)}
           >
-            <Plus className="h-4 w-4" />
+            <Plus className="size-4" />
           </Button>
         </div>
 
@@ -63,16 +63,17 @@ export const NotesWidget = () => {
               {notes.map((note) => (
                 <li
                   key={note.id}
-                  className="p-3 rounded-md bg-muted hover:bg-muted/80 transition-colors group border border-transparent hover:border-border"
+                  className="p-2 rounded-md bg-muted hover:bg-muted/80 transition-colors group border border-transparent hover:border-border"
                 >
                   <div className="flex items-start justify-between gap-2">
                     <button
                       onClick={() => handleEdit(note)}
                       className="flex-1 text-left hover:opacity-80 transition-opacity"
                     >
-                      <h3 className="text-sm font-medium text-foreground mb-1">
+                      <h3 className="text-sm font-medium text-foreground">
                         {note.title}
                       </h3>
+
                       <p className="text-xs text-muted-foreground line-clamp-2">
                         {note.content}
                       </p>
