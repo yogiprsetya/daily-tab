@@ -9,6 +9,7 @@ import {
   resetAll,
   saveSettings,
 } from '~/utils/settings';
+import { showConfirm } from '~/components/ui/alert-provider';
 
 function reloadAndApplySettings() {
   const s = loadSettings();
@@ -55,8 +56,9 @@ export function useSettings() {
     }
   };
 
-  const onReset = () => {
-    if (confirm('Reset all data? This cannot be undone.')) {
+  const onReset = async () => {
+    const ok = await showConfirm('Reset all data? This cannot be undone.');
+    if (ok) {
       resetAll();
       const s = reloadAndApplySettings();
       setTheme(s.theme);

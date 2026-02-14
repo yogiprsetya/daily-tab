@@ -4,6 +4,7 @@ import { Button } from '~/components/ui/button';
 import { ScrollArea } from '../ui/scroll-area';
 import { NoteDialog } from '../common/note-dialog';
 import { useNotes } from '~/state/use-notes';
+import { showConfirm } from '~/components/ui/alert-provider';
 import type { Note } from '~/types/notes';
 
 export const NotesWidget = () => {
@@ -16,8 +17,9 @@ export const NotesWidget = () => {
     setOpen(true);
   };
 
-  const handleDelete = (noteId: string) => {
-    if (confirm('Are you sure you want to delete this note?')) {
+  const handleDelete = async (noteId: string) => {
+    const ok = await showConfirm('Are you sure you want to delete this note?');
+    if (ok) {
       deleteNote(noteId);
     }
   };
@@ -65,7 +67,7 @@ export const NotesWidget = () => {
                   key={note.id}
                   className="p-2 rounded-md bg-muted hover:bg-muted/80 transition-colors group border border-transparent hover:border-border"
                 >
-                  <div className="flex items-start justify-between gap-2">
+                  <div className="flex items-start justify-between gap-2 group">
                     <button
                       onClick={() => handleEdit(note)}
                       className="flex-1 text-left hover:opacity-80 transition-opacity"
@@ -78,13 +80,16 @@ export const NotesWidget = () => {
                         {note.content}
                       </p>
                     </button>
-                    <button
+
+                    <Button
+                      size="icon-xs"
+                      variant="destructive"
+                      className="group-hover:opacity-75 opacity-0"
                       onClick={() => handleDelete(note.id)}
-                      className="p-1 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-destructive/10 rounded"
                       aria-label="Delete note"
                     >
-                      <Trash2 className="h-3 w-3 text-destructive" />
-                    </button>
+                      <Trash2 className="size-3" />
+                    </Button>
                   </div>
                 </li>
               ))}

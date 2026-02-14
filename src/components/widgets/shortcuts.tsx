@@ -5,6 +5,7 @@ import { ShortcutDialog } from '../common/shortcut-dialog';
 import { ShortcutTile, type Shortcut } from '../common/shortcut-tile';
 import { loadShortcuts, saveShortcuts } from '~/utils/settings';
 import { ScrollArea } from '../ui/scroll-area';
+import { showConfirm } from '~/components/ui/alert-provider';
 
 export const ShortcutsWidget = () => {
   const [shortcuts, setShortcuts] = useState<Shortcut[]>(() => loadShortcuts());
@@ -21,8 +22,9 @@ export const ShortcutsWidget = () => {
     setOpen(true);
   };
 
-  const handleDelete = (id: string) => {
-    if (!window.confirm('Delete this shortcut?')) return;
+  const handleDelete = async (id: string) => {
+    const ok = await showConfirm('Delete this shortcut?', 'Delete shortcut');
+    if (!ok) return;
     persist(shortcuts.filter((s) => s.id !== id));
   };
 
