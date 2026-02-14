@@ -26,7 +26,7 @@ export const ShortcutsWidget = () => {
   };
 
   return (
-    <div className="h-full flex flex-col bg-card rounded-lg border p-4">
+    <div className="h-full flex flex-col bg-card p-4">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold text-foreground">Shortcuts</h2>
         <div className="flex items-center gap-2">

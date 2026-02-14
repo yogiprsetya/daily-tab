@@ -62,7 +62,7 @@ export const ShortcutTile: React.FC<Props> = ({ s, onEdit, onDelete }) => {
       <a
         href={url}
         rel="noreferrer"
-        className="aspect-square bg-muted rounded border border-border flex flex-col items-center justify-center gap-2 p-3 hover:shadow-sm"
+        className="aspect-square bg-muted rounded flex flex-col items-center justify-center gap-2 p-3 hover:shadow-sm"
       >
         <img
           src={primary || fallback}
