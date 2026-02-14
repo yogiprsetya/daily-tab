@@ -6,13 +6,35 @@ import type {
 } from '~/types/settings';
 import type { StoredShortcut } from '~/types/shortcuts';
 
-const SETTINGS_KEY = 'dt_settings';
-const SHORTCUTS_KEY = 'dt_shortcuts';
-const NAVBAR_LINKS_KEY = 'dt_navbar_links';
-const TODOS_KEY = 'dt_todos';
-const NOTES_KEY = 'dt_notes';
-const LAYOUT_KEY = 'dt_layout';
+const STORAGE_KEYS = {
+  SETTINGS: 'dt_settings',
+  SHORTCUTS: 'dt_shortcuts',
+  NAVBAR_LINKS: 'dt_navbar_links',
+  TODOS: 'dt_todos',
+  NOTES: 'dt_notes',
+  LAYOUT: 'dt_layout',
+} as const;
+
 const SCHEMA_VERSION = 1;
+
+// Generic storage load/save with JSON parsing
+function loadFromStorage<T>(key: string, fallback: T): T {
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return fallback;
+    return JSON.parse(raw) as T;
+  } catch {
+    return fallback;
+  }
+}
+
+function saveToStorage<T>(key: string, value: T): void {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    // ignore
+  }
+}
 
 const DEFAULT_LAYOUT_STATE = {
   leftPanelWidth: 66,
@@ -38,56 +60,29 @@ function defaultSettings(): Settings {
 }
 
 export function loadSettings(): Settings {
-  try {
-    const raw = localStorage.getItem(SETTINGS_KEY);
-    if (!raw) return defaultSettings();
-    const parsed = JSON.parse(raw) as Settings;
-    return parsed;
-  } catch {
-    return defaultSettings();
-  }
+  return loadFromStorage(STORAGE_KEYS.SETTINGS, defaultSettings());
 }
 
 export function saveSettings(partial: Partial<Settings>) {
   const current = loadSettings();
   const next: Settings = { ...current, ...partial, updatedAt: now() };
-  localStorage.setItem(SETTINGS_KEY, JSON.stringify(next));
+  saveToStorage(STORAGE_KEYS.SETTINGS, next);
 }
 
 export function loadShortcuts(): StoredShortcut[] {
-  try {
-    const raw = localStorage.getItem(SHORTCUTS_KEY) || '[]';
-    const parsed = JSON.parse(raw) as StoredShortcut[];
-    return parsed;
-  } catch {
-    return [];
-  }
+  return loadFromStorage(STORAGE_KEYS.SHORTCUTS, []);
 }
 
 export function saveShortcuts(list: StoredShortcut[]) {
-  try {
-    localStorage.setItem(SHORTCUTS_KEY, JSON.stringify(list));
-  } catch {
-    // ignore
-  }
+  saveToStorage(STORAGE_KEYS.SHORTCUTS, list);
 }
 
 export function loadNavbarLinks(): StoredShortcut[] {
-  try {
-    const raw = localStorage.getItem(NAVBAR_LINKS_KEY) || '[]';
-    const parsed = JSON.parse(raw) as StoredShortcut[];
-    return parsed;
-  } catch {
-    return [];
-  }
+  return loadFromStorage(STORAGE_KEYS.NAVBAR_LINKS, []);
 }
 
 export function saveNavbarLinks(list: StoredShortcut[]) {
-  try {
-    localStorage.setItem(NAVBAR_LINKS_KEY, JSON.stringify(list));
-  } catch {
-    // ignore
-  }
+  saveToStorage(STORAGE_KEYS.NAVBAR_LINKS, list);
 }
 
 export function applyTheme(theme: ThemeSetting) {
@@ -109,12 +104,14 @@ export function applyDensity(density: Density) {
 export function exportAll() {
   const payload = {
     schemaVersion: SCHEMA_VERSION,
-    settings: JSON.parse(localStorage.getItem(SETTINGS_KEY) || 'null'),
-    shortcuts: JSON.parse(localStorage.getItem(SHORTCUTS_KEY) || '[]'),
-    navbarLinks: JSON.parse(localStorage.getItem(NAVBAR_LINKS_KEY) || '[]'),
-    todos: JSON.parse(localStorage.getItem(TODOS_KEY) || '[]'),
-    notes: JSON.parse(localStorage.getItem(NOTES_KEY) || '[]'),
-    layout: JSON.parse(localStorage.getItem(LAYOUT_KEY) || 'null'),
+    settings: JSON.parse(localStorage.getItem(STORAGE_KEYS.SETTINGS) || 'null'),
+    shortcuts: JSON.parse(localStorage.getItem(STORAGE_KEYS.SHORTCUTS) || '[]'),
+    navbarLinks: JSON.parse(
+      localStorage.getItem(STORAGE_KEYS.NAVBAR_LINKS) || '[]'
+    ),
+    todos: JSON.parse(localStorage.getItem(STORAGE_KEYS.TODOS) || '[]'),
+    notes: JSON.parse(localStorage.getItem(STORAGE_KEYS.NOTES) || '[]'),
+    layout: JSON.parse(localStorage.getItem(STORAGE_KEYS.LAYOUT) || 'null'),
   };
 
   const blob = new Blob([JSON.stringify(payload, null, 2)], {
@@ -142,54 +139,48 @@ export async function importAll(jsonText: string) {
   if (notesText.length > 2_000_000) throw new Error('Import too large');
 
   if (data.settings)
-    localStorage.setItem(SETTINGS_KEY, JSON.stringify(data.settings));
+    localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(data.settings));
   if (Array.isArray(data.shortcuts))
-    localStorage.setItem(SHORTCUTS_KEY, JSON.stringify(data.shortcuts));
+    localStorage.setItem(
+      STORAGE_KEYS.SHORTCUTS,
+      JSON.stringify(data.shortcuts)
+    );
   if (Array.isArray(data.navbarLinks))
-    localStorage.setItem(NAVBAR_LINKS_KEY, JSON.stringify(data.navbarLinks));
+    localStorage.setItem(
+      STORAGE_KEYS.NAVBAR_LINKS,
+      JSON.stringify(data.navbarLinks)
+    );
   if (Array.isArray(data.todos))
-    localStorage.setItem(TODOS_KEY, JSON.stringify(data.todos));
+    localStorage.setItem(STORAGE_KEYS.TODOS, JSON.stringify(data.todos));
   if (Array.isArray(data.notes))
-    localStorage.setItem(NOTES_KEY, JSON.stringify(data.notes));
+    localStorage.setItem(STORAGE_KEYS.NOTES, JSON.stringify(data.notes));
   if (data.layout && typeof data.layout === 'object')
-    localStorage.setItem(LAYOUT_KEY, JSON.stringify(data.layout));
+    localStorage.setItem(STORAGE_KEYS.LAYOUT, JSON.stringify(data.layout));
 }
 
 export function resetAll() {
-  localStorage.removeItem(SETTINGS_KEY);
-  localStorage.removeItem(SHORTCUTS_KEY);
-  localStorage.removeItem(NAVBAR_LINKS_KEY);
-  localStorage.removeItem(TODOS_KEY);
-  localStorage.removeItem(NOTES_KEY);
-  localStorage.removeItem(LAYOUT_KEY);
+  localStorage.removeItem(STORAGE_KEYS.SETTINGS);
+  localStorage.removeItem(STORAGE_KEYS.SHORTCUTS);
+  localStorage.removeItem(STORAGE_KEYS.NAVBAR_LINKS);
+  localStorage.removeItem(STORAGE_KEYS.TODOS);
+  localStorage.removeItem(STORAGE_KEYS.NOTES);
+  localStorage.removeItem(STORAGE_KEYS.LAYOUT);
 }
 
 export function loadLayout(): LayoutState {
-  try {
-    const raw = localStorage.getItem(LAYOUT_KEY);
+  const parsed = loadFromStorage(STORAGE_KEYS.LAYOUT, DEFAULT_LAYOUT_STATE);
 
-    if (!raw) return DEFAULT_LAYOUT_STATE;
-
-    const parsed = JSON.parse(raw) as LayoutState;
-
-    if (
-      typeof parsed.leftPanelWidth !== 'number' ||
-      typeof parsed.shortcutWidgetHeight !== 'number'
-    )
-      return DEFAULT_LAYOUT_STATE;
-
-    return parsed;
-  } catch {
+  if (
+    typeof parsed.leftPanelWidth !== 'number' ||
+    typeof parsed.shortcutWidgetHeight !== 'number'
+  )
     return DEFAULT_LAYOUT_STATE;
-  }
+
+  return parsed;
 }
 
 export function saveLayout(next: Partial<LayoutState>) {
-  try {
-    const current = loadLayout();
-    const merged = { ...current, ...next };
-    localStorage.setItem(LAYOUT_KEY, JSON.stringify(merged));
-  } catch {
-    // ignore
-  }
+  const current = loadLayout();
+  const merged = { ...current, ...next };
+  saveToStorage(STORAGE_KEYS.LAYOUT, merged);
 }

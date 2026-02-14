@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { Button } from '~/components/ui/button';
 import {
   Dialog,
@@ -8,6 +8,7 @@ import {
 } from '~/components/ui/dialog';
 import { Input } from '~/components/ui/input';
 import type { Note } from '~/types/notes';
+import { useDialogState } from '~/hooks/use-dialog-state';
 
 type Props = {
   open: boolean;
@@ -22,13 +23,8 @@ export const NoteDialog: React.FC<Props> = ({
   editing,
   onSave,
 }) => {
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
+  const { resetState, updateState, getDisplayValue } = useDialogState(editing);
   const contentRef = useRef<HTMLTextAreaElement>(null);
-
-  // Use editing values if available, otherwise use local state
-  const displayTitle = editing ? editing.title : title;
-  const displayContent = editing ? editing.content : content;
 
   // Auto-focus content when dialog opens
   useEffect(() => {
@@ -38,21 +34,17 @@ export const NoteDialog: React.FC<Props> = ({
   }, [open]);
 
   const handleSave = () => {
-    const t = (editing ? displayTitle : title).trim();
-    const c = (editing ? displayContent : content).trim();
+    const t = getDisplayValue('title', '').trim();
+    const c = getDisplayValue('content', '').trim();
     if (!t || !c) return;
     onSave({ title: t, content: c });
     onOpenChange(false);
-    setTitle('');
-    setContent('');
+    resetState();
   };
 
   const handleOpenChange = (open: boolean) => {
     onOpenChange(open);
-    if (!open) {
-      setTitle('');
-      setContent('');
-    }
+    if (!open) resetState();
   };
 
   return (
@@ -62,8 +54,8 @@ export const NoteDialog: React.FC<Props> = ({
         <div className="px-6 pt-6 pb-0 border-b border-border/50">
           <Input
             id="note-title"
-            value={displayTitle}
-            onChange={(e) => setTitle(e.target.value)}
+            value={getDisplayValue('title', '')}
+            onChange={(e) => updateState('title', e.target.value)}
             placeholder="Title"
             className="text-xl font-semibold h-auto border-0 bg-transparent px-0 py-2 focus-visible:ring-0 placeholder:text-muted-foreground/50"
           />
@@ -74,18 +66,18 @@ export const NoteDialog: React.FC<Props> = ({
           <textarea
             ref={contentRef}
             id="note-content"
-            value={displayContent}
-            onChange={(e) => setContent(e.target.value)}
+            value={getDisplayValue('content', '')}
+            onChange={(e) => updateState('content', e.target.value)}
             placeholder="Start typing..."
             className="flex-1 w-full bg-transparent text-base leading-relaxed resize-none border-0 focus-visible:outline-none focus-visible:ring-0 placeholder:text-muted-foreground/40 font-normal"
-            style={{
-              fontFamily: 'inherit',
-            }}
           />
           {/* Word count - subtle hint */}
           <div className="text-xs text-muted-foreground/50 mt-4 pt-2 border-t border-border/30">
-            {displayContent.trim().split(/\s+/).filter(Boolean).length} words •{' '}
-            {displayContent.length} characters
+            {
+              getDisplayValue('content', '').trim().split(/\s+/).filter(Boolean)
+                .length
+            }{' '}
+            words • {getDisplayValue('content', '').length} characters
           </div>
         </div>
 

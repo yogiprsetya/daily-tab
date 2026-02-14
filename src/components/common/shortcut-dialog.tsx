@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Button } from '~/components/ui/button';
 import {
   Dialog,
@@ -12,6 +11,7 @@ import {
 import { Input } from '~/components/ui/input';
 import type { Shortcut } from './shortcut-tile';
 import { Label } from '../ui/label';
+import { useDialogState } from '~/hooks/use-dialog-state';
 
 type Props = {
   open: boolean;
@@ -26,30 +26,20 @@ export const ShortcutDialog: React.FC<Props> = ({
   editing,
   onSave,
 }) => {
-  const [title, setTitle] = useState('');
-  const [url, setUrl] = useState('');
-
-  // Use editing values if available, otherwise use local state
-  const displayTitle = editing ? editing.title : title;
-  const displayUrl = editing ? editing.url : url;
+  const { resetState, updateState, getDisplayValue } = useDialogState(editing);
 
   const handleSave = () => {
-    const t = (editing ? displayTitle : title).trim();
-    const u = (editing ? displayUrl : url).trim();
+    const t = getDisplayValue('title', '').trim();
+    const u = getDisplayValue('url', '').trim();
     if (!t || !u) return;
     onSave({ title: t, url: u });
     onOpenChange(false);
-    setTitle('');
-    setUrl('');
+    resetState();
   };
 
   const handleOpenChange = (open: boolean) => {
     onOpenChange(open);
-
-    if (!open) {
-      setTitle('');
-      setUrl('');
-    }
+    if (!open) resetState();
   };
 
   return (
@@ -70,16 +60,16 @@ export const ShortcutDialog: React.FC<Props> = ({
           <Label className="text-sm text-muted-foreground">Title</Label>
 
           <Input
-            value={displayTitle}
-            onChange={(e) => setTitle(e.target.value)}
+            value={getDisplayValue('title', '')}
+            onChange={(e) => updateState('title', e.target.value)}
             placeholder="e.g. GitHub"
           />
 
           <Label className="text-sm text-muted-foreground">URL</Label>
 
           <Input
-            value={displayUrl}
-            onChange={(e) => setUrl(e.target.value)}
+            value={getDisplayValue('url', '')}
+            onChange={(e) => updateState('url', e.target.value)}
             placeholder="https://github.com"
           />
         </div>

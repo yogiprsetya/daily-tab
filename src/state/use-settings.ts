@@ -10,6 +10,13 @@ import {
   saveSettings,
 } from '~/utils/settings';
 
+function reloadAndApplySettings() {
+  const s = loadSettings();
+  applyTheme(s.theme);
+  applyDensity(s.density);
+  return s;
+}
+
 export function useSettings() {
   const [theme, setTheme] = useState<ThemeSetting>(() => loadSettings().theme);
   const [density, setDensity] = useState<Density>(() => loadSettings().density);
@@ -38,11 +45,9 @@ export function useSettings() {
     try {
       const text = await file.text();
       await importAll(text);
-      const s = loadSettings();
+      const s = reloadAndApplySettings();
       setTheme(s.theme);
       setDensity(s.density);
-      applyTheme(s.theme);
-      applyDensity(s.density);
     } catch (err) {
       console.error('Import failed', err);
     } finally {
@@ -53,11 +58,9 @@ export function useSettings() {
   const onReset = () => {
     if (confirm('Reset all data? This cannot be undone.')) {
       resetAll();
-      const s = loadSettings();
+      const s = reloadAndApplySettings();
       setTheme(s.theme);
       setDensity(s.density);
-      applyTheme(s.theme);
-      applyDensity(s.density);
     }
   };
 
