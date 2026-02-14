@@ -3,6 +3,7 @@
 // Provides: theme + density persistence and JSON export/import/reset for all stores.
 
 import type { Density, Settings, ThemeSetting } from '~/types/settings';
+import type { StoredShortcut } from '~/types/shortcuts';
 
 const SETTINGS_KEY = 'dt_settings';
 const SHORTCUTS_KEY = 'dt_shortcuts';
@@ -43,6 +44,24 @@ export function saveSettings(partial: Partial<Settings>) {
   const current = loadSettings();
   const next: Settings = { ...current, ...partial, updatedAt: now() };
   localStorage.setItem(SETTINGS_KEY, JSON.stringify(next));
+}
+
+export function loadShortcuts(): StoredShortcut[] {
+  try {
+    const raw = localStorage.getItem(SHORTCUTS_KEY) || '[]';
+    const parsed = JSON.parse(raw) as StoredShortcut[];
+    return parsed;
+  } catch {
+    return [];
+  }
+}
+
+export function saveShortcuts(list: StoredShortcut[]) {
+  try {
+    localStorage.setItem(SHORTCUTS_KEY, JSON.stringify(list));
+  } catch {
+    // ignore
+  }
 }
 
 export function applyTheme(theme: ThemeSetting) {
