@@ -4,8 +4,8 @@ import { NotesWidget } from '~/components/widgets/notes';
 
 export const MainLayout = () => {
   return (
-    <main className="p-4">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 h-[calc(100vh-32px)]">
+    <main className="m-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 h-[calc(100vh-86px)]">
         <div className="lg:col-span-2 grid grid-rows-[1fr_auto] gap-4">
           <div className="min-h-0">
             <ShortcutsWidget />

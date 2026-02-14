@@ -89,8 +89,8 @@ export const Navbar = () => {
   };
 
   return (
-    <header className="fixed bottom-2 opacity-60 hover:opacity-100 right-2 z-50 bg-background/80 backdrop-blur supports-backdrop-filter:bg-background/70 border rounded-3xl shadow">
-      <div className="flex h-12 w-52 items-center justify-end gap-1 px-2">
+    <header className="bg-background/80 border-b shadow w-full">
+      <div className="flex h-12 w-full items-center justify-end gap-1 px-2">
         {/* Hidden file input for Import */}
         <input
           id={importId}

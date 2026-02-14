@@ -3,10 +3,10 @@ import { MainLayout } from './components/layout/main';
 
 function App() {
   return (
-    <>
-      <MainLayout />
+    <div className="h-screen">
       <Navbar />
-    </>
+      <MainLayout />
+    </div>
   );
 }
 
