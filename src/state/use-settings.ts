@@ -8,7 +8,7 @@ function reloadAndApplySettings() {
   const rawSettings = settingsAdapter.loadSettings();
   // For now, use defaults if not present
   const s = {
-    theme: (rawSettings?.theme || 'light') as ThemeSetting,
+    theme: (rawSettings?.theme || 'system') as ThemeSetting,
     density: (rawSettings?.density || 'compact') as Density,
   };
   domAdapter.applyTheme(s.theme);
@@ -19,7 +19,7 @@ function reloadAndApplySettings() {
 export function useSettings() {
   const [theme, setTheme] = useState<ThemeSetting>(() => {
     const settings = settingsAdapter.loadSettings();
-    return (settings?.theme || 'light') as ThemeSetting;
+    return (settings?.theme || 'system') as ThemeSetting;
   });
   const [density, setDensity] = useState<Density>(() => {
     const settings = settingsAdapter.loadSettings();

@@ -19,7 +19,7 @@ const STORAGE_KEYS = {
 
 const DEFAULT_SETTINGS: Settings = {
   id: 'global',
-  theme: 'light',
+  theme: 'system',
   density: 'compact',
   createdAt: Date.now(),
   updatedAt: Date.now(),
