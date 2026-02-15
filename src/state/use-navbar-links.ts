@@ -1,17 +1,19 @@
 import { useCallback, useState } from 'react';
 import type { StoredShortcut } from '~/types/shortcuts';
-import { loadNavbarLinks, saveNavbarLinks } from '~/utils/settings';
+import { settingsAdapter } from '~/adapters';
 
 export function useNavbarLinks() {
-  const [links, setLinks] = useState<StoredShortcut[]>(() => loadNavbarLinks());
+  const [links, setLinks] = useState<StoredShortcut[]>(() =>
+    settingsAdapter.loadNavbarLinks()
+  );
 
   const refresh = useCallback(() => {
-    setLinks(loadNavbarLinks());
+    setLinks(settingsAdapter.loadNavbarLinks());
   }, []);
 
   const persist = useCallback((next: StoredShortcut[]) => {
     setLinks(next);
-    saveNavbarLinks(next);
+    settingsAdapter.saveNavbarLinks(next);
   }, []);
 
   const addLink = useCallback(
@@ -27,7 +29,7 @@ export function useNavbarLinks() {
         createdAt: Date.now(),
         updatedAt: Date.now(),
       };
-      const next = [item, ...loadNavbarLinks()];
+      const next = [item, ...settingsAdapter.loadNavbarLinks()];
       persist(next.slice(0, 5));
       return true;
     },

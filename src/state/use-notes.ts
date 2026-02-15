@@ -1,27 +1,13 @@
 import { useCallback, useState } from 'react';
 import type { Note } from '~/types/notes';
-
-const NOTES_STORAGE_KEY = 'daily-tab-notes';
-
-function loadNotes(): Note[] {
-  try {
-    const stored = localStorage.getItem(NOTES_STORAGE_KEY);
-    return stored ? JSON.parse(stored) : [];
-  } catch {
-    return [];
-  }
-}
-
-function saveNotes(notes: Note[]): void {
-  localStorage.setItem(NOTES_STORAGE_KEY, JSON.stringify(notes));
-}
+import { notesAdapter } from '~/adapters';
 
 function generateId(): string {
   return Date.now().toString(36) + Math.random().toString(36).slice(2);
 }
 
 export function useNotes() {
-  const [notes, setNotes] = useState<Note[]>(() => loadNotes());
+  const [notes, setNotes] = useState<Note[]>(() => notesAdapter.load());
 
   // CREATE
   const addNote = useCallback(
@@ -35,7 +21,7 @@ export function useNotes() {
       };
       const updated = [...notes, newNote];
       setNotes(updated);
-      saveNotes(updated);
+      notesAdapter.save(updated);
       return newNote;
     },
     [notes]
@@ -68,7 +54,7 @@ export function useNotes() {
           : note
       );
       setNotes(updated);
-      saveNotes(updated);
+      notesAdapter.save(updated);
       return updated.find((note) => note.id === id);
     },
     [notes]
@@ -79,7 +65,7 @@ export function useNotes() {
     (id: string) => {
       const updated = notes.filter((note) => note.id !== id);
       setNotes(updated);
-      saveNotes(updated);
+      notesAdapter.save(updated);
     },
     [notes]
   );
@@ -87,7 +73,7 @@ export function useNotes() {
   // DELETE ALL
   const deleteAllNotes = useCallback(() => {
     setNotes([]);
-    saveNotes([]);
+    notesAdapter.clear();
   }, []);
 
   return {

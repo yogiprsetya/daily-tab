@@ -3,18 +3,20 @@ import { useState } from 'react';
 import { Button } from '~/components/ui/button';
 import { ShortcutDialog } from '../common/shortcut-dialog';
 import { ShortcutTile, type Shortcut } from '../common/shortcut-tile';
-import { loadShortcuts, saveShortcuts } from '~/utils/settings';
+import { settingsAdapter } from '~/adapters';
 import { ScrollArea } from '../ui/scroll-area';
 import { showConfirm } from '~/components/ui/alert-provider';
 
 export const ShortcutsWidget = () => {
-  const [shortcuts, setShortcuts] = useState<Shortcut[]>(() => loadShortcuts());
+  const [shortcuts, setShortcuts] = useState<Shortcut[]>(() =>
+    settingsAdapter.loadShortcuts()
+  );
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Shortcut | null>(null);
 
   const persist = (next: Shortcut[]) => {
     setShortcuts(next);
-    saveShortcuts(next);
+    settingsAdapter.saveShortcuts(next);
   };
 
   const openEdit = (s: Shortcut) => {

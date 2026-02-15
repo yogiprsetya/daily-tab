@@ -1,17 +1,17 @@
 import { useState, useEffect, useCallback } from 'react';
-import { loadLayout, saveLayout } from '~/utils/settings';
+import { settingsAdapter } from '~/adapters';
 
 export const useLayout = () => {
   const [leftPanelWidth, setLeftPanelWidth] = useState(
-    () => loadLayout().leftPanelWidth
+    () => settingsAdapter.loadLayout().leftPanelWidth
   );
 
   const [shortcutWidgetHeight, setShortcutWidgetHeight] = useState(
-    () => loadLayout().shortcutWidgetHeight
+    () => settingsAdapter.loadLayout().shortcutWidgetHeight
   );
 
   useEffect(() => {
-    saveLayout({ leftPanelWidth, shortcutWidgetHeight });
+    settingsAdapter.saveLayout({ leftPanelWidth, shortcutWidgetHeight });
   }, [leftPanelWidth, shortcutWidgetHeight]);
 
   const handleLeftPanelResize = useCallback(
