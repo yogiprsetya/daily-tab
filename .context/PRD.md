@@ -11,6 +11,7 @@ Scope
 - Override Chrome New Tab.
 - Single page; no router; no sidebar.
 - Settings live in the header.
+- Header displays up to 5 user-defined navbar links for quick access.
 - Dark/Light mode; three core widgets: Shortcut, Todo list, Notes.
 - Local export/import.
 
@@ -41,7 +42,7 @@ Layout Map
 - Top-left: Shortcut widget
 - Right: Todo list widget
 - Bottom-left: Notes widget
-- Header: settings only (theme, density, export/import, reset)
+- Header: settings + navbar links (theme, density, export/import, reset; max 5 quick links)
 
 Detailed layout is documented in `Layout.md`.
 
@@ -55,6 +56,14 @@ Widgets
 - CRUD: add/edit/delete; drag or arrow reorder; optional pin.
 - Keyboard: S add; J/K or arrows navigate; Enter activate; Esc dismiss overlay.
 - Tagging: add/remove tags; filter by tag; overlay search matches titles and tags.
+
+## Navbar Links (header)
+
+- Display: up to 5 simple links (title + URL) shown in the header for one-click access.
+- Open behavior: click opens the link (current tab); target behavior can be adjusted per anchor.
+- CRUD: add, inline edit, and delete via a management dialog; capped at 5 items.
+- Persistence: local-first; stored under `dt_navbar_links`.
+- Keyboard: none in MVP to avoid conflicts; manage via mouse/trackpad.
 
 Todo list widget (right)
 
@@ -117,7 +126,7 @@ Frontend
   - Similar hooks for todos, notes, and shortcuts planned.
 - **Components**:
   - Header/Navbar with navbar link display and dialog trigger.
-  - ShortcutsDialog (decoupled) — add/manage navbar links.
+  - NavbarLinkDialog — add/manage navbar links.
   - Shortcut, Todo, Notes widgets in main layout.
   - Modular UI primitives from shadcn/ui.
 - Drag-and-drop via native HTML5 or lightweight lib.
@@ -161,6 +170,7 @@ Acceptance Criteria
 - Shortcut widget: direct open + overlay open-in-new-tab; CRUD + reorder persist; tags supported.
 - Todo list widget: add/edit/delete; toggle done; filters persist.
 - Notes widget: multiple notes CRUD; reorder; autosave; persist and restore on reload.
+- Navbar links: add/edit/delete; max 5; persist to storage; display in header and open links correctly.
 - Export produces valid JSON; Import restores full state.
 - Single page (no router); no sidebar; header-only settings; no logo/brand text.
 - All features operate fully offline.

@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "Daily Tab",
+  "version": "0.0.1",
+  "description": "Turn your New Tab into a sleek daily dashboard: todos, notes, shortcuts, and focus tools at a glance.",
+  "chrome_url_overrides": {
+    "newtab": "index.html"
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "yogiprsetya@gmail.com",
+      "strict_min_version": "109.0"
+    }
+  }
+}
