@@ -45,6 +45,7 @@ export const NotesWidget = () => {
       <ScrollArea className="h-full flex flex-col bg-card p-4">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-foreground">Notes</h2>
+
           <Button
             size="icon-sm"
             variant="ghost"
@@ -67,7 +68,7 @@ export const NotesWidget = () => {
                   key={note.id}
                   className="p-2 rounded-md bg-muted hover:bg-muted/80 transition-colors group border border-transparent hover:border-border"
                 >
-                  <div className="flex items-start justify-between gap-2 group">
+                  <div className="relative group">
                     <button
                       onClick={() => handleEdit(note)}
                       className="flex-1 text-left hover:opacity-80 transition-opacity"
@@ -76,15 +77,15 @@ export const NotesWidget = () => {
                         {note.title}
                       </h3>
 
-                      <p className="text-xs text-muted-foreground line-clamp-2">
-                        {note.content}
+                      <p className="text-xs text-muted-foreground line-clamp-1">
+                        {note.content.slice(0, 150)}
                       </p>
                     </button>
 
                     <Button
                       size="icon-xs"
                       variant="destructive"
-                      className="group-hover:opacity-75 opacity-0"
+                      className="group-hover:opacity-75 opacity-0 absolute top-0 right-0"
                       onClick={() => handleDelete(note.id)}
                       aria-label="Delete note"
                     >
