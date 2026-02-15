@@ -135,6 +135,7 @@ export const PendingWidget = () => {
         onOpenChange={setDialogOpen}
         editing={editing}
         onSave={handleSave}
+        onDelete={(id) => deleteItem(id)}
       />
     </ScrollArea>
   );

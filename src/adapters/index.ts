@@ -21,3 +21,8 @@ export {
   createPendingAdapter,
   type PendingAdapter,
 } from './pending.adapter';
+export {
+  todosAdapter,
+  createTodosAdapter,
+  type TodosAdapter,
+} from './todos.adapter';

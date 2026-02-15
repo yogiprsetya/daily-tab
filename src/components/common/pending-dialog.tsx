@@ -17,12 +17,14 @@ import {
 } from '~/components/ui/select';
 import type { PendingItem, PendingType } from '~/types/pending';
 import { useDialogState } from '~/hooks/use-dialog-state';
+import { showAlert } from '~/components/ui/alert-provider';
 
 type Props = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   editing: PendingItem | null;
   onSave: (data: { title: string; type: PendingType; url?: string }) => void;
+  onDelete?: (id: string) => void;
 };
 
 export const PendingDialog: React.FC<Props> = ({
@@ -30,6 +32,7 @@ export const PendingDialog: React.FC<Props> = ({
   onOpenChange,
   editing,
   onSave,
+  onDelete,
 }) => {
   const { resetState, updateState, getDisplayValue } = useDialogState(editing);
   const titleRef = useRef<HTMLInputElement>(null);
@@ -53,6 +56,14 @@ export const PendingDialog: React.FC<Props> = ({
   const handleOpenChange = (open: boolean) => {
     onOpenChange(open);
     if (!open) resetState();
+  };
+
+  const handleDelete = async () => {
+    if (!editing || !onDelete) return;
+    onDelete(editing.id);
+    await showAlert('Pending item deleted');
+    onOpenChange(false);
+    resetState();
   };
 
   return (
@@ -105,6 +116,12 @@ export const PendingDialog: React.FC<Props> = ({
         </div>
 
         <DialogFooter className="pt-4">
+          {editing && onDelete ? (
+            <Button variant="destructive" onClick={handleDelete}>
+              Delete
+            </Button>
+          ) : null}
+
           <DialogClose asChild>
             <Button variant="outline">Cancel</Button>
           </DialogClose>
