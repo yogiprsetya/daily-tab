@@ -9,8 +9,8 @@ import {
   DialogClose,
 } from '~/components/ui/dialog';
 import { useNavbarLinks } from '~/state/use-navbar-links';
-import { Label } from '../ui/label';
 import { Input } from '../ui/input';
+import { Label } from '../ui/label';
 
 type Props = {
   open: boolean;

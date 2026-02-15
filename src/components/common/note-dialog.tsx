@@ -1,4 +1,3 @@
-import { useEffect, useRef } from 'react';
 import { Button } from '~/components/ui/button';
 import {
   Dialog,
@@ -9,6 +8,7 @@ import {
 import { Input } from '~/components/ui/input';
 import type { Note } from '~/types/notes';
 import { useDialogState } from '~/hooks/use-dialog-state';
+import { useAutoFocus } from '~/hooks/use-auto-focus';
 
 type Props = {
   open: boolean;
@@ -24,14 +24,7 @@ export const NoteDialog: React.FC<Props> = ({
   onSave,
 }) => {
   const { resetState, updateState, getDisplayValue } = useDialogState(editing);
-  const contentRef = useRef<HTMLTextAreaElement>(null);
-
-  // Auto-focus content when dialog opens
-  useEffect(() => {
-    if (open && contentRef.current) {
-      setTimeout(() => contentRef.current?.focus(), 0);
-    }
-  }, [open]);
+  const contentRef = useAutoFocus<HTMLTextAreaElement>(open);
 
   const handleSave = () => {
     const t = getDisplayValue('title', '').trim();

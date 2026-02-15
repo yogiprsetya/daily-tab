@@ -1,4 +1,3 @@
-import { useEffect, useRef } from 'react';
 import { Button } from '~/components/ui/button';
 import {
   Dialog,
@@ -18,6 +17,7 @@ import {
 import type { PendingItem, PendingType } from '~/types/pending';
 import { useDialogState } from '~/hooks/use-dialog-state';
 import { showAlert } from '~/components/ui/alert-provider';
+import { useAutoFocus } from '~/hooks/use-auto-focus';
 
 type Props = {
   open: boolean;
@@ -35,13 +35,7 @@ export const PendingDialog: React.FC<Props> = ({
   onDelete,
 }) => {
   const { resetState, updateState, getDisplayValue } = useDialogState(editing);
-  const titleRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    if (open && titleRef.current) {
-      setTimeout(() => titleRef.current?.focus(), 0);
-    }
-  }, [open]);
+  const titleRef = useAutoFocus<HTMLInputElement>(open);
 
   const handleSave = () => {
     const t = String(getDisplayValue('title', '')).trim();
