@@ -2,6 +2,13 @@
 
 Turn your New Tab into a sleek daily dashboard: todos, notes, shortcuts, and focus tools at a glance.
 
+## Installation
+
+See `USAGE.md` for end-user installation instructions:
+
+- Via GitHub Pages: https://yogiprsetya.github.io/daily-tab
+- Load package in Developer Mode: https://github.com/yogiprsetya/daily-tab/releases (latest version)
+
 ## Features
 
 - Todos and pending items
