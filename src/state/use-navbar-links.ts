@@ -44,10 +44,36 @@ export function useNavbarLinks() {
     [links, persist]
   );
 
+  const updateLink = useCallback(
+    (id: string, title: string, url: string) => {
+      const trimmedTitle = title.trim();
+      const trimmedUrl = url.trim();
+      if (!trimmedTitle || !trimmedUrl) return false;
+
+      const exists = links.some((l) => l.id === id);
+      if (!exists) return false;
+
+      const next = links.map((l) =>
+        l.id === id
+          ? {
+              ...l,
+              title: trimmedTitle,
+              url: trimmedUrl,
+              updatedAt: Date.now(),
+            }
+          : l
+      );
+      persist(next);
+      return true;
+    },
+    [links, persist]
+  );
+
   return {
     links,
     addLink,
     removeLink,
+    updateLink,
     refresh,
     maxReached: links.length >= 5,
   } as const;
