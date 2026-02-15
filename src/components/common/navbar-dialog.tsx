@@ -41,21 +41,27 @@ export const ShortcutsDialog = ({ open, onOpenChange }: Props) => {
         </DialogHeader>
 
         <div className="grid gap-2">
-          <Label className="text-sm text-muted-foreground">Title</Label>
+          <div className="grid gap-1">
+            <Label htmlFor="title">Title</Label>
 
-          <Input
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="e.g. GitHub"
-          />
+            <Input
+              id="title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="e.g. GitHub"
+            />
+          </div>
 
-          <Label className="text-sm text-muted-foreground">URL</Label>
+          <div className="grid gap-1">
+            <Label htmlFor="url">URL</Label>
 
-          <Input
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-            placeholder="https://github.com"
-          />
+            <Input
+              id="url"
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+              placeholder="https://github.com"
+            />
+          </div>
         </div>
 
         <DialogClose asChild>

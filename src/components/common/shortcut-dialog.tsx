@@ -57,21 +57,27 @@ export const ShortcutDialog: React.FC<Props> = ({
         </DialogHeader>
 
         <div className="grid gap-2">
-          <Label className="text-sm text-muted-foreground">Title</Label>
+          <div className="grid gap-1">
+            <Label htmlFor="title">Title</Label>
 
-          <Input
-            value={getDisplayValue('title', '')}
-            onChange={(e) => updateState('title', e.target.value)}
-            placeholder="e.g. GitHub"
-          />
+            <Input
+              id="title"
+              value={getDisplayValue('title', '')}
+              onChange={(e) => updateState('title', e.target.value)}
+              placeholder="e.g. GitHub"
+            />
+          </div>
 
-          <Label className="text-sm text-muted-foreground">URL</Label>
+          <div className="grid gap-1">
+            <Label htmlFor="url">URL</Label>
 
-          <Input
-            value={getDisplayValue('url', '')}
-            onChange={(e) => updateState('url', e.target.value)}
-            placeholder="https://github.com"
-          />
+            <Input
+              id="url"
+              value={getDisplayValue('url', '')}
+              onChange={(e) => updateState('url', e.target.value)}
+              placeholder="https://github.com"
+            />
+          </div>
         </div>
 
         <DialogFooter>

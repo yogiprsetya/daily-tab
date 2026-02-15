@@ -16,3 +16,8 @@ export {
   type SettingsAdapter,
 } from './settings.adapter';
 export { domAdapter, createDOMAdapter, type DOMAdapter } from './dom.adapter';
+export {
+  pendingAdapter,
+  createPendingAdapter,
+  type PendingAdapter,
+} from './pending.adapter';
