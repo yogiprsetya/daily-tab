@@ -5,6 +5,7 @@ Goal
 - Deliver a clean, single-page New Tab that boosts focus with fast shortcuts, lightweight todos, and notes.
 - Zero branding; minimalist UI; efficient keyboard flows.
 - Local-first using IndexedDB; no network.
+- Secondary distribution via GitHub Pages as an offline-capable PWA demo (no server dependency).
 
 Scope
 
@@ -14,6 +15,7 @@ Scope
 - Header displays up to 5 user-defined navbar links for quick access.
 - Dark/Light mode; three core widgets: Shortcut, Todo list, Notes.
 - Local export/import.
+- Optional web distribution (GitHub Pages) with offline caching. Core UX identical to extension.
 
 Non-Goals
 
@@ -132,6 +134,16 @@ Frontend
 - Drag-and-drop via native HTML5 or lightweight lib.
 - Performance: debounced writes; batched updates; lazy render where sensible.
 
+GitHub Pages (PWA build)
+
+- Build-time flag `BUILD_TARGET=pages` enables a Service Worker via `vite-plugin-pwa`.
+- Caching strategy (Workbox):
+  - Documents (HTML): NetworkFirst with `index.html` as navigate fallback.
+  - Assets (JS/CSS/Workers): StaleWhileRevalidate, 30-day cap.
+  - Images/SVG: StaleWhileRevalidate, 30-day cap.
+- Auto update: SW registers with `registerType: autoUpdate` to refresh in the background; activation on next reload.
+- Isolation: SW and PWA features are excluded from the extension build to avoid MV3 manifest conflicts.
+
 Privacy & Security
 
 - Local-only data; zero network calls.
@@ -143,6 +155,7 @@ Performance Targets
 - New Tab paint < 120ms on mid-range hardware.
 - First Interactive < 200ms.
 - IndexedDB operations debounced and ~10ms typical.
+- Pages PWA: first load fast with HTTP cache; repeat loads primarily served from SW cache.
 
 Success Metrics (local, optional)
 
@@ -155,6 +168,7 @@ Risks & Mitigations
 - Favicon fetching variability → fallback letter tile.
 - IndexedDB migration issues → versioning and backup on migrate.
 - Over-clutter → minimalist defaults; limit visible items; collapsible widgets.
+- SW staleness on Pages → auto-update strategy + cache expiration windows (7d documents, 30d assets/images).
 
 Release Plan
 
@@ -163,6 +177,7 @@ Release Plan
 - v0.3: Todo widget CRUD and filters.
 - v0.4: Notes widget (multiple notes) with autosave.
 - v1.0: Export/Import, a11y polish, performance pass; optional keyboard shortcuts behind a setting.
+- v1.0a: Publish GitHub Pages PWA demo with offline caching and SW auto-update.
 
 Acceptance Criteria
 
@@ -174,6 +189,10 @@ Acceptance Criteria
 - Export produces valid JSON; Import restores full state.
 - Single page (no router); no sidebar; header-only settings; no logo/brand text.
 - All features operate fully offline.
+- GitHub Pages (PWA build):
+  - Service Worker registers on first visit and caches HTML, JS/CSS, and images.
+  - App loads while offline (DevTools Offline toggle) using cached `index.html` as fallback.
+  - New builds trigger SW update and activate on reload without manual intervention.
 
 Constraints
 
