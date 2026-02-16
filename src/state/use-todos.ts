@@ -2,10 +2,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { showAlert } from '~/components/ui/alert-provider';
 import type { Todo, TodoFilter } from '~/types/todos';
 import { todosAdapter } from '~/adapters';
-
-function generateId(): string {
-  return Date.now().toString(36) + Math.random().toString(36).slice(2);
-}
+import { generateId } from '~/utils/id';
 
 export function useTodos() {
   const [todos, setTodos] = useState<Todo[]>(() => todosAdapter.load());

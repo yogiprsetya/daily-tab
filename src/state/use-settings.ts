@@ -1,6 +1,12 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useRef, useState } from 'react';
 import type { Density, ThemeSetting, Settings } from '~/types/settings';
-import { domAdapter, settingsAdapter } from '~/adapters';
+import {
+  domAdapter,
+  settingsAdapter,
+  notesAdapter,
+  pendingAdapter,
+} from '~/adapters';
 import { showConfirm } from '~/components/ui/alert-provider';
 
 function reloadAndApplySettings() {
@@ -56,6 +62,8 @@ export function useSettings() {
       shortcuts: settingsAdapter.loadShortcuts(),
       navbarLinks: settingsAdapter.loadNavbarLinks(),
       todos: settingsAdapter.loadTodos(),
+      notes: notesAdapter.load(),
+      pending: pendingAdapter.load(),
       layout: settingsAdapter.loadLayout(),
     };
     domAdapter.exportJSON(payload);
@@ -73,9 +81,12 @@ export function useSettings() {
         throw new Error('Invalid file');
       if (!('schemaVersion' in data)) throw new Error('Missing schemaVersion');
 
-      // Validate size
-      const notesText = JSON.stringify(data.notes || []);
-      if (notesText.length > 2_000_000) throw new Error('Import too large');
+      // Validate size (notes and pending)
+      const notesText = JSON.stringify((data as any).notes || []);
+      const pendingText = JSON.stringify((data as any).pending || []);
+      if (notesText.length > 2_000_000 || pendingText.length > 2_000_000) {
+        throw new Error('Import too large');
+      }
 
       // Restore data through adapters
       if (data.settings)
@@ -85,6 +96,10 @@ export function useSettings() {
       if (Array.isArray(data.navbarLinks))
         settingsAdapter.saveNavbarLinks(data.navbarLinks);
       if (Array.isArray(data.todos)) settingsAdapter.saveTodos(data.todos);
+      if (Array.isArray((data as any).notes))
+        notesAdapter.save((data as any).notes);
+      if (Array.isArray((data as any).pending))
+        pendingAdapter.save((data as any).pending);
       if (data.layout) settingsAdapter.saveLayout(data.layout);
 
       const s = reloadAndApplySettings();

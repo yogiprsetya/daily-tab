@@ -1,10 +1,7 @@
 import { useCallback, useState } from 'react';
 import type { Note } from '~/types/notes';
 import { notesAdapter } from '~/adapters';
-
-function generateId(): string {
-  return Date.now().toString(36) + Math.random().toString(36).slice(2);
-}
+import { generateId } from '~/utils/id';
 
 export function useNotes() {
   const [notes, setNotes] = useState<Note[]>(() => notesAdapter.load());

@@ -85,7 +85,8 @@ export const createSettingsAdapter = (): SettingsAdapter => {
     },
 
     clearAll(): void {
-      storageAdapter.clear();
+      // Remove only app-related keys
+      storageAdapter.clearNamespace(['dt_', 'daily-tab-']);
     },
   };
 };

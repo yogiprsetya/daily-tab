@@ -8,7 +8,7 @@ export interface StorageAdapter {
   getItem<T>(key: string, fallback: T): T;
   setItem<T>(key: string, value: T): void;
   removeItem(key: string): void;
-  clear(): void;
+  clearNamespace(prefixes: string[]): void;
 }
 
 const createStorageAdapter = (): StorageAdapter => {
@@ -39,11 +39,17 @@ const createStorageAdapter = (): StorageAdapter => {
       }
     },
 
-    clear(): void {
+    clearNamespace(prefixes: string[]): void {
       try {
-        localStorage.clear();
-      } catch {
-        console.error('Failed to clear storage');
+        const keys: string[] = [];
+        for (let i = 0; i < localStorage.length; i++) {
+          const k = localStorage.key(i);
+          if (!k) continue;
+          if (prefixes.some((p) => k.startsWith(p))) keys.push(k);
+        }
+        keys.forEach((k) => localStorage.removeItem(k));
+      } catch (e) {
+        console.error('Failed to clear app storage namespace', e);
       }
     },
   };

@@ -29,11 +29,11 @@ export function useNavbarLinks() {
         createdAt: Date.now(),
         updatedAt: Date.now(),
       };
-      const next = [item, ...settingsAdapter.loadNavbarLinks()];
+      const next = [item, ...links];
       persist(next.slice(0, 5));
       return true;
     },
-    [persist]
+    [links, persist]
   );
 
   const removeLink = useCallback(

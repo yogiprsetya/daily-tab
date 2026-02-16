@@ -1,4 +1,4 @@
-import { settingsAdapter } from '~/adapters';
+import { settingsAdapter, storageAdapter } from '~/adapters';
 import type { StoredShortcut } from '~/types/shortcuts';
 import type { Todo } from '~/types/todos';
 
@@ -9,7 +9,7 @@ import type { Todo } from '~/types/todos';
 export function initDefaults() {
   try {
     const markerKey = 'dt_initialized';
-    const initialized = localStorage.getItem(markerKey);
+    const initialized = storageAdapter.getItem(markerKey, '');
     if (initialized) return;
 
     const now = Date.now();
@@ -19,14 +19,14 @@ export function initDefaults() {
       {
         id: 'gmail',
         title: 'Gmail',
-        url: 'https://drive.google.com',
+        url: 'https://mail.google.com',
         createdAt: now,
         updatedAt: now,
       },
       {
         id: 'drive',
         title: 'Drive',
-        url: 'https://mail.google.com/mail',
+        url: 'https://drive.google.com',
         createdAt: now,
         updatedAt: now,
       },
@@ -43,7 +43,7 @@ export function initDefaults() {
     const shortcuts: StoredShortcut[] = [
       {
         id: 'github',
-        title: 'GIthub',
+        title: 'GitHub',
         url: 'https://github.com',
         createdAt: now,
         updatedAt: now,
@@ -93,7 +93,7 @@ export function initDefaults() {
       settingsAdapter.saveTodos(todos);
     }
 
-    localStorage.setItem(markerKey, '1');
+    storageAdapter.setItem(markerKey, '1');
   } catch (e) {
     // Non-fatal; app can run without defaults
     console.warn('Init defaults skipped:', e);

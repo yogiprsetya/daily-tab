@@ -1,10 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import type { PendingItem, PendingType } from '~/types/pending';
 import { pendingAdapter } from '~/adapters';
-
-function generateId(): string {
-  return Date.now().toString(36) + Math.random().toString(36).slice(2);
-}
+import { generateId } from '~/utils/id';
 
 export function usePending() {
   const [items, setItems] = useState<PendingItem[]>(() =>
