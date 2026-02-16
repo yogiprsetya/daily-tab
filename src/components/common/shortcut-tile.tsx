@@ -6,6 +6,7 @@ export type Shortcut = {
   id: string;
   title: string;
   url: string;
+  group?: string;
   createdAt?: number;
   updatedAt?: number;
 };

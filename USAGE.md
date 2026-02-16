@@ -8,7 +8,8 @@ You can use Daily Tab in two ways:
 - Auto update
 - Open: https://yogiprsetya.github.io/daily-tab
 - Optional: Set it as your browser start/home page in settings.
-- To make it your New Tab page in Chromium browsers, use a "custom new tab URL" helper extension and point it to the URL above.
+- To make it your New Tab page in Chromium browsers, use [Custom New Tab URL
+  ](https://chromewebstore.google.com/detail/custom-new-tab-url/mmjbdbjnoablegbkcklggeknkfcjkjia) extention
 
 ## 2) Load as an unpacked extension (Developer mode)
 

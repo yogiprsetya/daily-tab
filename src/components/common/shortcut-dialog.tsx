@@ -17,7 +17,7 @@ type Props = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   editing: Shortcut | null;
-  onSave: (data: { title: string; url: string }) => void;
+  onSave: (data: { title: string; url: string; group?: string }) => void;
 };
 
 export const ShortcutDialog: React.FC<Props> = ({
@@ -31,8 +31,9 @@ export const ShortcutDialog: React.FC<Props> = ({
   const handleSave = () => {
     const t = getDisplayValue('title', '').trim();
     const u = getDisplayValue('url', '').trim();
+    const g = getDisplayValue('group', '').trim();
     if (!t || !u) return;
-    onSave({ title: t, url: u });
+    onSave({ title: t, url: u, group: g || undefined });
     onOpenChange(false);
     resetState();
   };
@@ -76,6 +77,17 @@ export const ShortcutDialog: React.FC<Props> = ({
               value={getDisplayValue('url', '')}
               onChange={(e) => updateState('url', e.target.value)}
               placeholder="https://github.com"
+            />
+          </div>
+
+          <div className="grid gap-1">
+            <Label htmlFor="group">Group (optional)</Label>
+
+            <Input
+              id="group"
+              value={getDisplayValue('group', '')}
+              onChange={(e) => updateState('group', e.target.value)}
+              placeholder="e.g. Work, Personal"
             />
           </div>
         </div>
