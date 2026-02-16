@@ -11,7 +11,7 @@ import {
 import { useNavbarLinks } from '~/state/use-navbar-links';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
-import { Pencil, Save, Trash2, X } from 'lucide-react';
+import { ArrowDown, ArrowUp, Pencil, Save, Trash2, X } from 'lucide-react';
 import { ScrollArea } from '../ui/scroll-area';
 
 type Props = {
@@ -26,7 +26,7 @@ export const NavbarLinkDialog = ({ open, onOpenChange }: Props) => {
   const [editingTitle, setEditingTitle] = useState('');
   const [editingUrl, setEditingUrl] = useState('');
 
-  const { links, addLink, removeLink, updateLink, maxReached } =
+  const { links, addLink, removeLink, updateLink, moveLink, maxReached } =
     useNavbarLinks();
 
   const isEditing = useMemo(() => Boolean(editingId), [editingId]);
@@ -135,7 +135,7 @@ export const NavbarLinkDialog = ({ open, onOpenChange }: Props) => {
                   </span>
                 )}
 
-                {links.map((l) => (
+                {links.map((l, idx) => (
                   <div key={l.id} className="flex items-center gap-2">
                     {editingId === l.id ? (
                       <>
@@ -160,6 +160,28 @@ export const NavbarLinkDialog = ({ open, onOpenChange }: Props) => {
                       </>
                     )}
                     <div className="ml-auto flex items-center gap-2">
+                      <Button
+                        size="icon-xs"
+                        variant="ghost"
+                        disabled={idx === 0}
+                        onClick={() => moveLink(l.id, 'up')}
+                        title="Move up"
+                        aria-label="Move up"
+                      >
+                        <ArrowUp />
+                      </Button>
+
+                      <Button
+                        size="icon-xs"
+                        variant="ghost"
+                        disabled={idx === links.length - 1}
+                        onClick={() => moveLink(l.id, 'down')}
+                        title="Move down"
+                        aria-label="Move down"
+                      >
+                        <ArrowDown />
+                      </Button>
+
                       {editingId === l.id ? (
                         <>
                           <Button

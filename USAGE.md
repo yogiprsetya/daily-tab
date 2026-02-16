@@ -4,11 +4,16 @@ You can use Daily Tab in two ways:
 
 ## 1) GitHub Pages (no install)
 
+- Recomended, must be online
+- Auto update
 - Open: https://yogiprsetya.github.io/daily-tab
 - Optional: Set it as your browser start/home page in settings.
 - To make it your New Tab page in Chromium browsers, use a "custom new tab URL" helper extension and point it to the URL above.
 
 ## 2) Load as an unpacked extension (Developer mode)
+
+- Local first
+- Manual update
 
 Chromium (Chrome/Edge):
 

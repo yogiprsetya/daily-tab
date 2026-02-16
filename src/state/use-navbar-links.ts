@@ -69,11 +69,27 @@ export function useNavbarLinks() {
     [links, persist]
   );
 
+  const moveLink = useCallback(
+    (id: string, direction: 'up' | 'down') => {
+      const index = links.findIndex((l) => l.id === id);
+      if (index === -1) return;
+      const targetIndex = direction === 'up' ? index - 1 : index + 1;
+      if (targetIndex < 0 || targetIndex >= links.length) return;
+
+      const next = [...links];
+      const [item] = next.splice(index, 1);
+      next.splice(targetIndex, 0, item);
+      persist(next);
+    },
+    [links, persist]
+  );
+
   return {
     links,
     addLink,
     removeLink,
     updateLink,
+    moveLink,
     refresh,
     maxReached: links.length >= 5,
   } as const;
