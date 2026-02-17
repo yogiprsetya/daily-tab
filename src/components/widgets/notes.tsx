@@ -33,6 +33,12 @@ export const NotesWidget = () => {
     setEditing(null);
   };
 
+  const handleAutoSave = (data: { title: string; content: string }) => {
+    if (!editing) return;
+    // Update without closing dialog
+    updateNote(editing.id, data.title, data.content);
+  };
+
   const handleOpenChange = (newOpen: boolean) => {
     setOpen(newOpen);
     if (!newOpen) {
@@ -104,6 +110,7 @@ export const NotesWidget = () => {
         onOpenChange={handleOpenChange}
         editing={editing}
         onSave={handleSave}
+        onAutoSave={handleAutoSave}
       />
     </>
   );

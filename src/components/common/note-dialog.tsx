@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { Button } from '~/components/ui/button';
 import {
   Dialog,
@@ -15,6 +16,7 @@ type Props = {
   onOpenChange: (open: boolean) => void;
   editing: Note | null;
   onSave: (data: { title: string; content: string }) => void;
+  onAutoSave?: (data: { title: string; content: string }) => void;
 };
 
 export const NoteDialog: React.FC<Props> = ({
@@ -22,9 +24,24 @@ export const NoteDialog: React.FC<Props> = ({
   onOpenChange,
   editing,
   onSave,
+  onAutoSave,
 }) => {
   const { resetState, updateState, getDisplayValue } = useDialogState(editing);
   const contentRef = useAutoFocus<HTMLTextAreaElement>(open);
+
+  // Track last saved values to avoid repeated autosaves on identical content
+  const lastSavedRef = useRef<{ title: string; content: string }>({
+    title: editing?.title ?? '',
+    content: editing?.content ?? '',
+  });
+
+  // Keep ref in sync when switching notes or opening dialog
+  useEffect(() => {
+    lastSavedRef.current = {
+      title: editing?.title ?? '',
+      content: editing?.content ?? '',
+    };
+  }, [editing, open]);
 
   const handleSave = () => {
     const t = getDisplayValue('title', '').trim();
@@ -40,11 +57,36 @@ export const NoteDialog: React.FC<Props> = ({
     if (!open) resetState();
   };
 
+  const titleValue = String(getDisplayValue('title', ''));
   const contentValue = String(getDisplayValue('content', ''));
   const wordCount = contentValue.trim()
     ? contentValue.trim().split(/\s+/).filter(Boolean).length
     : 0;
   const charCount = contentValue.length;
+
+  // Auto-save when user is idle while editing an existing note
+  useEffect(() => {
+    if (!editing) return; // Only autosave updates, not new note creation
+
+    const t = titleValue.trim();
+    const c = contentValue.trim();
+
+    // Skip if nothing changed or fields are empty
+    const last = lastSavedRef.current;
+    const changed = t !== last.title || c !== last.content;
+    if (!changed) return;
+    if (!t || !c) return;
+
+    const id = window.setTimeout(() => {
+      // Save without closing the dialog
+      if (typeof onAutoSave === 'function') {
+        onAutoSave({ title: t, content: c });
+        lastSavedRef.current = { title: t, content: c };
+      }
+    }, 1000);
+
+    return () => clearTimeout(id);
+  }, [editing, titleValue, contentValue, onAutoSave]);
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -52,7 +94,7 @@ export const NoteDialog: React.FC<Props> = ({
         <div className="px-6 pt-6 pb-0 border-b border-border/50">
           <Input
             id="note-title"
-            value={getDisplayValue('title', '')}
+            value={titleValue}
             onChange={(e) => updateState('title', e.target.value)}
             placeholder="Title"
             className="text-lg font-semibold h-auto border-0 bg-transparent px-0 py-2 focus-visible:outline-none focus-visible:ring-0 placeholder:text-muted-foreground/50"
