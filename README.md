@@ -16,6 +16,10 @@ See `USAGE.md` for end-user installation instructions:
 - Resizable layout and keyboard shortcuts
 - Minimal, fast, offline-ready UI
 
+## User Interface
+
+![screenshot](/public/chrome-new-tab.png)
+
 ## Tech Stack
 
 - React 19, Vite 7, TypeScript
