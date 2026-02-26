@@ -16,6 +16,14 @@ See `USAGE.md` for end-user installation instructions:
 - Resizable layout and keyboard shortcuts
 - Minimal, fast, offline-ready UI
 
+## Why it matters
+
+- Open a new tab and see a single, calm dashboard of today’s todos, notes, and go‑to links.
+- Add what’s on your mind in seconds with a keyboard‑first flow—no context switch.
+- Launch the sites you use most from shortcuts instead of typing or access recent web
+- Stay in flow even offline; the UI loads instantly and keeps working.
+- At a glance, decide the next most important action and keep momentum.
+
 ## User Interface
 
 ![screenshot](/public/chrome-new-tab.png)
