@@ -1,137 +1,36 @@
-# Daily Tab – Browser Extension (MV3)
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-Turn your New Tab into a sleek daily dashboard: todos, notes, shortcuts, and focus tools at a glance.
+## Getting Started
 
-## Installation
-
-See `USAGE.md` for end-user installation instructions:
-
-- Via GitHub Pages: https://yogiprsetya.github.io/daily-tab
-- Load package in Developer Mode: https://github.com/yogiprsetya/daily-tab/releases (latest version)
-
-## Features
-
-- Todos and pending items
-- Notes and shortcuts
-- Resizable layout and keyboard shortcuts
-- Minimal, fast, offline-ready UI
-
-## Why it matters
-
-- Open a new tab and see a single, calm dashboard of today’s todos, notes, and go‑to links.
-- Add what’s on your mind in seconds with a keyboard‑first flow—no context switch.
-- Launch the sites you use most from shortcuts instead of typing or access recent web
-- Stay in flow even offline; the UI loads instantly and keeps working.
-- At a glance, decide the next most important action and keep momentum.
-
-## User Interface
-
-![screenshot](/public/chrome-new-tab.png)
-
-## Tech Stack
-
-- React 19, Vite 7, TypeScript
-- TailwindCSS 4, Radix UI
-
-## Development
+First, run the development server:
 
 ```bash
-npm install
 npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
 ```
 
-Open http://localhost:5173
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-## Build (web)
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-```bash
-npm run build
-npm run preview
-```
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## Browser Extension (MV3)
+## Learn More
 
-This project ships as a New Tab override extension for Chromium and Firefox.
+To learn more about Next.js, take a look at the following resources:
 
-### Manifest
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-- `public/manifest.json` uses:
-  ```json
-  {
-    "manifest_version": 3,
-    "chrome_url_overrides": { "newtab": "index.html" }
-  }
-  ```
-- `vite.config.ts` sets `base: "./"` for relative asset paths.
-- `index.html` uses a relative favicon path.
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-### Build for Extension
+## Deploy on Vercel
 
-```bash
-npm run package:ext
-```
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-This builds to `dist/` and zips it as `daily-tab-extension.zip`.
-
-### Load Unpacked (Chrome/Edge)
-
-1. Chrome → Extensions → enable Developer mode
-2. Click “Load unpacked” and select the `dist` folder
-3. Open a New Tab to see Daily Tab
-
-### Temporary Install (Firefox)
-
-1. Firefox → about:debugging → This Firefox
-2. Click “Load Temporary Add-on…” and select `dist/manifest.json`
-3. Open a New Tab to see Daily Tab
-
-### Publish to Stores
-
-Chrome Web Store:
-
-1. Create a Developer account at the Chrome Web Store Dashboard
-2. Upload `daily-tab-extension.zip`
-3. Provide description, screenshots, and 128×128, 48×48, 16×16 icons
-4. Submit for review
-
-Firefox Add-ons (AMO):
-
-1. Ensure `browser_specific_settings.gecko.id` is set in `manifest.json`
-2. Upload the ZIP to https://addons.mozilla.org/developers/
-3. Fill listing details and submit
-
-### Permissions & Policies
-
-- New Tab override requires no extra permissions
-- If adding network calls, declare `host_permissions`
-- For cross-device sync, migrate from `localStorage` to `chrome.storage.sync`
-
-### Optional: open once after install
-
-Add a background service worker:
-
-```json
-// public/manifest.json
-{
-  "background": { "service_worker": "background.js" }
-}
-```
-
-```js
-// public/background.js
-chrome.runtime.onInstalled.addListener(() => {
-  chrome.tabs.create({ url: chrome.runtime.getURL('index.html') });
-});
-```
-
-## Deploy to GitHub Pages (free)
-
-- Run: `npm run deploy:pages`
-- The site will be published to the repository’s GitHub Pages
-
-Tip: Users can install a “New Tab Redirect” extension and set it to your Pages URL as a free alternative to store publishing.
-
-## Useful Links
-
-- Chrome Extensions: https://developer.chrome.com/docs/extensions
-- Firefox WebExtensions: https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
