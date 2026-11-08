@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { NAV_ITEMS, isActive } from './nav-items';
+import { LogoutButton } from './logout-button';
 
 export function NavRail({ className }: { className?: string }) {
   const pathname = usePathname();
@@ -33,6 +34,7 @@ export function NavRail({ className }: { className?: string }) {
           </Link>
         );
       })}
+      <LogoutButton variant="rail" className="mt-auto" />
     </nav>
   );
 }

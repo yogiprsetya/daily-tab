@@ -98,14 +98,14 @@ now)`, `pruneAttempts(now)` (> 24 h). Integration tests truncate `login_attempts
 
 ## Phase 2: Gate and UI
 
-- [ ] **Task 5: Login page**
+- [x] **Task 5: Login page**
   - Description: `app/login/page.tsx` (static, outside `(app)`, dark, centered card) + `login-form.tsx`
     (client): email + PIN fields with correct `autocomplete`/`inputMode`, submit → `fetch` login → on 200
     `router.replace(safeNextPath(next))`; shows generic error or "Too many attempts, try again in N
     minutes"; disables while submitting; focuses the first field.
   - Acceptance:
-    - [ ] `/login` builds as static.
-    - [ ] Errors are announced (`role="alert"`), fields have labels, PIN never echoed in UI state beyond the
+    - [x] `/login` builds as static.
+    - [x] Errors are announced (`role="alert"`), fields have labels, PIN never echoed in UI state beyond the
           input.
     - [ ] Manual (owner): login works and lands on `next`.
   - Verify: `pnpm build` route table; manual browser check
@@ -113,25 +113,25 @@ now)`, `pruneAttempts(now)` (> 24 h). Integration tests truncate `login_attempts
   - Files: `app/login/page.tsx`, `app/login/login-form.tsx`
   - Scope: S
 
-- [ ] **Task 6: Proxy**
+- [x] **Task 6: Proxy**
   - Description: `proxy.ts` with matcher excluding assets; public routes; Origin check for mutating `/api/*`;
     page → 307 `/login?next=…`; API → 401 JSON; `/login` with session → `/`; valid session older than 24 h →
     `NextResponse.next()` with a refreshed cookie.
   - Acceptance:
-    - [ ] Unit tests for every branch with `NextRequest` and `next/experimental/testing/server`.
-    - [ ] `unstable_doesProxyMatch` false for `/_next/static/x.js`, `/icons/icon-192.png`,
+    - [x] Unit tests for every branch with `NextRequest` and `next/experimental/testing/server`.
+    - [x] `unstable_doesMiddlewareMatch` (the docs name `unstable_doesProxyMatch` is not exported in 16.4.5) false for `/_next/static/x.js`, `/icons/icon-192.png`,
           `/manifest.webmanifest`; true for `/`, `/todos`, `/api/health`.
-    - [ ] curl without cookie: `/` 307, `/api/health` 200, icons/manifest 200.
+    - [x] curl without cookie: `/` 307, `/api/health` 200, icons/manifest 200.
   - Verify: `pnpm test proxy`; `pnpm build && pnpm start` + curl
   - Dependencies: Tasks 1, 2, 5
   - Files: `proxy.ts`, `proxy.test.ts`
   - Scope: M
 
-- [ ] **Task 7: Logout button**
+- [x] **Task 7: Logout button**
   - Description: `components/shell/logout-button.tsx` (client): `POST /api/auth/logout` then
     `router.replace('/login')`. Rendered at the bottom of the nav rail and in the Home header below 1024px.
   - Acceptance:
-    - [ ] Visible on desktop rail and mobile Home only; keyboard reachable with a visible label.
+    - [x] Visible on desktop rail and mobile Home only; keyboard reachable with a visible label.
     - [ ] Manual (owner): logout lands on `/login`; back button does not show protected content.
   - Verify: `pnpm build`; manual browser check
   - Dependencies: Task 6

@@ -159,7 +159,7 @@ export async function GET() {
   credential compare (right/wrong/case/whitespace), `safeNextPath`, `clientIp`, `isSameOrigin`, config
   validation messages.
 - **Proxy:** call `proxy(new NextRequest(…))` for each branch (asset passthrough via
-  `unstable_doesProxyMatch`, page redirect with `next`, API 401, bad Origin 403, valid session passes,
+  `unstable_doesMiddlewareMatch` (the name actually exported by Next 16.4.5; the docs say `unstable_doesProxyMatch`), page redirect with `next`, API 401, bad Origin 403, valid session passes,
   old session gets a refreshed `Set-Cookie`, `/login` with session → `/`). Utilities from
   `next/experimental/testing/server`.
 - **Integration (test DB):** rate limiter windows (per-IP 5/15 min, global 20/60 min, ageing out),
@@ -183,15 +183,15 @@ export async function GET() {
 
 ## Success Criteria
 
-- [ ] `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build` pass.
-- [ ] Local: unauthenticated `/`, `/todos` → 307 `/login?next=…`; `/api/health` → 200;
+- [x] `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build` pass.
+- [x] Local: unauthenticated `/`, `/todos` → 307 `/login?next=…`; `/api/health` → 200;
       `/manifest.webmanifest` and `/icons/icon-192.png` → 200 without a session.
-- [ ] Local: login with the right email + PIN reaches `next`; wrong PIN shows the generic message.
-- [ ] 6th failed attempt from one IP within 15 min → 429 with `Retry-After`; correct PIN is also refused
+- [x] Local: login with the right email + PIN reaches `next`; wrong PIN shows the generic message.
+- [x] 6th failed attempt from one IP within 15 min → 429 with `Retry-After`; correct PIN is also refused
       while limited.
-- [ ] `POST /api/auth/login` with `Origin: https://evil.example` → 403.
-- [ ] A session older than 24 h gets a new cookie on the next request; a 31-day-old token is rejected.
-- [ ] Logout clears the cookie and lands on `/login`.
+- [x] `POST /api/auth/login` with `Origin: https://evil.example` → 403.
+- [x] A session older than 24 h gets a new cookie on the next request; a 31-day-old token is rejected.
+- [x] Logout clears the cookie and lands on `/login`.
 - [ ] Deployed: same checks against https://daily-tab.vercel.app; Android PWA can log in and stays logged
       in after closing and reopening.
 

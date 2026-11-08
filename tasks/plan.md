@@ -44,9 +44,9 @@ pnpm.
 
 ### Phase 2: Gate and UI
 
-- [ ] Task 5: Login page
-- [ ] Task 6: Proxy (redirect, 401, Origin check, sliding refresh)
-- [ ] Task 7: Logout button
+- [x] Task 5: Login page
+- [x] Task 6: Proxy (redirect, 401, Origin check, sliding refresh)
+- [x] Task 7: Logout button
 
 ### Checkpoint B: Locked locally
 
