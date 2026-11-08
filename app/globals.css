@@ -126,5 +126,7 @@
   }
   html {
     @apply font-sans;
+    /* Dark-only app: native scrollbars and form controls follow suit. */
+    color-scheme: dark;
   }
 }

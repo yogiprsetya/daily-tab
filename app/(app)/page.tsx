@@ -1,0 +1,48 @@
+import { Link2, ListTodo } from 'lucide-react';
+import { Today } from '@/components/home/today';
+import { ModulePlaceholder } from '@/components/shell/module-placeholder';
+
+export default function HomePage() {
+  return (
+    <div className="mx-auto flex w-full max-w-5xl flex-col gap-10 px-4 py-8 sm:px-8 lg:py-12">
+      <header>
+        <h1 className="sr-only">Today</h1>
+        <Today />
+      </header>
+
+      <section
+        aria-labelledby="shortcuts-heading"
+        className="flex flex-col gap-3"
+      >
+        <h2
+          id="shortcuts-heading"
+          className="text-sm font-medium text-muted-foreground"
+        >
+          Shortcuts
+        </h2>
+        <ModulePlaceholder
+          icon={Link2}
+          title="No shortcuts yet"
+          description="Quick links will appear here once the shortcuts module is built."
+        />
+      </section>
+
+      <section
+        aria-labelledby="pending-heading"
+        className="flex flex-col gap-3"
+      >
+        <h2
+          id="pending-heading"
+          className="text-sm font-medium text-muted-foreground"
+        >
+          Pending tasks
+        </h2>
+        <ModulePlaceholder
+          icon={ListTodo}
+          title="No pending tasks"
+          description="Unfinished todos will appear here once the todos module is built."
+        />
+      </section>
+    </div>
+  );
+}
