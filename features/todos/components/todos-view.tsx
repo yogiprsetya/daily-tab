@@ -37,8 +37,8 @@ export async function TodosView({
 
   return (
     <>
-      <div className="flex flex-col gap-1">
-        <div className="flex items-start justify-between gap-3">
+      <div className="flex flex-col items-start gap-1">
+        <div className="flex w-full items-start justify-between gap-3">
           <ProjectFilter
             filter={filter}
             projects={projects}
@@ -51,6 +51,7 @@ export async function TodosView({
             defaultProjectId={filter.kind === 'project' ? filter.id : null}
           />
         </div>
+
         <ProjectManager projects={projectOptions} />
       </div>
 

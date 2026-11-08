@@ -156,14 +156,10 @@ export function ProjectManager({ projects }: { projects: Project[] }) {
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        className="flex min-h-11 items-center gap-2 self-start rounded-lg text-sm text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
-      >
+      <Button type="button" onClick={() => setOpen(true)} variant="link">
         <Settings2 aria-hidden className="size-4" />
         Manage projects
-      </button>
+      </Button>
 
       <Dialog
         open={open}
