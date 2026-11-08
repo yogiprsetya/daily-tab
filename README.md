@@ -30,6 +30,8 @@ can be shared with other projects: this app keeps every object in the `daily_tab
    - `DATABASE_URL`: `postgresql://postgres:postgres@127.0.0.1:54322/postgres` for the default local stack.
    - `TEST_DATABASE_URL`: same server, database `daily_tab_test`. It must differ from `DATABASE_URL`; the test
      config refuses to run otherwise.
+   - `AUTH_EMAIL`, `AUTH_PIN` (digits only, at least 6), `AUTH_SECRET` (generate with
+     `openssl rand -base64 32`). See [Authentication](#authentication). Tests use their own fake values.
 
 3. Create the test database once:
 
@@ -49,6 +51,8 @@ can be shared with other projects: this app keeps every object in the `daily_tab
    pnpm dev
    curl localhost:3000/api/health   # {"status":"ok","db":"ok"}
    ```
+
+   Then open http://localhost:3000 and sign in with `AUTH_EMAIL` and `AUTH_PIN`.
 
 ## Scripts
 
@@ -75,6 +79,24 @@ lint-staged (ESLint + Prettier on staged files).
   `daily_tab.__drizzle_migrations`.
 - Query the database only from `db/` and `features/<module>/dal.ts` (both `server-only`).
 - Never run `drizzle-kit push` against the cloud database.
+
+## Authentication
+
+Single owner, static credentials from env. Spec: [SPEC-auth.md](SPEC-auth.md).
+
+- **Session:** a signed JWT in the `dt_session` cookie (HttpOnly, Secure, SameSite=Lax), valid 30 days and
+  renewed automatically once it is more than a day old. Opening the app at least once a month keeps you
+  signed in.
+- **Log out everywhere:** set a new `AUTH_SECRET` and redeploy. Changing `AUTH_PIN` alone does not end
+  existing sessions.
+- **Brute-force limits:** 5 failed logins per IP within 15 minutes, and 20 failed logins in total within
+  60 minutes, block new logins until the oldest failure ages out. Sessions that already exist keep
+  working. Attempts are stored in `daily_tab.login_attempts` and pruned after 24 hours.
+- **What is public:** `/login`, `POST /api/auth/login`, `GET /api/health`, the manifest, icons and static
+  assets. Everything else needs a session: pages redirect to `/login?next=…`, API routes return 401.
+- **Writing a new API route:** call `requireSession()` from
+  [features/auth/require-session.ts](features/auth/require-session.ts) first, even though `proxy.ts`
+  already checks. Mutating requests (`POST`/`PUT`/`PATCH`/`DELETE`) must come from the app's own origin.
 
 ## PWA icons
 
@@ -103,7 +125,8 @@ render icon-maskable 512 public/icons/icon-maskable-512.png
    ```
 
 2. In Vercel, set `DATABASE_URL` to the **transaction pooler** (port 6543). The client already uses
-   `prepare: false`, which that pooler requires.
+   `prepare: false`, which that pooler requires. Also set `AUTH_EMAIL`, `AUTH_PIN` and `AUTH_SECRET`;
+   without them every request fails, because the proxy cannot verify sessions.
 3. Deploy, then check `https://<deployment>/api/health`.
 4. On Android, open the deployed URL in Chrome and choose "Install app".
 

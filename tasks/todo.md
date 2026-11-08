@@ -145,11 +145,11 @@ now)`, `pruneAttempts(now)` (> 24 h). Integration tests truncate `login_attempts
 
 ## Phase 3: Ship
 
-- [ ] **Task 8: Docs**
+- [x] **Task 8: Docs**
   - Description: README: auth env vars, generating `AUTH_SECRET`, how to revoke all sessions, rate-limit
     behaviour; `.env.example` gains `AUTH_*` names.
   - Acceptance:
-    - [ ] A new reader can set up auth locally from the README alone.
+    - [x] A new reader can set up auth locally from the README alone.
   - Verify: read-through; `pnpm format:check`
   - Dependencies: Tasks 1–7
   - Files: `README.md`, `.env.example`

@@ -55,7 +55,7 @@ pnpm.
 
 ### Phase 3: Ship
 
-- [ ] Task 8: Docs (README, .env.example)
+- [x] Task 8: Docs (README, .env.example)
 - [ ] Task 9: Deploy with `AUTH_*` on Vercel and cloud migration (human-gated)
 
 ### Checkpoint C: Auth complete
