@@ -11,7 +11,11 @@ filter; Home shows what is still pending so it is visible on every new tab.
 ### Acceptance criteria
 
 1. Todos
-   - A todo has a title (1–280 characters after trim) and at most one project.
+   - A todo has a title (1–280 characters after trim), at most one project, an optional link and optional
+     notes (up to 2000 characters). Links follow the same rules as shortcuts (`http`/`https` only, a bare
+     domain gets `https://`). Empty input clears either field. _Added 2026-11-08 at the owner's request._
+   - Link and notes are set in the edit dialog; the add input stays a single field. The link shows as its
+     hostname, opens in a new tab and sits outside the checkbox's label. Notes show on `/todos` only.
    - Add from one input at the top of `/todos`: Enter submits, the input clears and keeps focus. The project
      defaults to the active filter.
    - Pending todos are listed oldest first.
@@ -40,16 +44,16 @@ filter; Home shows what is still pending so it is visible on every new tab.
 
 ## API
 
-| Method and path             | Body or query                                  | Success                             |
-| --------------------------- | ---------------------------------------------- | ----------------------------------- |
-| `GET /api/todos`            | `?project=<uuid>\|none`                        | `200 { items: Todo[] }`             |
-| `POST /api/todos`           | `{ title, projectId? }`                        | `201 Todo`                          |
-| `PATCH /api/todos/[id]`     | `{ title?, projectId?, completed? }` (min one) | `200 Todo`, `404` if unknown        |
-| `DELETE /api/todos/[id]`    | —                                              | `204`, `404` if unknown             |
-| `GET /api/projects`         | —                                              | `200 { items: ProjectWithCount[] }` |
-| `POST /api/projects`        | `{ name }`                                     | `201 Project`, `409` on duplicate   |
-| `PATCH /api/projects/[id]`  | `{ name }`                                     | `200 Project`, `404`, `409`         |
-| `DELETE /api/projects/[id]` | —                                              | `204`, `404` if unknown             |
+| Method and path             | Body or query                                                | Success                             |
+| --------------------------- | ------------------------------------------------------------ | ----------------------------------- |
+| `GET /api/todos`            | `?project=<uuid>\|none`                                      | `200 { items: Todo[] }`             |
+| `POST /api/todos`           | `{ title, projectId?, url?, notes? }`                        | `201 Todo`                          |
+| `PATCH /api/todos/[id]`     | `{ title?, projectId?, url?, notes?, completed? }` (min one) | `200 Todo`, `404` if unknown        |
+| `DELETE /api/todos/[id]`    | —                                                            | `204`, `404` if unknown             |
+| `GET /api/projects`         | —                                                            | `200 { items: ProjectWithCount[] }` |
+| `POST /api/projects`        | `{ name }`                                                   | `201 Project`, `409` on duplicate   |
+| `PATCH /api/projects/[id]`  | `{ name }`                                                   | `200 Project`, `404`, `409`         |
+| `DELETE /api/projects/[id]` | —                                                            | `204`, `404` if unknown             |
 
 `projectId` may be `null`. A `projectId` that does not exist returns `400`. A malformed `id` returns `404`.
 `lib/api.ts` gains the error code `conflict` (409).
@@ -78,6 +82,8 @@ export const todos = dailyTab.table(
     projectId: uuid('project_id').references(() => projects.id, {
       onDelete: 'set null',
     }),
+    url: text('url'),
+    notes: text('notes'),
     completedAt: timestamp('completed_at', { withTimezone: true }),
     createdAt: timestamp('created_at', { withTimezone: true })
       .notNull()
@@ -152,7 +158,7 @@ Cloud migration: `DATABASE_URL_MIGRATE='…' pnpm db:migrate` (owner runs it).
 
 ## Not Doing (and why)
 
-- **Due dates, priority, notes, subtasks, reminders:** owner chose title + project only.
+- **Due dates, priority, subtasks, reminders:** owner chose title, project, link and notes only.
 - **Manual ordering of todos:** oldest first is predictable; add it only if it proves necessary.
 - **Automatic cleanup of completed todos:** owner chose to keep them until deleted by hand.
 - **Reading tasks from Obsidian:** todos are managed entirely in Supabase (owner decision).

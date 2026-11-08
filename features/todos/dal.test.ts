@@ -136,6 +136,46 @@ describe('createTodo / updateTodo / removeTodo', () => {
     });
   });
 
+  it('stores an optional link and notes', async () => {
+    const row = await createTodo({
+      title: 'A',
+      url: 'https://example.com/',
+      notes: 'why',
+    });
+
+    expect(row).toMatchObject({ url: 'https://example.com/', notes: 'why' });
+  });
+
+  it('defaults the link and notes to null', async () => {
+    expect(await createTodo({ title: 'A' })).toMatchObject({
+      url: null,
+      notes: null,
+    });
+  });
+
+  it('clears the link and notes with null', async () => {
+    const row = await createTodo({
+      title: 'A',
+      url: 'https://example.com/',
+      notes: 'why',
+    });
+
+    expect(await updateTodo(row.id, { url: null, notes: null })).toMatchObject({
+      title: 'A',
+      url: null,
+      notes: null,
+    });
+  });
+
+  it('leaves the link and notes alone when not given', async () => {
+    const row = await createTodo({ title: 'A', notes: 'why' });
+
+    expect(await updateTodo(row.id, { title: 'B' })).toMatchObject({
+      title: 'B',
+      notes: 'why',
+    });
+  });
+
   it('rejects a project that does not exist', async () => {
     await expect(
       createTodo({ title: 'A', projectId: UNKNOWN })

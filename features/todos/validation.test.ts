@@ -38,6 +38,63 @@ describe('createTodoBody', () => {
   });
 });
 
+describe('link and notes', () => {
+  it('normalizes the link and trims the notes', () => {
+    expect(
+      createTodoBody.parse({
+        title: 'A',
+        url: 'example.com/page',
+        notes: '  remember this  ',
+      })
+    ).toEqual({
+      title: 'A',
+      url: 'https://example.com/page',
+      notes: 'remember this',
+    });
+  });
+
+  it.each([
+    ['', null],
+    ['   ', null],
+    [null, null],
+  ])('treats the link %j as empty', (url, expected) => {
+    expect(updateTodoBody.parse({ url }).url).toBe(expected);
+  });
+
+  it.each([
+    ['', null],
+    ['   ', null],
+    [null, null],
+  ])('treats the notes %j as empty', (notes, expected) => {
+    expect(updateTodoBody.parse({ notes }).notes).toBe(expected);
+  });
+
+  it('keeps line breaks inside notes', () => {
+    expect(updateTodoBody.parse({ notes: 'a\nb' }).notes).toBe('a\nb');
+  });
+
+  it.each(['javascript:alert(1)', 'https://user:pw@example.com'])(
+    'rejects the link %j',
+    (url) => {
+      const result = updateTodoBody.safeParse({ url });
+
+      expect(result.success).toBe(false);
+      expect(result.error!.issues[0].path).toEqual(['url']);
+    }
+  );
+
+  it('rejects notes that are too long', () => {
+    const result = updateTodoBody.safeParse({ notes: 'x'.repeat(2001) });
+
+    expect(result.success).toBe(false);
+    expect(result.error!.issues[0].path).toEqual(['notes']);
+  });
+
+  it('accepts an update of only the link', () => {
+    expect(updateTodoBody.safeParse({ url: null }).success).toBe(true);
+  });
+});
+
 describe('updateTodoBody', () => {
   it.each([
     [{ title: 'New' }],

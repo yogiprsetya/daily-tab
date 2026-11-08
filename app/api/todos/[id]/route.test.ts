@@ -49,6 +49,20 @@ describe('PATCH /api/todos/[id]', () => {
     expect((await res.json()).completedAt).toEqual(expect.any(String));
   });
 
+  it('updates and clears the link and notes', async () => {
+    await signIn();
+    const row = await createTodo({ title: 'A' });
+
+    const set = await patch(row.id, { url: 'example.com', notes: 'why' });
+    expect(await set.json()).toMatchObject({
+      url: 'https://example.com/',
+      notes: 'why',
+    });
+
+    const cleared = await patch(row.id, { url: '', notes: '' });
+    expect(await cleared.json()).toMatchObject({ url: null, notes: null });
+  });
+
   it('returns 400 for an empty update', async () => {
     await signIn();
     const row = await createTodo({ title: 'A' });

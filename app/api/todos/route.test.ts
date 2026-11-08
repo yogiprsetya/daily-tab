@@ -73,6 +73,24 @@ describe('POST /api/todos', () => {
     expect(await res.json()).toMatchObject({ title: 'A', completedAt: null });
   });
 
+  it('normalizes the link', async () => {
+    await signIn();
+
+    const res = await post({ title: 'A', url: 'example.com' });
+
+    expect(res.status).toBe(201);
+    expect((await res.json()).url).toBe('https://example.com/');
+  });
+
+  it('rejects a javascript: link', async () => {
+    await signIn();
+
+    const res = await post({ title: 'A', url: 'javascript:alert(1)' });
+
+    expect(res.status).toBe(400);
+    expect(await db.select().from(todos)).toHaveLength(0);
+  });
+
   it('returns 400 for an empty title', async () => {
     await signIn();
 

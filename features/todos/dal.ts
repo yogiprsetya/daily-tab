@@ -106,10 +106,14 @@ export async function resolveFilter(
   return row ? filter : { kind: 'all' };
 }
 
-export function createTodo(input: {
-  title: string;
+type TodoFields = {
+  title?: string;
   projectId?: string | null;
-}) {
+  url?: string | null;
+  notes?: string | null;
+};
+
+export function createTodo(input: TodoFields & { title: string }) {
   return translatePgError(
     FOREIGN_KEY_VIOLATION,
     UnknownProjectError,
@@ -122,10 +126,7 @@ export function createTodo(input: {
 
 export function updateTodo(
   id: string,
-  {
-    completed,
-    ...fields
-  }: { title?: string; projectId?: string | null; completed?: boolean }
+  { completed, ...fields }: TodoFields & { completed?: boolean }
 ) {
   return translatePgError(
     FOREIGN_KEY_VIOLATION,

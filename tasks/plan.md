@@ -48,6 +48,7 @@ merge.
 - [x] Task 12: Edit and delete todos
 - [x] Task 13: Manage projects
 - [x] Task 14: Pending tasks on Home
+- [x] Task 14b: Optional link and notes on a todo
 
 ### Checkpoint B: Todos work locally
 

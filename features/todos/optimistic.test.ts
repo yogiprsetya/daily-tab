@@ -6,6 +6,8 @@ const todo = (id: string, projectName: string | null = null) => ({
   title: id,
   projectId: null,
   projectName,
+  url: null,
+  notes: null,
 });
 
 describe('applyToggle', () => {

@@ -23,6 +23,8 @@ export const todos = dailyTab.table(
     projectId: uuid('project_id').references(() => projects.id, {
       onDelete: 'set null',
     }),
+    url: text('url'),
+    notes: text('notes'),
     completedAt: timestamp('completed_at', { withTimezone: true }),
     createdAt: timestamp('created_at', { withTimezone: true })
       .notNull()

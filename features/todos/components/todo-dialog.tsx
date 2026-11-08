@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { apiRequest } from '@/lib/api-client';
 import type { TodoItem } from '../optimistic';
 import { ProjectSelect, readProjectId } from './project-select';
@@ -38,13 +39,22 @@ export function TodoDialog({
     setError(null);
     const result = await apiRequest(`/api/todos/${todo.id}`, {
       method: 'PATCH',
-      body: { title: form.get('title'), projectId: readProjectId(form) },
+      body: {
+        title: form.get('title'),
+        projectId: readProjectId(form),
+        url: form.get('url'),
+        notes: form.get('notes'),
+      },
     });
     setPending(false);
 
     if (result.ok) return onSaved();
     setError(
-      result.fieldErrors.title ?? result.fieldErrors.projectId ?? result.message
+      result.fieldErrors.title ??
+        result.fieldErrors.url ??
+        result.fieldErrors.notes ??
+        result.fieldErrors.projectId ??
+        result.message
     );
   }
 
@@ -94,6 +104,38 @@ export function TodoDialog({
               defaultProjectId={todo.projectId}
               projects={projects}
               className="w-full"
+            />
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="todo-url" className="text-sm">
+              Link (optional)
+            </Label>
+            <Input
+              id="todo-url"
+              name="url"
+              defaultValue={todo.url ?? ''}
+              inputMode="url"
+              autoCapitalize="none"
+              autoCorrect="off"
+              autoComplete="off"
+              spellCheck={false}
+              placeholder="example.com/page"
+              className={FIELD}
+            />
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="todo-notes" className="text-sm">
+              Notes (optional)
+            </Label>
+            <Textarea
+              id="todo-notes"
+              name="notes"
+              defaultValue={todo.notes ?? ''}
+              maxLength={2000}
+              rows={3}
+              className="min-h-20 rounded-lg px-3 py-2 text-base sm:text-sm md:text-sm"
             />
           </div>
 

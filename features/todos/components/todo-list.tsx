@@ -1,9 +1,10 @@
 'use client';
 
-import { Pencil } from 'lucide-react';
+import { ExternalLink, Pencil } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useOptimistic, useState, useTransition } from 'react';
 import { apiRequest } from '@/lib/api-client';
+import { displayHost } from '@/lib/url';
 import { cn } from '@/lib/utils';
 import { type TodoItem, type TodoLists, applyToggle } from '../optimistic';
 import { ICON_BUTTON } from './styles';
@@ -12,39 +13,66 @@ import { TodoDialog } from './todo-dialog';
 function TodoRow({
   todo,
   completed,
+  showNotes,
   onToggle,
   onEdit,
 }: {
   todo: TodoItem;
   completed: boolean;
+  showNotes: boolean;
   onToggle: () => void;
   onEdit?: () => void;
 }) {
+  const hasDetails = todo.url !== null || (showNotes && todo.notes !== null);
+
   return (
-    <li className="flex min-w-0 items-start">
-      <label className="flex min-h-11 min-w-0 flex-1 cursor-pointer items-start gap-3 rounded-lg px-1 py-2.5 text-sm has-focus-visible:ring-2 has-focus-visible:ring-ring">
-        <input
-          type="checkbox"
-          checked={completed}
-          onChange={onToggle}
-          className="mt-0.5 size-5 shrink-0 cursor-pointer accent-primary outline-none"
-        />
-        <span className="flex min-w-0 flex-col gap-0.5">
-          <span
-            className={cn(
-              'wrap-anywhere',
-              completed && 'text-muted-foreground line-through'
-            )}
-          >
-            {todo.title}
-          </span>
-          {todo.projectName && (
-            <span className="text-xs text-muted-foreground">
-              {todo.projectName}
+    <li className="flex min-w-0 items-center">
+      <div className="flex min-w-0 flex-1 flex-col">
+        <label className="flex min-h-11 min-w-0 flex-1 cursor-pointer items-center gap-4 rounded-lg px-1 py-2.5 text-sm has-focus-visible:ring-2 has-focus-visible:ring-ring">
+          <input
+            type="checkbox"
+            checked={completed}
+            onChange={onToggle}
+            className="mt-0.5 size-5 shrink-0 cursor-pointer accent-primary outline-none"
+          />
+          <span className="flex min-w-0 flex-col gap-0.5">
+            <span
+              className={cn(
+                'wrap-anywhere',
+                completed && 'text-muted-foreground line-through'
+              )}
+            >
+              {todo.title}
             </span>
-          )}
-        </span>
-      </label>
+            {todo.projectName && (
+              <span className="text-xs text-muted-foreground">
+                {todo.projectName}
+              </span>
+            )}
+          </span>
+        </label>
+        {/* Outside the label, so opening the link does not tick the todo. */}
+        {hasDetails && (
+          <div className="flex min-w-0 flex-col items-start gap-1 pb-2.5 pl-10 text-xs text-muted-foreground">
+            {todo.url && (
+              <a
+                href={todo.url}
+                target="_blank"
+                rel="noreferrer"
+                className="flex max-w-full min-w-0 items-center gap-1 rounded underline-offset-2 outline-none hover:text-foreground hover:underline focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <ExternalLink aria-hidden className="size-3 shrink-0" />
+                <span className="truncate">{displayHost(todo.url)}</span>
+              </a>
+            )}
+            {showNotes && todo.notes && (
+              <p className="line-clamp-3 wrap-anywhere whitespace-pre-line">
+                {todo.notes}
+              </p>
+            )}
+          </div>
+        )}
+      </div>
       {onEdit && (
         <button
           type="button"
@@ -112,6 +140,7 @@ export function TodoList({
               key={todo.id}
               todo={todo}
               completed={false}
+              showNotes={Boolean(projects)}
               onToggle={() => toggle(todo, true)}
               onEdit={onEdit(todo)}
             />
@@ -130,6 +159,7 @@ export function TodoList({
                 key={todo.id}
                 todo={todo}
                 completed
+                showNotes={Boolean(projects)}
                 onToggle={() => toggle(todo, false)}
                 onEdit={onEdit(todo)}
               />

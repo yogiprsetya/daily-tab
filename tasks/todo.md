@@ -137,6 +137,14 @@ first. Read the relevant guide in `node_modules/next/dist/docs/` before using a 
     - [x] At most 5 oldest pending, tickable; "View all (N)" shows the true total.
   - Scope: S
 
+- [x] **Task 14b: Optional link and notes on a todo (added by owner)**
+  - Files: `features/todos/{schema,validation,dal,optimistic}.ts`, `drizzle/0004_*`, `lib/url.ts` (+ test),
+    `features/todos/components/{todo-list,todo-dialog}.tsx`, `components/ui/textarea.tsx`
+  - Acceptance:
+    - [x] Link uses the shortcut URL rules; empty input clears link and notes.
+    - [x] The link does not tick the todo; notes show on `/todos`, not on Home.
+  - Scope: M
+
 ## Checkpoint B: Todos work locally
 
 - [x] Gates pass; curl CRUD smoke with a session cookie

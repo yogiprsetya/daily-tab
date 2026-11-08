@@ -3,6 +3,8 @@ export type TodoItem = {
   title: string;
   projectId: string | null;
   projectName: string | null;
+  url: string | null;
+  notes: string | null;
 };
 
 export type TodoLists = { pending: TodoItem[]; completed: TodoItem[] };
@@ -13,7 +15,9 @@ export const toItem = ({
   title,
   projectId,
   projectName,
-}: TodoItem): TodoItem => ({ id, title, projectId, projectName });
+  url,
+  notes,
+}: TodoItem): TodoItem => ({ id, title, projectId, projectName, url, notes });
 
 /** What the list shows between ticking a box and the server confirming it. */
 export function applyToggle(
