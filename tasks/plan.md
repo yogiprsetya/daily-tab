@@ -35,7 +35,7 @@ merge.
 ### Checkpoint A: Shortcuts work locally
 
 - [x] Gates pass; curl CRUD smoke with a session cookie
-- [ ] Owner checks shortcuts in a browser (desktop + mobile width)
+- [x] Owner checks shortcuts in a browser (desktop + mobile width)
 
 - [ ] Task 7: Release shortcuts (human-gated)
 

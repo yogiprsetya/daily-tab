@@ -82,7 +82,7 @@ first. Read the relevant guide in `node_modules/next/dist/docs/` before using a 
 ## Checkpoint A: Shortcuts work locally
 
 - [x] Gates pass; curl CRUD smoke with a session cookie
-- [ ] Owner's browser check (desktop + mobile width)
+- [x] Owner's browser check (desktop + mobile width)
 
 - [ ] **Task 7: Release shortcuts (human-gated)**
   - Acceptance:

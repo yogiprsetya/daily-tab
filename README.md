@@ -102,6 +102,14 @@ Single owner, static credentials from env. Spec: [SPEC-auth.md](SPEC-auth.md).
   [features/auth/require-session.ts](features/auth/require-session.ts) first, even though `proxy.ts`
   already checks. Mutating requests (`POST`/`PUT`/`PATCH`/`DELETE`) must come from the app's own origin.
 
+## Shortcuts
+
+Shown on Home; "Edit" switches to rows with move, edit and delete. Spec: [SPEC-shortcuts.md](SPEC-shortcuts.md).
+
+- URLs must be `http` or `https`; a bare domain gets `https://`.
+- Icons come from `icons.duckduckgo.com`, which receives only the hostname. The title's first letter shows
+  until the icon has loaded, or if it never does.
+
 ## PWA icons
 
 Sources are [public/icons/icon.svg](public/icons/icon.svg) (rounded, purpose `any`) and
