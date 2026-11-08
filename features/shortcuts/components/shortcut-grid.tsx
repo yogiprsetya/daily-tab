@@ -19,6 +19,82 @@ const TEXT_BUTTON =
 
 type DialogState = { key: string; shortcut: ShortcutItem | null } | null;
 
+function ShortcutTiles({ items }: { items: ShortcutItem[] }) {
+  return (
+    <ul className={GRID}>
+      {items.map((item) => (
+        <li key={item.id} className="min-w-0">
+          <a href={item.url} className={TILE}>
+            <ShortcutIcon title={item.title} url={item.url} />
+            <span className="w-full truncate text-center">{item.title}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function ShortcutRows({
+  items,
+  moving,
+  onMove,
+  onEdit,
+  onAdd,
+}: {
+  items: ShortcutItem[];
+  moving: boolean;
+  onMove: (id: string, direction: 'up' | 'down') => void;
+  onEdit: (item: ShortcutItem) => void;
+  onAdd: () => void;
+}) {
+  return (
+    <ul className="grid gap-1 lg:grid-cols-2">
+      {items.map((item, index) => (
+        <li key={item.id} className="flex min-w-0 items-center gap-2">
+          <ShortcutIcon title={item.title} url={item.url} />
+          <span className="min-w-0 flex-1 truncate text-sm">{item.title}</span>
+          <button
+            type="button"
+            aria-label={`Move ${item.title} up`}
+            disabled={index === 0 || moving}
+            onClick={() => onMove(item.id, 'up')}
+            className={ICON_BUTTON}
+          >
+            <ChevronUp aria-hidden className="size-5" />
+          </button>
+          <button
+            type="button"
+            aria-label={`Move ${item.title} down`}
+            disabled={index === items.length - 1 || moving}
+            onClick={() => onMove(item.id, 'down')}
+            className={ICON_BUTTON}
+          >
+            <ChevronDown aria-hidden className="size-5" />
+          </button>
+          <button
+            type="button"
+            aria-label={`Edit ${item.title}`}
+            onClick={() => onEdit(item)}
+            className={ICON_BUTTON}
+          >
+            <Pencil aria-hidden className="size-4" />
+          </button>
+        </li>
+      ))}
+      <li>
+        <button
+          type="button"
+          onClick={onAdd}
+          className={cn(TEXT_BUTTON, 'w-full')}
+        >
+          <Plus aria-hidden className="size-4" />
+          Add shortcut
+        </button>
+      </li>
+    </ul>
+  );
+}
+
 export function ShortcutGrid({ items }: { items: ShortcutItem[] }) {
   const router = useRouter();
   const [editing, setEditing] = useState(false);
@@ -40,6 +116,7 @@ export function ShortcutGrid({ items }: { items: ShortcutItem[] }) {
   }
 
   const openAdd = () => setDialog({ key: 'add', shortcut: null });
+  const hasItems = items.length > 0;
 
   return (
     <>
@@ -50,7 +127,7 @@ export function ShortcutGrid({ items }: { items: ShortcutItem[] }) {
         >
           Shortcuts
         </h2>
-        {items.length > 0 && (
+        {hasItems && (
           <button
             type="button"
             onClick={() => setEditing((value) => !value)}
@@ -67,7 +144,7 @@ export function ShortcutGrid({ items }: { items: ShortcutItem[] }) {
         </p>
       )}
 
-      {items.length === 0 ? (
+      {!hasItems && (
         <div className="flex flex-col items-start gap-2">
           <p className="text-sm text-muted-foreground">No shortcuts yet.</p>
           <button
@@ -79,66 +156,16 @@ export function ShortcutGrid({ items }: { items: ShortcutItem[] }) {
             Add shortcut
           </button>
         </div>
-      ) : editing ? (
-        <ul className="grid gap-1 lg:grid-cols-2">
-          {items.map((item, index) => (
-            <li key={item.id} className="flex min-w-0 items-center gap-2">
-              <ShortcutIcon title={item.title} url={item.url} />
-              <span className="min-w-0 flex-1 truncate text-sm">
-                {item.title}
-              </span>
-              <button
-                type="button"
-                aria-label={`Move ${item.title} up`}
-                disabled={index === 0 || movingId !== null}
-                onClick={() => move(item.id, 'up')}
-                className={ICON_BUTTON}
-              >
-                <ChevronUp aria-hidden className="size-5" />
-              </button>
-              <button
-                type="button"
-                aria-label={`Move ${item.title} down`}
-                disabled={index === items.length - 1 || movingId !== null}
-                onClick={() => move(item.id, 'down')}
-                className={ICON_BUTTON}
-              >
-                <ChevronDown aria-hidden className="size-5" />
-              </button>
-              <button
-                type="button"
-                aria-label={`Edit ${item.title}`}
-                onClick={() => setDialog({ key: item.id, shortcut: item })}
-                className={ICON_BUTTON}
-              >
-                <Pencil aria-hidden className="size-4" />
-              </button>
-            </li>
-          ))}
-          <li>
-            <button
-              type="button"
-              onClick={openAdd}
-              className={cn(TEXT_BUTTON, 'w-full')}
-            >
-              <Plus aria-hidden className="size-4" />
-              Add shortcut
-            </button>
-          </li>
-        </ul>
-      ) : (
-        <ul className={GRID}>
-          {items.map((item) => (
-            <li key={item.id} className="min-w-0">
-              <a href={item.url} className={TILE}>
-                <ShortcutIcon title={item.title} url={item.url} />
-                <span className="w-full truncate text-center">
-                  {item.title}
-                </span>
-              </a>
-            </li>
-          ))}
-        </ul>
+      )}
+      {hasItems && !editing && <ShortcutTiles items={items} />}
+      {hasItems && editing && (
+        <ShortcutRows
+          items={items}
+          moving={movingId !== null}
+          onMove={move}
+          onEdit={(item) => setDialog({ key: item.id, shortcut: item })}
+          onAdd={openAdd}
+        />
       )}
 
       {dialog && (
