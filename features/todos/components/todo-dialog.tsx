@@ -1,6 +1,7 @@
 'use client';
 
 import { type FormEvent, useState } from 'react';
+import { ACTION, FIELD } from '@/components/form-styles';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -13,7 +14,6 @@ import { Label } from '@/components/ui/label';
 import { apiRequest } from '@/lib/api-client';
 import type { TodoItem } from '../optimistic';
 import { ProjectSelect, readProjectId } from './project-select';
-import { ACTION, FIELD } from './styles';
 
 export function TodoDialog({
   todo,

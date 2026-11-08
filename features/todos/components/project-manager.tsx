@@ -3,6 +3,7 @@
 import { Check, Pencil, Settings2, Trash2, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { type FormEvent, useState } from 'react';
+import { ACTION, FIELD } from '@/components/form-styles';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -14,7 +15,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { apiRequest } from '@/lib/api-client';
 import { cn } from '@/lib/utils';
-import { ACTION, FIELD, ICON_BUTTON } from './styles';
+import { ICON_BUTTON } from './styles';
 
 type Project = { id: string; name: string };
 

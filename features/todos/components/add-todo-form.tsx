@@ -2,11 +2,11 @@
 
 import { useRouter } from 'next/navigation';
 import { type FormEvent, useRef, useState } from 'react';
+import { ACTION, FIELD } from '@/components/form-styles';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { apiRequest } from '@/lib/api-client';
 import { ProjectSelect, readProjectId } from './project-select';
-import { ACTION, FIELD } from './styles';
 
 export function AddTodoForm({
   projects,
