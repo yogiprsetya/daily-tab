@@ -1,161 +1,171 @@
-# Tasks: platform
+# Tasks: auth
 
-Plan: [plan.md](plan.md) · Spec: [SPEC-platform.md](../SPEC-platform.md)
+Plan: [plan.md](plan.md) · Spec: [SPEC-auth.md](../SPEC-auth.md)
 
-Standing verification for every task: `npm run lint && npm run typecheck && npm test && npm run build`
-(the last three exist from Task 1 onward). Read the relevant guide in `node_modules/next/dist/docs/` before
-using any Next.js API.
+Standing verification for every task: `pnpm lint && pnpm typecheck && pnpm test && pnpm build`. Read the
+relevant guide in `node_modules/next/dist/docs/` before using a Next.js API. Never print `AUTH_*` values.
 
-## Phase 1: Data foundation
+## Phase 0: Tooling
 
-- [x] **Task 1: Tooling, env validation, test runner**
-  - Description: Install approved deps (`drizzle-orm`, `postgres`, `zod`, `server-only`; dev `drizzle-kit`,
-    `vitest`). Add `typecheck`, `test`, `test:watch` scripts. Add `lib/env.ts` that parses `process.env`
-    with Zod (`DATABASE_URL` required, `DATABASE_URL_MIGRATE` and `TEST_DATABASE_URL` optional) and throws a
-    readable error listing missing vars. Add `.env.example` with names only.
+- [ ] **Task 0: Switch from npm to pnpm**
+  - Description: Track `pnpm-lock.yaml`, delete `package-lock.json`, resolve the `allowBuilds` placeholder
+    in `pnpm-workspace.yaml`, change the husky hook to `pnpm exec lint-staged`, replace `npm` with `pnpm` in
+    README and specs' command sections.
   - Acceptance:
-    - [x] `npm test` runs Vitest; `lib/env.test.ts` covers valid env, missing `DATABASE_URL`, invalid URL.
-    - [x] `npm run typecheck` passes.
-    - [x] `.env.example` is committed, `.env` is still ignored.
-  - Verify: `npm test`, `npm run typecheck`, `git check-ignore .env`
+    - [ ] `pnpm install --frozen-lockfile` succeeds with no prompts.
+    - [ ] Full gates and build pass under pnpm.
+    - [ ] A commit runs lint-staged through pnpm.
+  - Verify: `pnpm install --frozen-lockfile && pnpm lint && pnpm typecheck && pnpm test && pnpm build`
   - Dependencies: none
-  - Files: `package.json`, `vitest.config.mts`, `lib/env.ts`, `lib/env.test.ts`, `.env.example`
-  - Scope: M
-
-- [x] **Task 2: Drizzle connection and `daily_tab` migration pipeline**
-  - Description: `db/schema.ts` exports `dailyTab = pgSchema('daily_tab')`. `db/index.ts` creates the
-    server-only postgres.js client (`prepare: false`, `max: 5`, `globalThis` reuse in dev) and the Drizzle
-    instance. `drizzle.config.ts` uses `schemaFilter: ['daily_tab']`, `migrations: { schema: 'daily_tab' }`,
-    out dir `drizzle/`, and `DATABASE_URL_MIGRATE ?? DATABASE_URL`. Add `db:generate`, `db:migrate`,
-    `db:studio` scripts. Generate the initial migration that creates the schema (custom migration if
-    drizzle-kit emits nothing for a table-less schema).
-  - Acceptance:
-    - [x] `npm run db:migrate` against local Supabase creates schema `daily_tab` containing the migration
-          journal table, and no other schema gains objects.
-    - [x] Re-running `npm run db:migrate` is a no-op.
-    - [x] Importing `@/db` from a Client Component fails the build (`server-only`).
-  - Verify: `npm run db:migrate` twice; then
-    `select table_schema, table_name from information_schema.tables where table_schema = 'daily_tab';`
-  - Dependencies: Task 1
-  - Files: `db/schema.ts`, `db/index.ts`, `drizzle.config.ts`, `package.json`, `drizzle/0000_*.sql`
-  - Scope: M
-
-- [x] **Task 3: API helpers and `GET /api/health`**
-  - Description: `lib/api.ts` provides `json(data, init?)`, `apiError(code, message, issues?)` (status derived from code),
-    `parseBody(request, zodSchema)`, `parseQuery(url, zodSchema)` returning the error shape from the spec.
-    `app/api/health/route.ts` runs `select 1` and returns 200/503. Vitest global setup migrates the
-    `daily_tab_test` database; test env points `DATABASE_URL` at `TEST_DATABASE_URL`.
-  - Acceptance:
-    - [x] Unit tests for every helper, including Zod failure → 400 `validation_error` with `issues`.
-    - [x] Integration test: health handler returns `200 {"status":"ok","db":"ok"}` against the test DB.
-    - [x] Manual: `curl localhost:3000/api/health` → 200; with an unreachable `DATABASE_URL` → 503 (the shared local Postgres is never stopped).
-  - Verify: `npm test`, `npm run dev` + curl
-  - Dependencies: Task 2
-  - Files: `lib/api.ts`, `lib/api.test.ts`, `app/api/health/route.ts`, `app/api/health/route.test.ts`,
-    `tests/global-setup.ts`
-  - Scope: M
-  - Note: one-time manual step to create the test database, e.g.
-    `docker exec supabase_db_supabase createdb -U postgres daily_tab_test` (ask before running).
-
-## Checkpoint A: Data foundation
-
-- [x] `npm run lint && npm run typecheck && npm test && npm run build` pass
-- [x] Health endpoint 200 / 503 confirmed manually
-- [x] Human review before UI work (reviewed in chat, then continued with `/build auto`)
-
-## Phase 2: App shell
-
-- [x] **Task 4: Dark theme and root layout cleanup**
-  - Description: Root layout sets `<html lang="en" class="dark">`, metadata title "Daily Tab", keeps a
-    single sans font (Inter) and Geist Mono only if used, `body` is `h-dvh overflow-hidden bg-background
-text-foreground`. Remove create-next-app demo (`app/page.tsx`) and `public/{file,globe,next,vercel,window}.svg`.
-  - Acceptance:
-    - [x] App renders dark with OS set to light.
-    - [x] Tab title is "Daily Tab".
-    - [x] No references remain to removed files.
-  - Verify: `npm run build`; DevTools "Emulate prefers-color-scheme: light" still shows dark
-  - Dependencies: none (can run in parallel with Phase 1)
-  - Files: `app/layout.tsx`, `app/globals.css`, `app/page.tsx` (deleted), `public/*.svg` (deleted)
+  - Files: `package-lock.json` (deleted), `pnpm-lock.yaml`, `pnpm-workspace.yaml`, `.husky/pre-commit`,
+    `README.md`
   - Scope: S
 
-- [x] **Task 5: App shell with navigation and home route**
-  - Description: `nav-items.ts` lists the 5 destinations (Home `/`, Todos, Bookmarks, Reading list,
-    Obsidian) with lucide icons. `nav-rail.tsx` (≥1024px) and `bottom-tab-bar.tsx` (<1024px) render that list
-    with `next/link`, active state via `usePathname` + `aria-current="page"`. `app-shell.tsx` lays out nav +
-    an internally scrolling content area. `app/(app)/layout.tsx` uses it; `app/(app)/page.tsx` is home:
-    today's day + date (client-rendered in local time zone, rolls over at midnight) plus placeholder slots
-    for "Shortcuts" and "Pending tasks".
+## Phase 1: Auth core
+
+- [ ] **Task 1: Auth config and session primitives**
+  - Description: Add `jose`. `features/auth/config.ts` parses `AUTH_EMAIL`, `AUTH_PIN` (digits, ≥6),
+    `AUTH_SECRET` (≥32 chars) lazily, errors name variables only. `features/auth/session.ts`:
+    `signSession(now)`, `verifySession(token, now)`, `needsRefresh(payload, now)` (> 24 h),
+    `sessionCookie(token)` / `clearedSessionCookie()` (one place for name + attributes + 30-day Max-Age),
+    `requireSession()` reading `cookies()` and returning `{ ok, response }` like `parseBody`. Test values
+    for `AUTH_*` in `vitest.config.mts` env.
   - Acceptance:
-    - [x] Home shows the correct local day and date, weekday ("Sunday") above the date ("8 November 2026").
-    - [x] At 1440×900 the rail is visible and the tab bar hidden; at 412×915 the reverse.
-    - [x] Tab bar items are ≥44px tall and clear `env(safe-area-inset-bottom)`.
-    - [x] Long placeholder content scrolls inside the content area; `document.documentElement.scrollHeight
-=== innerHeight`, no horizontal overflow.
-  - Verify: `npm run build` (no Cache Components errors); DevTools device toolbar at both sizes
+    - [ ] Unit tests: valid token verifies; expired, tampered, wrong-secret and garbage tokens → null.
+    - [ ] JWT `exp` and cookie `Max-Age` are both 30 days from the same `now`.
+    - [ ] `needsRefresh` false at 23 h 59 m, true at 24 h 1 m.
+    - [ ] Config errors name the variable and never contain its value.
+  - Verify: `pnpm test features/auth`
+  - Dependencies: Task 0
+  - Files: `package.json`, `pnpm-lock.yaml`, `features/auth/config.ts`, `features/auth/session.ts`,
+    `features/auth/session.test.ts`, `vitest.config.mts` (+ `config.test.ts`)
+  - Scope: M
+
+- [ ] **Task 2: Credential check, request helpers, new API error codes**
+  - Description: `credentials.ts`: `checkCredentials(email, pin)` with trim + case-insensitive email,
+    SHA-256 + `timingSafeEqual` for both. `request.ts`: `clientIp(headers)`, `safeNextPath(value)`,
+    `isSameOrigin(request)`. `lib/api.ts`: add `forbidden` (403) and `rate_limited` (429).
+  - Acceptance:
+    - [ ] Credentials: right pair true; wrong email, wrong PIN, empty, different length → false;
+          `" Owner@X.com "` matches `owner@x.com`.
+    - [ ] `safeNextPath` keeps `/todos?x=1`; rejects `//evil.com`, `https://evil.com`, `/\evil`, empty → `/`.
+    - [ ] `clientIp` takes the first `x-forwarded-for` entry, falls back to `x-real-ip`, then `"unknown"`.
+    - [ ] `isSameOrigin` false for missing or foreign `Origin`.
+  - Verify: `pnpm test features/auth lib`
+  - Dependencies: Task 1
+  - Files: `features/auth/credentials.ts`, `features/auth/request.ts`, their tests, `lib/api.ts`,
+    `lib/api.test.ts`
+  - Scope: M
+
+- [ ] **Task 3: `login_attempts` table and rate limiter**
+  - Description: `features/auth/schema.ts` per spec, migration via `pnpm db:generate`, applied locally.
+    `rate-limit.ts` (server-only): `checkLoginAllowed(ip, now)` → `{ allowed: true } | { allowed: false,
+retryAfterSeconds }` (per-IP 5/15 min first, then global 20/60 min), `recordAttempt(ip, succeeded,
+now)`, `pruneAttempts(now)` (> 24 h). Integration tests truncate `login_attempts` between tests.
+  - Acceptance:
+    - [ ] 4 failures from an IP allowed, 5th failure → next check blocked; `retryAfterSeconds` matches the
+          oldest failure + 15 min.
+    - [ ] Failures older than the window do not count; successes never count.
+    - [ ] 20 failures spread over many IPs block every IP.
+    - [ ] Migration only touches `daily_tab`.
+  - Verify: `pnpm test features/auth/rate-limit`; `pnpm db:migrate`; check `information_schema`
+  - Dependencies: Task 1
+  - Files: `features/auth/schema.ts`, `features/auth/rate-limit.ts`, `features/auth/rate-limit.test.ts`,
+    `drizzle/0001_*.sql`, `db/schema.ts` (re-export if needed)
+  - Scope: M
+
+- [ ] **Task 4: Login and logout route handlers**
+  - Description: `POST /api/auth/login`: Zod body `{ email, pin }` → rate limit check (429 + `Retry-After`,
+    no record) → `checkCredentials` → record → 401 `invalid_credentials`-style generic message, or 200 with
+    `Set-Cookie`. `POST /api/auth/logout`: cleared cookie, 200. Both `await connection()`.
+  - Acceptance:
+    - [ ] Integration: success → 200 + cookie with correct attributes + success recorded.
+    - [ ] Wrong PIN → 401 generic message + failure recorded; 6th from the same IP → 429 with
+          `Retry-After`, nothing recorded, even with the right PIN.
+    - [ ] Invalid body → 400 `validation_error` without echoing the PIN.
+    - [ ] Logout → `Max-Age=0` cookie.
+  - Verify: `pnpm test app/api/auth`; curl locally
+  - Dependencies: Tasks 2, 3
+  - Files: `app/api/auth/login/route.ts`, `app/api/auth/login/route.test.ts`,
+    `app/api/auth/logout/route.ts`, `app/api/auth/logout/route.test.ts`
+  - Scope: M
+
+## Checkpoint A: API auth works
+
+- [ ] Gates pass
+- [ ] curl: login cookie, 401, 429, logout recorded below
+
+## Phase 2: Gate and UI
+
+- [ ] **Task 5: Login page**
+  - Description: `app/login/page.tsx` (static, outside `(app)`, dark, centered card) + `login-form.tsx`
+    (client): email + PIN fields with correct `autocomplete`/`inputMode`, submit → `fetch` login → on 200
+    `router.replace(safeNextPath(next))`; shows generic error or "Too many attempts, try again in N
+    minutes"; disables while submitting; focuses the first field.
+  - Acceptance:
+    - [ ] `/login` builds as static.
+    - [ ] Errors are announced (`role="alert"`), fields have labels, PIN never echoed in UI state beyond the
+          input.
+    - [ ] Manual (owner): login works and lands on `next`.
+  - Verify: `pnpm build` route table; manual browser check
   - Dependencies: Task 4
-  - Files: `components/shell/nav-items.ts`, `components/shell/nav-rail.tsx`,
-    `components/shell/bottom-tab-bar.tsx`, `components/shell/app-shell.tsx`, `app/(app)/layout.tsx`,
-    `app/(app)/page.tsx`
-  - Also added: `components/home/today.tsx` (+ test), `components/inline-script.tsx`, `components/shell/nav-items.test.ts`, and `module-placeholder.tsx` (moved up from Task 6 because home uses it).
-  - Scope: M
+  - Files: `app/login/page.tsx`, `app/login/login-form.tsx`
+  - Scope: S
 
-- [x] **Task 6: Placeholder routes for the four other modules**
-  - Description: Static pages `/todos`, `/bookmarks`, `/reading-list`, `/obsidian`, each rendering a shared
-    `ModulePlaceholder` (module name + "Coming soon").
+- [ ] **Task 6: Proxy**
+  - Description: `proxy.ts` with matcher excluding assets; public routes; Origin check for mutating `/api/*`;
+    page → 307 `/login?next=…`; API → 401 JSON; `/login` with session → `/`; valid session older than 24 h →
+    `NextResponse.next()` with a refreshed cookie.
   - Acceptance:
-    - [x] All 5 destinations navigate without 404 from both rail and tab bar.
-    - [x] Active item matches the current route on each page.
-  - Verify: `npm run build` shows the 4 routes as static; manual click-through at both viewport sizes
-  - Dependencies: Task 5
-  - Files: `components/shell/module-placeholder.tsx`, `app/(app)/todos/page.tsx`,
-    `app/(app)/bookmarks/page.tsx`, `app/(app)/reading-list/page.tsx`, `app/(app)/obsidian/page.tsx`
+    - [ ] Unit tests for every branch with `NextRequest` and `next/experimental/testing/server`.
+    - [ ] `unstable_doesProxyMatch` false for `/_next/static/x.js`, `/icons/icon-192.png`,
+          `/manifest.webmanifest`; true for `/`, `/todos`, `/api/health`.
+    - [ ] curl without cookie: `/` 307, `/api/health` 200, icons/manifest 200.
+  - Verify: `pnpm test proxy`; `pnpm build && pnpm start` + curl
+  - Dependencies: Tasks 1, 2, 5
+  - Files: `proxy.ts`, `proxy.test.ts`
   - Scope: M
 
-## Checkpoint B: App shell
+- [ ] **Task 7: Logout button**
+  - Description: `components/shell/logout-button.tsx` (client): `POST /api/auth/logout` then
+    `router.replace('/login')`. Rendered at the bottom of the nav rail and in the Home header below 1024px.
+  - Acceptance:
+    - [ ] Visible on desktop rail and mobile Home only; keyboard reachable with a visible label.
+    - [ ] Manual (owner): logout lands on `/login`; back button does not show protected content.
+  - Verify: `pnpm build`; manual browser check
+  - Dependencies: Task 6
+  - Files: `components/shell/logout-button.tsx`, `components/shell/nav-rail.tsx`, `app/(app)/page.tsx`
+  - Scope: S
 
-- [x] No document scroll at 1440×900 and 412×915; all destinations work
-- [x] Human review of look and feel (owner saw the installed app on Android, 2026-11-08)
+## Checkpoint B: Locked locally
+
+- [ ] Local Success Criteria in SPEC-auth.md checked
+- [ ] Owner's manual browser check (desktop + mobile width)
 
 ## Phase 3: Ship
 
-- [x] **Task 7: PWA manifest and icons**
-  - Description: `app/manifest.ts` per spec (name, short_name, standalone, `start_url: "/"`, dark
-    theme/background colors). Icons 192, 512 and maskable 512 in `public/icons/` (source depends on the
-    icon open question).
+- [ ] **Task 8: Docs**
+  - Description: README: auth env vars, generating `AUTH_SECRET`, how to revoke all sessions, rate-limit
+    behaviour; `.env.example` gains `AUTH_*` names.
   - Acceptance:
-    - [x] `/manifest.webmanifest` serves the manifest.
-    - [x] DevTools > Application > Manifest shows no errors or installability warnings.
-  - Verify: `npm run build && npm start`, DevTools Application panel
-  - Dependencies: Task 4
-  - Files: `app/manifest.ts`, `public/icons/icon-192.png`, `public/icons/icon-512.png`,
-    `public/icons/icon-maskable-512.png`
-  - Scope: S
-
-- [x] **Task 8: README and setup docs**
-  - Description: Replace create-next-app README with: what the app is, local setup (shared local Supabase,
-    `.env` from `.env.example`, create `daily_tab_test`, `npm run db:migrate`), all scripts, deploy notes,
-    link to CAPABILITY-MAP and specs.
-  - Acceptance:
-    - [x] Following the README from a fresh clone reaches a running app with `/api/health` 200.
-    - Verified 2026-11-08 in a clean worktree: npm ci → db:migrate → dev → /api/health 200. Found and fixed: `typecheck` needed `next typegen` on a clone without `.next/`.
-  - Verify: walk through the steps in a clean worktree
+    - [ ] A new reader can set up auth locally from the README alone.
+  - Verify: read-through; `pnpm format:check`
   - Dependencies: Tasks 1–7
-  - Files: `README.md`
+  - Files: `README.md`, `.env.example`
   - Scope: XS
 
-- [x] **Task 9: Deploy to Vercel + Supabase cloud (human-gated)**
-  - Description: With explicit approval: confirm/create the Supabase cloud project, run
-    `npm run db:migrate` with `DATABASE_URL_MIGRATE` set to the session pooler, set `DATABASE_URL`
-    (transaction pooler `:6543`) in Vercel, deploy.
+- [ ] **Task 9: Deploy (human-gated)**
+  - Description: Owner sets `AUTH_EMAIL`, `AUTH_PIN`, `AUTH_SECRET` on Vercel and runs the cloud migration
+    (`DATABASE_URL_MIGRATE='…' pnpm db:migrate`); PR merged; prod smoke by Claude (curl) and owner
+    (Android).
   - Acceptance:
-    - [x] Deployed `/api/health` → 200. (https://daily-tab.vercel.app, migrations applied to Supabase cloud by owner)
-    - [x] App installs on Android from the deployed URL and launches standalone as "Daily Tab".
-  - Verify: curl the deployed URL; install on the Android device
-  - Dependencies: Tasks 1–8
-  - Files: none in repo (Vercel/Supabase settings)
+    - [ ] Prod: `/` 307 `/login`; `/api/health` 200; wrong PIN 401; foreign Origin 403.
+    - [ ] Android PWA logs in and is still logged in after closing and reopening.
+  - Dependencies: Tasks 0–8
+  - Files: none in repo
   - Scope: S
 
-## Checkpoint C: Platform complete
+## Checkpoint C: Auth complete
 
-- [x] Every Success Criteria box in SPEC-platform.md is checked
-- [x] Ready for `SPEC-auth`
+- [ ] Every Success Criteria box in SPEC-auth.md checked
+- [ ] Ready for the next module

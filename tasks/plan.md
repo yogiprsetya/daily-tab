@@ -1,82 +1,80 @@
-# Implementation Plan: platform (done 2026-11-08)
+# Implementation Plan: auth
 
-Spec: [SPEC-platform.md](../SPEC-platform.md) · Map: [CAPABILITY-MAP.md](../CAPABILITY-MAP.md)
-Tasks: [todo.md](todo.md)
+Spec: [SPEC-auth.md](../SPEC-auth.md) · Map: [CAPABILITY-MAP.md](../CAPABILITY-MAP.md) · Tasks: [todo.md](todo.md)
+Previous module: [archive/platform-plan.md](archive/platform-plan.md)
 
 ## Overview
 
-Build the foundation that every feature module plugs into: validated env, Drizzle + postgres.js against
-Supabase with everything inside `pgSchema('daily_tab')`, a migration pipeline that cannot touch other schemas
-in the shared local Supabase instance, a JSON API convention proven by `GET /api/health`, a dark-only app
-shell with one route per module (nav rail ≥1024px, bottom tab bar below), and an installable PWA manifest.
-Ends with a Vercel deploy talking to the Supabase cloud project.
+Put the whole app behind a static email + PIN login. A `jose`-signed cookie (30 days, sliding) carries the
+session; `proxy.ts` redirects pages and returns 401 for APIs without it, rejects cross-origin mutations,
+and refreshes old sessions. Login attempts go to `daily_tab.login_attempts` for per-IP and global rate
+limits. Every non-public Route Handler also calls `requireSession()`. First, the repo switches from npm to
+pnpm.
 
 ## Architecture Decisions
 
-- **Order: data path first, UI second.** DB + API (Tasks 1–3) carry the most unknowns (drizzle-kit behaviour
-  with a custom schema, shared local instance, test database). The shell (Tasks 4–6) is low risk.
-- **Migration journal inside `daily_tab`** (`migrations.schema = 'daily_tab'`) plus `schemaFilter: ['daily_tab']`,
-  so drizzle-kit never diffs or writes other schemas in the shared Supabase instance.
-- **Separate test database** `daily_tab_test` on the same local Postgres. Vitest sets `DATABASE_URL` to
-  `TEST_DATABASE_URL` and runs migrations in global setup. Tests never touch the dev database.
-- **Route group `app/(app)/`** owns the shell layout, so future non-shell routes (e.g. `/login` in `auth`)
-  can live outside it without layout hacks.
-- **Navigation is data**: `components/shell/nav-items.ts` is the single list both the rail and the tab bar
-  render, so adding or renaming a destination is one edit.
-- **Deploy is a human-gated task.** Creating the Supabase cloud project, setting Vercel env vars, and running
-  the first prod migration are "ask first" in the spec.
+- **Primitives before wiring.** Session, credential and request helpers are pure and unit-tested first
+  (Tasks 1–2). The DB-backed rate limiter (Task 3) and the route handlers (Task 4) build on them.
+- **Login page before the proxy.** The proxy redirects everything to `/login`; shipping it before the page
+  exists would leave the app unusable between tasks. Order: routes → page → proxy → logout UI.
+- **Auth env parsed separately** (`features/auth/config.ts`), so `drizzle-kit` and DB tooling never need
+  `AUTH_*`.
+- **No DB in the proxy.** It only verifies the JWT (fast, runs on every request). Rate limiting lives in the
+  login handler.
+- **No browser E2E** for now (owner decision). HTTP-level smoke with curl plus a manual browser check at
+  the checkpoints.
 
 ## Task List
 
-### Phase 1: Data foundation
+### Phase 0: Tooling
 
-- [x] Task 1: Tooling, env validation, test runner
-- [x] Task 2: Drizzle connection and `daily_tab` migration pipeline
-- [x] Task 3: API helpers and `GET /api/health`
+- [ ] Task 0: Switch from npm to pnpm
 
-### Checkpoint A: Data foundation
+### Phase 1: Auth core
 
-- [x] `npm run lint && npm run typecheck && npm test && npm run build` pass
-- [x] `curl localhost:3000/api/health` → 200; unreachable DB → 503
-- [x] Human review before UI work
+- [ ] Task 1: Auth config and session primitives
+- [ ] Task 2: Credential check, request helpers, new API error codes
+- [ ] Task 3: `login_attempts` table and rate limiter
+- [ ] Task 4: Login and logout route handlers
 
-### Phase 2: App shell
+### Checkpoint A: API auth works
 
-- [x] Task 4: Dark theme and root layout cleanup
-- [x] Task 5: App shell with navigation and home route
-- [x] Task 6: Placeholder routes for the four other modules
+- [ ] `pnpm lint && pnpm typecheck && pnpm test && pnpm build` pass
+- [ ] curl: login sets a correct `dt_session` cookie; wrong PIN 401; 6th failure 429; logout clears
 
-### Checkpoint B: App shell
+### Phase 2: Gate and UI
 
-- [x] No document scroll at 1440×900 and 412×915; all 5 destinations navigate
-- [x] Human review of look and feel
+- [ ] Task 5: Login page
+- [ ] Task 6: Proxy (redirect, 401, Origin check, sliding refresh)
+- [ ] Task 7: Logout button
+
+### Checkpoint B: Locked locally
+
+- [ ] All local Success Criteria in SPEC-auth.md checked
+- [ ] Owner checks login, wrong PIN, `next` redirect, logout in a browser (desktop + mobile width)
 
 ### Phase 3: Ship
 
-- [x] Task 7: PWA manifest and icons
-- [x] Task 8: README and setup docs
-- [x] Task 9: Deploy to Vercel + Supabase cloud (human-gated)
+- [ ] Task 8: Docs (README, .env.example)
+- [ ] Task 9: Deploy with `AUTH_*` on Vercel and cloud migration (human-gated)
 
-### Checkpoint C: Platform complete
+### Checkpoint C: Auth complete
 
-- [x] Every Success Criteria box in SPEC-platform.md checked
-- [x] Installed on Android from the deployed URL
+- [ ] Deployed Success Criteria checked; Android PWA logs in and stays logged in
 
 ## Risks and Mitigations
 
-| Risk                                                                                             | Impact | Mitigation                                                                                                               |
-| ------------------------------------------------------------------------------------------------ | ------ | ------------------------------------------------------------------------------------------------------------------------ |
-| drizzle-kit does not emit `CREATE SCHEMA daily_tab` when the schema has no tables yet            | Med    | Verify in Task 2; if absent, add a custom migration via `drizzle-kit generate --custom`                                  |
-| Migration or test accidentally touches another project's schema in the shared local instance     | High   | `schemaFilter`, journal in `daily_tab`, tests on a separate database; verify with an `information_schema` query          |
-| Next 16 APIs differ from training data (`proxy.ts`, Cache Components, metadata)                  | Med    | Read the matching guide in `node_modules/next/dist/docs/` before each task; build must pass with `cacheComponents: true` |
-| `usePathname` in nav or request data in a page triggers Cache Components "blocking route" errors | Low    | Nav is a small client component; placeholder pages are static; check `npm run build` output                              |
-| Android install needs a secure origin                                                            | Low    | Test via the deployed URL (Task 9) or `chrome://inspect` port forwarding to localhost                                    |
-| Too many pooled connections from serverless instances                                            | Low    | Transaction pooler `:6543`, `prepare: false`, `max: 5`                                                                   |
+| Risk                                                                               | Impact | Mitigation                                                                                     |
+| ---------------------------------------------------------------------------------- | ------ | ---------------------------------------------------------------------------------------------- |
+| Proxy matcher blocks static assets or the manifest, breaking install/icons         | High   | Test the matcher with `unstable_doesProxyMatch`; curl assets without a session                 |
+| Proxy forgets a route; data leaks                                                  | High   | `requireSession()` in every non-public handler (defense in depth); proxy unit tests per branch |
+| Sliding refresh sets a cookie on every request, or desyncs JWT `exp` and `Max-Age` | Med    | Refresh only when token is > 24 h old; one helper builds both token and cookie                 |
+| `Origin` absent on legitimate same-origin requests                                 | Med    | Browsers send `Origin` on POST/PUT/PATCH/DELETE `fetch`; test that the login form passes       |
+| `x-forwarded-for` spoofing bypasses per-IP limit                                   | Med    | Global limit (20/60 min) caps total guesses regardless of IP                                   |
+| Global limit lets an attacker block the owner's new logins                         | Low    | Accepted: existing 30-day sliding sessions keep working                                        |
+| pnpm switch changes resolved versions                                              | Med    | Use the existing `pnpm-lock.yaml`; run full gates + build right after switching                |
+| Login page or form reads the session and breaks Cache Components static shell      | Low    | `/login` stays static; the redirect-when-logged-in lives in the proxy                          |
 
 ## Open Questions
 
-Resolved 2026-11-08: home `/` = day + date, shortcuts, pending tasks; icon = generated simple mark;
-Supabase connection is in `.env`, everything in `pgSchema('daily_tab')`.
-
-- Vercel needs the cloud (pooler) connection string; the local `.env` points at `127.0.0.1:54322`.
-  Confirm in Task 9.
+None blocking. Vercel `AUTH_*` values are set by the owner in Task 9.
