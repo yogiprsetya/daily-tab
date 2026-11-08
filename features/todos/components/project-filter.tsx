@@ -1,11 +1,10 @@
 import Link from 'next/link';
+import { buttonVariants } from '@/components/ui/button';
+import { ButtonGroup } from '@/components/ui/button-group';
 import { cn } from '@/lib/utils';
 import type { ProjectFilter as Filter } from '../validation';
 
-const CHIP =
-  'flex min-h-11 items-center gap-1.5 rounded-lg border border-border px-3 text-sm text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring';
-
-function Chip({
+function FilterLink({
   href,
   label,
   count,
@@ -17,19 +16,19 @@ function Chip({
   active: boolean;
 }) {
   return (
-    <li className="min-w-0">
-      <Link
-        href={href}
-        aria-current={active ? 'page' : undefined}
-        className={cn(
-          CHIP,
-          active && 'border-transparent bg-muted text-foreground'
-        )}
-      >
-        <span className="truncate">{label}</span>
-        <span className="text-xs tabular-nums">{count}</span>
-      </Link>
-    </li>
+    <Link
+      href={href}
+      aria-current={active ? 'page' : undefined}
+      data-slot="button"
+      className={cn(
+        buttonVariants({ variant: active ? 'secondary' : 'outline' }),
+        'h-11 shrink-0 px-3 text-sm',
+        !active && 'text-muted-foreground'
+      )}
+    >
+      <span className="max-w-40 truncate">{label}</span>
+      <span className="text-xs tabular-nums">{count}</span>
+    </Link>
   );
 }
 
@@ -45,16 +44,20 @@ export function ProjectFilter({
   withoutProject: number;
 }) {
   return (
-    <nav aria-label="Filter by project" className="min-w-0 flex-1">
-      <ul className="flex flex-wrap gap-2">
-        <Chip
+    // A joined group cannot wrap, so a long list scrolls sideways instead.
+    <nav
+      aria-label="Filter by project"
+      className="min-w-0 flex-1 [scrollbar-width:none] overflow-x-auto p-px"
+    >
+      <ButtonGroup className="[&>[data-slot]:first-child]:rounded-l-lg [&>[data-slot]:last-child]:rounded-r-lg">
+        <FilterLink
           href="/todos"
           label="All"
           count={total}
           active={filter.kind === 'all'}
         />
         {projects.map((project) => (
-          <Chip
+          <FilterLink
             key={project.id}
             href={`/todos?project=${project.id}`}
             label={project.name}
@@ -62,13 +65,13 @@ export function ProjectFilter({
             active={filter.kind === 'project' && filter.id === project.id}
           />
         ))}
-        <Chip
+        <FilterLink
           href="/todos?project=none"
           label="No project"
           count={withoutProject}
           active={filter.kind === 'none'}
         />
-      </ul>
+      </ButtonGroup>
     </nav>
   );
 }
