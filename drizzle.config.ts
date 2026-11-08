@@ -13,12 +13,13 @@ export default defineConfig({
   dbCredentials: {
     url: env.DATABASE_URL_MIGRATE ?? env.DATABASE_URL,
   },
-  // The local Supabase instance is shared: only ever look at our schema,
-  // and keep the migration journal inside it too.
+  // The Supabase instance is shared: only ever diff our own schema.
   schemaFilter: ['daily_tab'],
+  // Journal lives next to other projects' journals (e.g. drizzle.lontu_migrations),
+  // under a name that cannot collide with them.
   migrations: {
-    schema: 'daily_tab',
-    table: '__drizzle_migrations',
+    schema: 'drizzle',
+    table: 'daily_tab_migration',
   },
   strict: true,
   verbose: true,

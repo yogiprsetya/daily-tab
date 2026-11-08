@@ -156,7 +156,7 @@ now)`, `pruneAttempts(now)` (> 24 h). Integration tests truncate `login_attempts
   - Scope: XS
 
 - [ ] **Task 9: Deploy (human-gated)**
-  - Description: Owner sets `AUTH_EMAIL`, `AUTH_PIN`, `AUTH_SECRET` on Vercel and runs the cloud migration
+  - Description: Owner sets `AUTH_EMAIL`, `AUTH_PIN`, `AUTH_SECRET` on Vercel, runs `scripts/sql/2026-11-08-move-migration-journal.sql` once in the Supabase SQL editor (journal moves to `drizzle.daily_tab_migration`), then runs the cloud migration
     (`DATABASE_URL_MIGRATE='…' pnpm db:migrate`); PR merged; prod smoke by Claude (curl) and owner
     (Android).
   - Acceptance:

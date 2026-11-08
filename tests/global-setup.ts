@@ -11,8 +11,8 @@ export default async function setup() {
   try {
     await migrate(drizzle(sql), {
       migrationsFolder: 'drizzle',
-      migrationsSchema: 'daily_tab',
-      migrationsTable: '__drizzle_migrations',
+      migrationsSchema: 'drizzle',
+      migrationsTable: 'daily_tab_migration',
     });
   } finally {
     await sql.end();

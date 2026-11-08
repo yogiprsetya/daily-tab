@@ -75,8 +75,12 @@ lint-staged (ESLint + Prettier on staged files).
 ## Database rules
 
 - Declare tables with `dailyTab.table(...)` from [db/schema.ts](db/schema.ts). Nothing goes in `public`.
-- drizzle-kit is limited to the `daily_tab` schema (`schemaFilter`), and its migration journal lives in
-  `daily_tab.__drizzle_migrations`.
+- drizzle-kit is limited to the `daily_tab` schema (`schemaFilter`). Its migration journal is
+  `drizzle.daily_tab_migration`, next to other projects' journals such as `drizzle.lontu_migrations`. This
+  is the only object outside `daily_tab`.
+- A database migrated before 2026-11-08 still has the journal at `daily_tab.__drizzle_migrations`. Run
+  [scripts/sql/2026-11-08-move-migration-journal.sql](scripts/sql/2026-11-08-move-migration-journal.sql)
+  on it once (e.g. in the Supabase SQL editor) before the next `pnpm db:migrate`.
 - Query the database only from `db/` and `features/<module>/dal.ts` (both `server-only`).
 - Never run `drizzle-kit push` against the cloud database.
 
