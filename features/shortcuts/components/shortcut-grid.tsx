@@ -1,23 +1,131 @@
 'use client';
 
+import { ChevronDown, ChevronUp, Pencil, Plus } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { apiRequest } from '@/lib/api-client';
+import { cn } from '@/lib/utils';
+import { GRID } from './grid-styles';
+import { ShortcutDialog } from './shortcut-dialog';
 import { ShortcutIcon } from './shortcut-icon';
 import type { ShortcutItem } from './types';
 
-export const GRID = 'grid grid-cols-4 gap-1 sm:grid-cols-6 lg:grid-cols-8';
-export const TILE =
+const TILE =
   'flex min-h-22 min-w-0 flex-col items-center gap-2 rounded-lg p-2 text-xs transition-colors outline-none hover:bg-muted/60 focus-visible:ring-2 focus-visible:ring-ring';
+const ICON_BUTTON =
+  'flex size-11 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors outline-none hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-30 disabled:hover:bg-transparent';
+const TEXT_BUTTON =
+  'flex min-h-11 items-center gap-2 rounded-lg px-3 text-sm text-muted-foreground transition-colors outline-none hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring';
+
+type DialogState = { key: string; shortcut: ShortcutItem | null } | null;
 
 export function ShortcutGrid({ items }: { items: ShortcutItem[] }) {
+  const router = useRouter();
+  const [editing, setEditing] = useState(false);
+  const [dialog, setDialog] = useState<DialogState>(null);
+  const [movingId, setMovingId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  async function move(id: string, direction: 'up' | 'down') {
+    setMovingId(id);
+    setError(null);
+    const result = await apiRequest(`/api/shortcuts/${id}/move`, {
+      method: 'POST',
+      body: { direction },
+    });
+    setMovingId(null);
+
+    if (result.ok) router.refresh();
+    else setError(result.message);
+  }
+
+  const openAdd = () => setDialog({ key: 'add', shortcut: null });
+
   return (
     <>
-      <h2
-        id="shortcuts-heading"
-        className="text-sm font-medium text-muted-foreground"
-      >
-        Shortcuts
-      </h2>
+      <div className="flex min-h-11 items-center justify-between gap-2">
+        <h2
+          id="shortcuts-heading"
+          className="text-sm font-medium text-muted-foreground"
+        >
+          Shortcuts
+        </h2>
+        {items.length > 0 && (
+          <button
+            type="button"
+            onClick={() => setEditing((value) => !value)}
+            className={cn(TEXT_BUTTON, '-mr-3')}
+          >
+            {editing ? 'Done' : 'Edit'}
+          </button>
+        )}
+      </div>
+
+      {error && (
+        <p role="alert" className="text-sm text-destructive">
+          {error}
+        </p>
+      )}
+
       {items.length === 0 ? (
-        <p className="text-sm text-muted-foreground">No shortcuts yet.</p>
+        <div className="flex flex-col items-start gap-2">
+          <p className="text-sm text-muted-foreground">No shortcuts yet.</p>
+          <button
+            type="button"
+            onClick={openAdd}
+            className={cn(TEXT_BUTTON, '-ml-3')}
+          >
+            <Plus aria-hidden className="size-4" />
+            Add shortcut
+          </button>
+        </div>
+      ) : editing ? (
+        <ul className="grid gap-1 lg:grid-cols-2">
+          {items.map((item, index) => (
+            <li key={item.id} className="flex min-w-0 items-center gap-2">
+              <ShortcutIcon title={item.title} url={item.url} />
+              <span className="min-w-0 flex-1 truncate text-sm">
+                {item.title}
+              </span>
+              <button
+                type="button"
+                aria-label={`Move ${item.title} up`}
+                disabled={index === 0 || movingId !== null}
+                onClick={() => move(item.id, 'up')}
+                className={ICON_BUTTON}
+              >
+                <ChevronUp aria-hidden className="size-5" />
+              </button>
+              <button
+                type="button"
+                aria-label={`Move ${item.title} down`}
+                disabled={index === items.length - 1 || movingId !== null}
+                onClick={() => move(item.id, 'down')}
+                className={ICON_BUTTON}
+              >
+                <ChevronDown aria-hidden className="size-5" />
+              </button>
+              <button
+                type="button"
+                aria-label={`Edit ${item.title}`}
+                onClick={() => setDialog({ key: item.id, shortcut: item })}
+                className={ICON_BUTTON}
+              >
+                <Pencil aria-hidden className="size-4" />
+              </button>
+            </li>
+          ))}
+          <li>
+            <button
+              type="button"
+              onClick={openAdd}
+              className={cn(TEXT_BUTTON, 'w-full')}
+            >
+              <Plus aria-hidden className="size-4" />
+              Add shortcut
+            </button>
+          </li>
+        </ul>
       ) : (
         <ul className={GRID}>
           {items.map((item) => (
@@ -31,6 +139,18 @@ export function ShortcutGrid({ items }: { items: ShortcutItem[] }) {
             </li>
           ))}
         </ul>
+      )}
+
+      {dialog && (
+        <ShortcutDialog
+          key={dialog.key}
+          shortcut={dialog.shortcut}
+          onClose={() => setDialog(null)}
+          onSaved={() => {
+            setDialog(null);
+            router.refresh();
+          }}
+        />
       )}
     </>
   );

@@ -47,32 +47,32 @@ first. Read the relevant guide in `node_modules/next/dist/docs/` before using a 
     `app/(app)/page.tsx`, `app/(app)/error.tsx`
   - Scope: L
 
-- [ ] **Task 4: Add a shortcut**
+- [x] **Task 4: Add a shortcut**
   - Description: `normalizeUrl` and Zod bodies, `createShortcut`, `POST /api/shortcuts`, add dialog.
   - Acceptance:
-    - [ ] `github.com` stores `https://github.com/`; `javascript:alert(1)` and credentials → 400.
-    - [ ] New shortcut goes last and appears after `router.refresh()`.
+    - [x] `github.com` stores `https://github.com/`; `javascript:alert(1)` and credentials → 400.
+    - [x] New shortcut goes last and appears after `router.refresh()`.
   - Verify: `pnpm test features/shortcuts app/api/shortcuts`
   - Dependencies: Task 3
   - Files: `features/shortcuts/validation.ts` (+ test), `features/shortcuts/dal.ts`,
     `app/api/shortcuts/route.ts`, `features/shortcuts/components/shortcut-dialog.tsx`, `components/ui/dialog.tsx`
   - Scope: M
 
-- [ ] **Task 5: Edit and delete a shortcut**
+- [x] **Task 5: Edit and delete a shortcut**
   - Description: Edit mode, `PATCH` and `DELETE /api/shortcuts/[id]`, delete with a second press.
   - Acceptance:
-    - [ ] Unknown or malformed id → 404; empty PATCH → 400; DELETE → 204.
-    - [ ] In edit mode tiles are not links.
+    - [x] Unknown or malformed id → 404; empty PATCH → 400; DELETE → 204.
+    - [x] In edit mode tiles are not links.
   - Verify: `pnpm test app/api/shortcuts features/shortcuts`
   - Dependencies: Task 4
   - Files: `app/api/shortcuts/[id]/route.ts` (+ test), `features/shortcuts/dal.ts`,
     `features/shortcuts/components/shortcut-grid.tsx`, `features/shortcuts/components/shortcut-dialog.tsx`
   - Scope: M
 
-- [ ] **Task 6: Reorder shortcuts**
+- [x] **Task 6: Reorder shortcuts**
   - Description: `moveShortcut` in a transaction, `POST /api/shortcuts/[id]/move`, move buttons.
   - Acceptance:
-    - [ ] Moving swaps neighbours; at either end it is a no-op returning 200.
+    - [x] Moving swaps neighbours; at either end it is a no-op returning 200.
   - Verify: `pnpm test app/api/shortcuts features/shortcuts`
   - Dependencies: Task 5
   - Files: `features/shortcuts/dal.ts`, `features/shortcuts/dal.test.ts`, `app/api/shortcuts/[id]/move/route.ts`
@@ -81,7 +81,7 @@ first. Read the relevant guide in `node_modules/next/dist/docs/` before using a 
 
 ## Checkpoint A: Shortcuts work locally
 
-- [ ] Gates pass; curl CRUD smoke with a session cookie
+- [x] Gates pass; curl CRUD smoke with a session cookie
 - [ ] Owner's browser check (desktop + mobile width)
 
 - [ ] **Task 7: Release shortcuts (human-gated)**

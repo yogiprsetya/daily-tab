@@ -18,8 +18,9 @@ app shows first on desktop and Android. There is no separate `/shortcuts` route.
      tile shows the title's first letter. Only the hostname leaves the app (`referrerPolicy="no-referrer"`).
    - Empty state offers "Add shortcut".
 2. Manage
-   - An "Edit" toggle in the section header switches the grid into edit mode. In edit mode tiles are not
-     links; each shows Move earlier, Move later and Edit buttons, and an "Add shortcut" tile is shown.
+   - An "Edit" toggle in the section header switches the grid into edit mode. In edit mode the grid becomes
+     a list of rows (three 44px buttons do not fit a phone-width tile). Rows are not links; each shows Move
+     up, Move down and Edit buttons, and an "Add shortcut" row is shown.
    - Add and Edit use a dialog with Title and URL. Edit also offers Delete, which needs a second press to
      confirm.
    - All controls are keyboard reachable, labelled, and at least 44px tall on touch screens.

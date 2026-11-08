@@ -28,13 +28,13 @@ merge.
 - [x] Task 1: Shared session and test foundations
 - [x] Task 2: Shortcuts data and read API
 - [x] Task 3: Home shows shortcuts
-- [ ] Task 4: Add a shortcut
-- [ ] Task 5: Edit and delete a shortcut
-- [ ] Task 6: Reorder shortcuts
+- [x] Task 4: Add a shortcut
+- [x] Task 5: Edit and delete a shortcut
+- [x] Task 6: Reorder shortcuts
 
 ### Checkpoint A: Shortcuts work locally
 
-- [ ] Gates pass; curl CRUD smoke with a session cookie
+- [x] Gates pass; curl CRUD smoke with a session cookie
 - [ ] Owner checks shortcuts in a browser (desktop + mobile width)
 
 - [ ] Task 7: Release shortcuts (human-gated)

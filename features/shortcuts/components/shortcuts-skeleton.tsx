@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils';
+import { GRID } from './grid-styles';
 
-const GRID = 'grid grid-cols-4 gap-1 sm:grid-cols-6 lg:grid-cols-8';
 // One row at every breakpoint: 4 tiles, 6 from sm, 8 from lg.
 const VISIBILITY = [
   '',
