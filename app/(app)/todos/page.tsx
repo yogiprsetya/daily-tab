@@ -9,6 +9,7 @@ export default function TodosPage({ searchParams }: PageProps<'/todos'>) {
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-8 sm:px-8 lg:py-12">
       <h1 className="text-2xl font-semibold tracking-tight">Todos</h1>
+
       <Suspense fallback={<TodosSkeleton />}>
         <TodosView searchParams={searchParams} />
       </Suspense>

@@ -50,7 +50,7 @@ export function ProjectFilter({
     <ProjectFilterNav
       activeKey={filter.kind === 'project' ? filter.id : filter.kind}
     >
-      <ButtonGroup>
+      <ButtonGroup className="[&>[data-slot]:first-child]:rounded-l-lg [&>[data-slot]:last-child]:rounded-r-lg">
         <FilterLink
           href="/todos"
           label="All"

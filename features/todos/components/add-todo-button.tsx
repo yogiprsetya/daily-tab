@@ -27,6 +27,7 @@ export function AddTodoButton({
         <Plus aria-hidden />
         Add todo
       </Button>
+
       {open && (
         <TodoDialog
           todo={null}

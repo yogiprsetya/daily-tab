@@ -45,6 +45,7 @@ export async function TodosView({
             total={total}
             withoutProject={withoutProject}
           />
+
           <AddTodoButton
             projects={projectOptions}
             defaultProjectId={filter.kind === 'project' ? filter.id : null}
@@ -52,6 +53,7 @@ export async function TodosView({
         </div>
         <ProjectManager projects={projectOptions} />
       </div>
+
       <TodoList
         pending={pending.map(toItem)}
         completed={completed.map(toItem)}
