@@ -27,7 +27,8 @@ filter; Home shows what is still pending so it is visible on every new tab.
    - They stay stored until deleted by hand. Unchecking returns one to pending.
 3. Projects and filter
    - Project names are unique ignoring case (1–50 characters after trim). A duplicate returns `409`.
-   - Filter chips: All, each project, and No project, each with its pending count.
+   - Filter as a joined button group: All, each project, and No project, each with its pending count. The
+     group scrolls sideways when it does not fit, and the active filter is scrolled into view.
    - The filter lives in the URL: `/todos?project=<uuid>` or `/todos?project=none`. An unknown or malformed
      value behaves as All.
    - Projects are created, renamed and deleted from `/todos`. Deleting one asks for confirmation and moves

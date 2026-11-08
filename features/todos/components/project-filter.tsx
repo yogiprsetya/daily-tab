@@ -3,6 +3,7 @@ import { buttonVariants } from '@/components/ui/button';
 import { ButtonGroup } from '@/components/ui/button-group';
 import { cn } from '@/lib/utils';
 import type { ProjectFilter as Filter } from '../validation';
+import { ProjectFilterNav } from './project-filter-nav';
 
 function FilterLink({
   href,
@@ -21,8 +22,9 @@ function FilterLink({
       aria-current={active ? 'page' : undefined}
       data-slot="button"
       className={cn(
-        buttonVariants({ variant: active ? 'secondary' : 'outline' }),
-        'h-11 shrink-0 px-3 text-sm',
+        buttonVariants({
+          variant: active ? 'secondary' : 'outline',
+        }),
         !active && 'text-muted-foreground'
       )}
     >
@@ -44,10 +46,8 @@ export function ProjectFilter({
   withoutProject: number;
 }) {
   return (
-    // A joined group cannot wrap, so a long list scrolls sideways instead.
-    <nav
-      aria-label="Filter by project"
-      className="min-w-0 flex-1 [scrollbar-width:none] overflow-x-auto p-px"
+    <ProjectFilterNav
+      activeKey={filter.kind === 'project' ? filter.id : filter.kind}
     >
       <ButtonGroup className="[&>[data-slot]:first-child]:rounded-l-lg [&>[data-slot]:last-child]:rounded-r-lg">
         <FilterLink
@@ -72,6 +72,6 @@ export function ProjectFilter({
           active={filter.kind === 'none'}
         />
       </ButtonGroup>
-    </nav>
+    </ProjectFilterNav>
   );
 }
