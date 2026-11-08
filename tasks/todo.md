@@ -131,13 +131,13 @@ text-foreground`. Remove create-next-app demo (`app/page.tsx`) and `public/{file
     `public/icons/icon-maskable-512.png`
   - Scope: S
 
-- [ ] **Task 8: README and setup docs**
+- [x] **Task 8: README and setup docs**
   - Description: Replace create-next-app README with: what the app is, local setup (shared local Supabase,
     `.env` from `.env.example`, create `daily_tab_test`, `npm run db:migrate`), all scripts, deploy notes,
     link to CAPABILITY-MAP and specs.
   - Acceptance:
-    - [ ] Following the README from a fresh clone reaches a running app with `/api/health` 200.
-    - Pending: walk through it from a fresh clone once the branch is committed.
+    - [x] Following the README from a fresh clone reaches a running app with `/api/health` 200.
+    - Verified 2026-11-08 in a clean worktree: npm ci → db:migrate → dev → /api/health 200. Found and fixed: `typecheck` needed `next typegen` on a clone without `.next/`.
   - Verify: walk through the steps in a clean worktree
   - Dependencies: Tasks 1–7
   - Files: `README.md`

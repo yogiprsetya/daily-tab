@@ -86,7 +86,7 @@ Infrastructure:
 npm run dev            # next dev
 npm run build          # next build
 npm run lint           # eslint
-npm run typecheck      # tsc --noEmit                         (new)
+npm run typecheck      # next typegen && tsc --noEmit         (new)
 npm run format:check   # prettier --check .
 npm test               # vitest run                            (new)
 npm run test:watch     # vitest                                (new)

@@ -54,7 +54,7 @@ Ends with a Vercel deploy talking to the Supabase cloud project.
 ### Phase 3: Ship
 
 - [x] Task 7: PWA manifest and icons
-- [ ] Task 8: README and setup docs
+- [x] Task 8: README and setup docs
 - [ ] Task 9: Deploy to Vercel + Supabase cloud (human-gated)
 
 ### Checkpoint C: Platform complete

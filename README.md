@@ -52,18 +52,18 @@ can be shared with other projects: this app keeps every object in the `daily_tab
 
 ## Scripts
 
-| Command               | What it does                                                          |
-| --------------------- | --------------------------------------------------------------------- |
-| `npm run dev`         | Next.js dev server                                                    |
-| `npm run build`       | Production build                                                      |
-| `npm start`           | Serve the production build                                            |
-| `npm run lint`        | ESLint                                                                |
-| `npm run typecheck`   | `tsc --noEmit`                                                        |
-| `npm run format`      | Prettier write (`format:check` to verify only)                        |
-| `npm test`            | Vitest, once (`test:watch` for watch mode); needs `TEST_DATABASE_URL` |
-| `npm run db:generate` | Generate a SQL migration from `db/schema.ts` + `features/*/schema.ts` |
-| `npm run db:migrate`  | Apply migrations (uses `DATABASE_URL_MIGRATE`, else `DATABASE_URL`)   |
-| `npm run db:studio`   | Drizzle Studio                                                        |
+| Command               | What it does                                                             |
+| --------------------- | ------------------------------------------------------------------------ |
+| `npm run dev`         | Next.js dev server                                                       |
+| `npm run build`       | Production build                                                         |
+| `npm start`           | Serve the production build                                               |
+| `npm run lint`        | ESLint                                                                   |
+| `npm run typecheck`   | `next typegen` (route types) then `tsc --noEmit`; works before any build |
+| `npm run format`      | Prettier write (`format:check` to verify only)                           |
+| `npm test`            | Vitest, once (`test:watch` for watch mode); needs `TEST_DATABASE_URL`    |
+| `npm run db:generate` | Generate a SQL migration from `db/schema.ts` + `features/*/schema.ts`    |
+| `npm run db:migrate`  | Apply migrations (uses `DATABASE_URL_MIGRATE`, else `DATABASE_URL`)      |
+| `npm run db:studio`   | Drizzle Studio                                                           |
 
 Before committing: `npm run lint && npm run typecheck && npm test`. The pre-commit hook only runs
 lint-staged (ESLint + Prettier on staged files).
