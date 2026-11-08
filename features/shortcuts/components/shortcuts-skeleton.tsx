@@ -16,12 +16,14 @@ const VISIBILITY = [
 export function ShortcutsSkeleton() {
   return (
     <>
-      <h2
-        id="shortcuts-heading"
-        className="text-sm font-medium text-muted-foreground"
-      >
-        Shortcuts
-      </h2>
+      <div className="flex min-h-11 items-center">
+        <h2
+          id="shortcuts-heading"
+          className="text-sm font-medium text-muted-foreground"
+        >
+          Shortcuts
+        </h2>
+      </div>
       <div aria-hidden className={GRID}>
         {VISIBILITY.map((visibility, index) => (
           <div key={index} className={cn('min-h-22 p-2', visibility)}>

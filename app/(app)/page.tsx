@@ -1,10 +1,10 @@
-import { ListTodo } from 'lucide-react';
 import { Suspense } from 'react';
 import { Today } from '@/components/home/today';
 import { LogoutButton } from '@/components/shell/logout-button';
-import { ModulePlaceholder } from '@/components/shell/module-placeholder';
 import { ShortcutsSection } from '@/features/shortcuts/components/shortcuts-section';
 import { ShortcutsSkeleton } from '@/features/shortcuts/components/shortcuts-skeleton';
+import { PendingSection } from '@/features/todos/components/pending-section';
+import { PendingSkeleton } from '@/features/todos/components/todos-skeleton';
 
 export default function HomePage() {
   return (
@@ -30,17 +30,9 @@ export default function HomePage() {
         aria-labelledby="pending-heading"
         className="flex flex-col gap-3"
       >
-        <h2
-          id="pending-heading"
-          className="text-sm font-medium text-muted-foreground"
-        >
-          Pending tasks
-        </h2>
-        <ModulePlaceholder
-          icon={ListTodo}
-          title="No pending tasks"
-          description="Unfinished todos will appear here once the todos module is built."
-        />
+        <Suspense fallback={<PendingSkeleton />}>
+          <PendingSection />
+        </Suspense>
       </section>
     </div>
   );

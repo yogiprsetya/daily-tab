@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { safeNextPath } from '@/features/auth/request';
 
-const FIELD = 'h-11 rounded-lg px-3 text-base sm:text-sm';
+const FIELD = 'h-11 rounded-lg px-3 text-base sm:text-sm md:text-sm';
 
 function retryMessage(retryAfter: string | null) {
   const minutes = Math.max(1, Math.ceil(Number(retryAfter || 60) / 60));
