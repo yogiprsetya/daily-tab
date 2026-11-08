@@ -25,6 +25,7 @@ function FilterLink({
         buttonVariants({
           variant: active ? 'secondary' : 'outline',
         }),
+        'h-11',
         !active && 'text-muted-foreground'
       )}
     >
@@ -49,7 +50,7 @@ export function ProjectFilter({
     <ProjectFilterNav
       activeKey={filter.kind === 'project' ? filter.id : filter.kind}
     >
-      <ButtonGroup className="[&>[data-slot]:first-child]:rounded-l-lg [&>[data-slot]:last-child]:rounded-r-lg">
+      <ButtonGroup>
         <FilterLink
           href="/todos"
           label="All"
