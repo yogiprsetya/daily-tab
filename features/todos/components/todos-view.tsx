@@ -9,7 +9,7 @@ import {
 } from '../dal';
 import { toItem } from '../optimistic';
 import { parseProjectFilter } from '../validation';
-import { AddTodoForm } from './add-todo-form';
+import { AddTodoButton } from './add-todo-button';
 import { ProjectFilter } from './project-filter';
 import { ProjectManager } from './project-manager';
 import { TodoList } from './todo-list';
@@ -46,7 +46,7 @@ export async function TodosView({
         />
         <ProjectManager projects={projectOptions} />
       </div>
-      <AddTodoForm
+      <AddTodoButton
         projects={projectOptions}
         defaultProjectId={filter.kind === 'project' ? filter.id : null}
       />

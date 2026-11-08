@@ -145,6 +145,12 @@ first. Read the relevant guide in `node_modules/next/dist/docs/` before using a 
     - [x] The link does not tick the todo; notes show on `/todos`, not on Home.
   - Scope: M
 
+- [x] **Task 14c: Create todos in a dialog (added by owner)**
+  - Files: `features/todos/components/{add-todo-button,todo-dialog,todos-view}.tsx`
+  - Acceptance:
+    - [x] "Add todo" opens the dialog; the project defaults to the active filter; delete only shows when editing.
+  - Scope: S
+
 ## Checkpoint B: Todos work locally
 
 - [x] Gates pass; curl CRUD smoke with a session cookie

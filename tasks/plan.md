@@ -49,6 +49,7 @@ merge.
 - [x] Task 13: Manage projects
 - [x] Task 14: Pending tasks on Home
 - [x] Task 14b: Optional link and notes on a todo
+- [x] Task 14c: Create todos in a dialog
 
 ### Checkpoint B: Todos work locally
 

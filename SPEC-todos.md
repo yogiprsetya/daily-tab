@@ -14,14 +14,13 @@ filter; Home shows what is still pending so it is visible on every new tab.
    - A todo has a title (1–280 characters after trim), at most one project, an optional link and optional
      notes (up to 2000 characters). Links follow the same rules as shortcuts (`http`/`https` only, a bare
      domain gets `https://`). Empty input clears either field. _Added 2026-11-08 at the owner's request._
-   - Link and notes are set in the edit dialog; the add input stays a single field. The link shows as its
-     hostname, opens in a new tab and sits outside the checkbox's label. Notes show on `/todos` only.
-   - Add from one input at the top of `/todos`: Enter submits, the input clears and keeps focus. The project
-     defaults to the active filter.
+   - The link shows as its hostname, opens in a new tab and sits outside the checkbox's label. Notes show on `/todos` only.
+   - "Add todo" on `/todos` opens a dialog with title, project, link and notes (owner decision 2026-11-08,
+     replacing an inline input). The project defaults to the active filter.
    - Pending todos are listed oldest first.
    - Checking a todo moves it to Completed immediately (optimistic); if the request fails it returns to its
      place and an error is shown.
-   - Edit title and project in a dialog, which also offers Delete with a second press to confirm.
+   - Edit all of a todo's fields in the same dialog, which also offers Delete with a second press to confirm.
 2. Completed
    - Completed todos sit in a collapsed "Completed (N)" section, most recently completed first, respecting
      the active filter.
@@ -113,7 +112,7 @@ features/todos/
     pending-section.tsx         async Server Component for Home
     project-filter.tsx          chips (links)
     project-manager.tsx         client: create, rename, delete
-    add-todo-form.tsx           client
+    add-todo-button.tsx           client: opens the dialog
     todo-list.tsx, todo-row.tsx client: optimistic toggle
     todo-dialog.tsx             client: edit, delete
     todos-skeleton.tsx          Suspense fallbacks

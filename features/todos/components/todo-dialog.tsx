@@ -16,13 +16,16 @@ import { apiRequest } from '@/lib/api-client';
 import type { TodoItem } from '../optimistic';
 import { ProjectSelect, readProjectId } from './project-select';
 
+/** `todo` is null when creating; `defaultProjectId` only applies then. */
 export function TodoDialog({
   todo,
+  defaultProjectId = null,
   projects,
   onClose,
   onSaved,
 }: {
-  todo: TodoItem;
+  todo: TodoItem | null;
+  defaultProjectId?: string | null;
   projects: { id: string; name: string }[];
   onClose: () => void;
   onSaved: () => void;
@@ -37,15 +40,15 @@ export function TodoDialog({
 
     setPending(true);
     setError(null);
-    const result = await apiRequest(`/api/todos/${todo.id}`, {
-      method: 'PATCH',
-      body: {
-        title: form.get('title'),
-        projectId: readProjectId(form),
-        url: form.get('url'),
-        notes: form.get('notes'),
-      },
-    });
+    const body = {
+      title: form.get('title'),
+      projectId: readProjectId(form),
+      url: form.get('url'),
+      notes: form.get('notes'),
+    };
+    const result = todo
+      ? await apiRequest(`/api/todos/${todo.id}`, { method: 'PATCH', body })
+      : await apiRequest('/api/todos', { method: 'POST', body });
     setPending(false);
 
     if (result.ok) return onSaved();
@@ -59,6 +62,7 @@ export function TodoDialog({
   }
 
   async function onDelete() {
+    if (!todo) return;
     if (!confirmingDelete) return setConfirmingDelete(true);
 
     setPending(true);
@@ -76,7 +80,9 @@ export function TodoDialog({
     <Dialog open onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="rounded-lg p-5 sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-base">Edit todo</DialogTitle>
+          <DialogTitle className="text-base">
+            {todo ? 'Edit todo' : 'Add todo'}
+          </DialogTitle>
         </DialogHeader>
 
         <form onSubmit={onSubmit} className="flex flex-col gap-4" noValidate>
@@ -87,7 +93,7 @@ export function TodoDialog({
             <Input
               id="todo-title"
               name="title"
-              defaultValue={todo.title}
+              defaultValue={todo?.title}
               maxLength={280}
               autoComplete="off"
               autoFocus
@@ -101,7 +107,7 @@ export function TodoDialog({
             </Label>
             <ProjectSelect
               id="todo-project"
-              defaultProjectId={todo.projectId}
+              defaultProjectId={todo ? todo.projectId : defaultProjectId}
               projects={projects}
               className="w-full"
             />
@@ -114,7 +120,7 @@ export function TodoDialog({
             <Input
               id="todo-url"
               name="url"
-              defaultValue={todo.url ?? ''}
+              defaultValue={todo?.url ?? ''}
               inputMode="url"
               autoCapitalize="none"
               autoCorrect="off"
@@ -132,7 +138,7 @@ export function TodoDialog({
             <Textarea
               id="todo-notes"
               name="notes"
-              defaultValue={todo.notes ?? ''}
+              defaultValue={todo?.notes ?? ''}
               maxLength={2000}
               rows={3}
               className="min-h-20 rounded-lg px-3 py-2 text-base sm:text-sm md:text-sm"
@@ -146,15 +152,17 @@ export function TodoDialog({
           )}
 
           <div className="flex flex-wrap items-center justify-end gap-2">
-            <Button
-              type="button"
-              variant="destructive"
-              disabled={pending}
-              onClick={onDelete}
-              className={`${ACTION} mr-auto`}
-            >
-              {confirmingDelete ? 'Press again to delete' : 'Delete'}
-            </Button>
+            {todo && (
+              <Button
+                type="button"
+                variant="destructive"
+                disabled={pending}
+                onClick={onDelete}
+                className={`${ACTION} mr-auto`}
+              >
+                {confirmingDelete ? 'Press again to delete' : 'Delete'}
+              </Button>
+            )}
             <Button
               type="button"
               variant="ghost"
