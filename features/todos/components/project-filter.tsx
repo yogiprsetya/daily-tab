@@ -45,7 +45,7 @@ export function ProjectFilter({
   withoutProject: number;
 }) {
   return (
-    <nav aria-label="Filter by project">
+    <nav aria-label="Filter by project" className="min-w-0 flex-1">
       <ul className="flex flex-wrap gap-2">
         <Chip
           href="/todos"

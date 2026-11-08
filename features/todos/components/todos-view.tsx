@@ -38,18 +38,20 @@ export async function TodosView({
   return (
     <>
       <div className="flex flex-col gap-1">
-        <ProjectFilter
-          filter={filter}
-          projects={projects}
-          total={total}
-          withoutProject={withoutProject}
-        />
+        <div className="flex items-start justify-between gap-3">
+          <ProjectFilter
+            filter={filter}
+            projects={projects}
+            total={total}
+            withoutProject={withoutProject}
+          />
+          <AddTodoButton
+            projects={projectOptions}
+            defaultProjectId={filter.kind === 'project' ? filter.id : null}
+          />
+        </div>
         <ProjectManager projects={projectOptions} />
       </div>
-      <AddTodoButton
-        projects={projectOptions}
-        defaultProjectId={filter.kind === 'project' ? filter.id : null}
-      />
       <TodoList
         pending={pending.map(toItem)}
         completed={completed.map(toItem)}

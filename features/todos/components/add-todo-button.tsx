@@ -22,7 +22,7 @@ export function AddTodoButton({
       <Button
         type="button"
         onClick={() => setOpen(true)}
-        className={`${ACTION} w-full sm:w-auto sm:self-start`}
+        className={`${ACTION} shrink-0`}
       >
         <Plus aria-hidden />
         Add todo
