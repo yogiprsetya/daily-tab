@@ -1,80 +1,72 @@
-# Implementation Plan: auth (done 2026-11-08)
+# Implementation Plan: shortcuts and todos
 
-Spec: [SPEC-auth.md](../SPEC-auth.md) · Map: [CAPABILITY-MAP.md](../CAPABILITY-MAP.md) · Tasks: [todo.md](todo.md)
-Previous module: [archive/platform-plan.md](archive/platform-plan.md)
+Specs: [SPEC-shortcuts.md](../SPEC-shortcuts.md), [SPEC-todos.md](../SPEC-todos.md) · Map: [CAPABILITY-MAP.md](../CAPABILITY-MAP.md) · Tasks: [todo.md](todo.md)
+Previous modules: [archive/](archive/)
 
 ## Overview
 
-Put the whole app behind a static email + PIN login. A `jose`-signed cookie (30 days, sliding) carries the
-session; `proxy.ts` redirects pages and returns 401 for APIs without it, rejects cross-origin mutations,
-and refreshes old sessions. Login attempts go to `daily_tab.login_attempts` for per-IP and global rate
-limits. Every non-public Route Handler also calls `requireSession()`. First, the repo switches from npm to
-pnpm.
+Fill Home with the owner's shortcuts and pending todos, and turn `/todos` into the full list with a project
+filter. Shipped as two sequential PRs: `feat/shortcuts`, then `feat/todos` from `master` after the first
+merge.
 
 ## Architecture Decisions
 
-- **Primitives before wiring.** Session, credential and request helpers are pure and unit-tested first
-  (Tasks 1–2). The DB-backed rate limiter (Task 3) and the route handlers (Task 4) build on them.
-- **Login page before the proxy.** The proxy redirects everything to `/login`; shipping it before the page
-  exists would leave the app unusable between tasks. Order: routes → page → proxy → logout UI.
-- **Auth env parsed separately** (`features/auth/config.ts`), so `drizzle-kit` and DB tooling never need
-  `AUTH_*`.
-- **No DB in the proxy.** It only verifies the JWT (fast, runs on every request). Rate limiting lives in the
-  login handler.
-- **No browser E2E** for now (owner decision). HTTP-level smoke with curl plus a manual browser check at
-  the checkpoints.
+- **Vertical slices by user capability.** Each task leaves the app working; a placeholder is replaced only
+  when its slice is ready.
+- **Reads in Server Components** behind `<Suspense>`, calling `requirePageSession()`. `cookies()` makes them
+  request-time, so no `connection()` is needed and the page frame stays static.
+- **Mutations through Route Handlers**, then `router.refresh()`. Ticking a todo uses `useOptimistic`.
+- **Ordering:** `order by position, created_at`; a move swaps `position` inside `db.transaction`.
+- **Duplicate project names:** catch Postgres `23505` in the DAL (read from `error.cause`, as Drizzle wraps
+  driver errors), return 409.
 
 ## Task List
 
-### Phase 0: Tooling
+### Shortcuts
 
-- [x] Task 0: Switch from npm to pnpm
+- [ ] Task 0: Prep branch, specs, task list
+- [ ] Task 1: Shared session and test foundations
+- [ ] Task 2: Shortcuts data and read API
+- [ ] Task 3: Home shows shortcuts
+- [ ] Task 4: Add a shortcut
+- [ ] Task 5: Edit and delete a shortcut
+- [ ] Task 6: Reorder shortcuts
 
-### Phase 1: Auth core
+### Checkpoint A: Shortcuts work locally
 
-- [x] Task 1: Auth config and session primitives
-- [x] Task 2: Credential check, request helpers, new API error codes
-- [x] Task 3: `login_attempts` table and rate limiter
-- [x] Task 4: Login and logout route handlers
+- [ ] Gates pass; curl CRUD smoke with a session cookie
+- [ ] Owner checks shortcuts in a browser (desktop + mobile width)
 
-### Checkpoint A: API auth works
+- [ ] Task 7: Release shortcuts (human-gated)
 
-- [x] `pnpm lint && pnpm typecheck && pnpm test && pnpm build` pass
-- [x] curl: login sets a correct `dt_session` cookie; wrong PIN 401; 6th failure 429; logout clears
+### Todos
 
-### Phase 2: Gate and UI
+- [ ] Task 8: Todos data model and validation
+- [ ] Task 9: Todos read API
+- [ ] Task 10: `/todos` page
+- [ ] Task 11: Add and tick todos
+- [ ] Task 12: Edit and delete todos
+- [ ] Task 13: Manage projects
+- [ ] Task 14: Pending tasks on Home
 
-- [x] Task 5: Login page
-- [x] Task 6: Proxy (redirect, 401, Origin check, sliding refresh)
-- [x] Task 7: Logout button
+### Checkpoint B: Todos work locally
 
-### Checkpoint B: Locked locally
+- [ ] Gates pass; curl CRUD smoke with a session cookie
+- [ ] Owner checks todos in a browser (desktop + mobile width)
 
-- [x] All local Success Criteria in SPEC-auth.md checked
-- [x] Owner checks login, wrong PIN, `next` redirect, logout in a browser (desktop + mobile width)
-
-### Phase 3: Ship
-
-- [x] Task 8: Docs (README, .env.example)
-- [x] Task 9: Deploy with `AUTH_*` on Vercel and cloud migration (human-gated)
-
-### Checkpoint C: Auth complete
-
-- [x] Deployed Success Criteria checked; Android PWA logs in and stays logged in
+- [ ] Task 15: Release todos (human-gated)
 
 ## Risks and Mitigations
 
-| Risk                                                                               | Impact | Mitigation                                                                                     |
-| ---------------------------------------------------------------------------------- | ------ | ---------------------------------------------------------------------------------------------- |
-| Proxy matcher blocks static assets or the manifest, breaking install/icons         | High   | Test the matcher with `unstable_doesProxyMatch`; curl assets without a session                 |
-| Proxy forgets a route; data leaks                                                  | High   | `requireSession()` in every non-public handler (defense in depth); proxy unit tests per branch |
-| Sliding refresh sets a cookie on every request, or desyncs JWT `exp` and `Max-Age` | Med    | Refresh only when token is > 24 h old; one helper builds both token and cookie                 |
-| `Origin` absent on legitimate same-origin requests                                 | Med    | Browsers send `Origin` on POST/PUT/PATCH/DELETE `fetch`; test that the login form passes       |
-| `x-forwarded-for` spoofing bypasses per-IP limit                                   | Med    | Global limit (20/60 min) caps total guesses regardless of IP                                   |
-| Global limit lets an attacker block the owner's new logins                         | Low    | Accepted: existing 30-day sliding sessions keep working                                        |
-| pnpm switch changes resolved versions                                              | Med    | Use the existing `pnpm-lock.yaml`; run full gates + build right after switching                |
-| Login page or form reads the session and breaks Cache Components static shell      | Low    | `/login` stays static; the redirect-when-logged-in lives in the proxy                          |
+| Risk                                                                     | Impact | Mitigation                                                                            |
+| ------------------------------------------------------------------------ | ------ | ------------------------------------------------------------------------------------- |
+| Merging before the cloud migration: queries on new tables fail on Home   | High   | Required step in each PR checklist; `(app)/error.tsx` contains the blast radius       |
+| DB read outside `<Suspense>` fails the Cache Components build            | Med    | Session and queries only in async components inside Suspense; `pnpm build` every task |
+| Deleting a project deletes todos                                         | High   | `ON DELETE SET NULL` + integration test                                               |
+| DuckDuckGo favicons slow or blocked (timed out from the agent's network) | Low    | Letter shows first; owner checks at Checkpoint A                                      |
+| `useOptimistic` out of sync after `router.refresh()`                     | Med    | Toggle in `startTransition`; refresh after success; manual check                      |
+| DB tests racing                                                          | Med    | `fileParallelism: false`; truncate in `beforeEach`                                    |
 
 ## Open Questions
 
-None blocking. Vercel `AUTH_*` values are set by the owner in Task 9.
+None blocking.
