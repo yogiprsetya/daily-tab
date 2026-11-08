@@ -61,7 +61,7 @@ using any Next.js API.
 
 - [x] `npm run lint && npm run typecheck && npm test && npm run build` pass
 - [x] Health endpoint 200 / 503 confirmed manually
-- [ ] Human review before UI work
+- [x] Human review before UI work (reviewed in chat, then continued with `/build auto`)
 
 ## Phase 2: App shell
 
@@ -114,7 +114,7 @@ text-foreground`. Remove create-next-app demo (`app/page.tsx`) and `public/{file
 ## Checkpoint B: App shell
 
 - [x] No document scroll at 1440×900 and 412×915; all destinations work
-- [ ] Human review of look and feel
+- [x] Human review of look and feel (owner saw the installed app on Android, 2026-11-08)
 
 ## Phase 3: Ship
 
@@ -143,13 +143,13 @@ text-foreground`. Remove create-next-app demo (`app/page.tsx`) and `public/{file
   - Files: `README.md`
   - Scope: XS
 
-- [ ] **Task 9: Deploy to Vercel + Supabase cloud (human-gated)**
+- [x] **Task 9: Deploy to Vercel + Supabase cloud (human-gated)**
   - Description: With explicit approval: confirm/create the Supabase cloud project, run
     `npm run db:migrate` with `DATABASE_URL_MIGRATE` set to the session pooler, set `DATABASE_URL`
     (transaction pooler `:6543`) in Vercel, deploy.
   - Acceptance:
-    - [ ] Deployed `/api/health` → 200.
-    - [ ] App installs on Android from the deployed URL and launches standalone as "Daily Tab".
+    - [x] Deployed `/api/health` → 200. (https://daily-tab.vercel.app, migrations applied to Supabase cloud by owner)
+    - [x] App installs on Android from the deployed URL and launches standalone as "Daily Tab".
   - Verify: curl the deployed URL; install on the Android device
   - Dependencies: Tasks 1–8
   - Files: none in repo (Vercel/Supabase settings)
@@ -157,5 +157,5 @@ text-foreground`. Remove create-next-app demo (`app/page.tsx`) and `public/{file
 
 ## Checkpoint C: Platform complete
 
-- [ ] Every Success Criteria box in SPEC-platform.md is checked
-- [ ] Ready for `SPEC-auth`
+- [x] Every Success Criteria box in SPEC-platform.md is checked
+- [x] Ready for `SPEC-auth`

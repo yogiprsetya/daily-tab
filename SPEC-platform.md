@@ -1,6 +1,6 @@
 # Spec: platform
 
-Status: **Approved 2026-11-07** (open questions below do not block planning)
+Status: **Done 2026-11-08**: deployed at https://daily-tab.vercel.app
 Module id: `platform` (see [CAPABILITY-MAP.md](CAPABILITY-MAP.md)) · Depends on: —
 
 ## Objective
@@ -256,8 +256,8 @@ API response shape for every module:
 - [x] At 412×915: bottom tab bar visible, nav rail hidden; same 5 destinations work; no document scroll.
 - [x] The app renders in dark theme regardless of the OS color scheme.
 - [x] Chrome reports no manifest errors and no installability errors (`Page.getInstallabilityErrors`).
-- [ ] On Android the app installs from the deployed URL and launches standalone as "Daily Tab".
-- [ ] Deployed to Vercel with `/api/health` returning 200 against the Supabase cloud project.
+- [x] On Android the app installs from the deployed URL and launches standalone as "Daily Tab".
+- [x] Deployed to Vercel with `/api/health` returning 200 against the Supabase cloud project.
 
 ## Open Questions
 

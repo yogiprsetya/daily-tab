@@ -1,4 +1,4 @@
-# Implementation Plan: platform
+# Implementation Plan: platform (done 2026-11-08)
 
 Spec: [SPEC-platform.md](../SPEC-platform.md) · Map: [CAPABILITY-MAP.md](../CAPABILITY-MAP.md)
 Tasks: [todo.md](todo.md)
@@ -36,9 +36,9 @@ Ends with a Vercel deploy talking to the Supabase cloud project.
 
 ### Checkpoint A: Data foundation
 
-- [ ] `npm run lint && npm run typecheck && npm test && npm run build` pass
-- [ ] `curl localhost:3000/api/health` → 200; DB stopped → 503
-- [ ] Human review before UI work
+- [x] `npm run lint && npm run typecheck && npm test && npm run build` pass
+- [x] `curl localhost:3000/api/health` → 200; unreachable DB → 503
+- [x] Human review before UI work
 
 ### Phase 2: App shell
 
@@ -48,19 +48,19 @@ Ends with a Vercel deploy talking to the Supabase cloud project.
 
 ### Checkpoint B: App shell
 
-- [ ] No document scroll at 1440×900 and 412×915; all 5 destinations navigate
-- [ ] Human review of look and feel
+- [x] No document scroll at 1440×900 and 412×915; all 5 destinations navigate
+- [x] Human review of look and feel
 
 ### Phase 3: Ship
 
 - [x] Task 7: PWA manifest and icons
 - [x] Task 8: README and setup docs
-- [ ] Task 9: Deploy to Vercel + Supabase cloud (human-gated)
+- [x] Task 9: Deploy to Vercel + Supabase cloud (human-gated)
 
 ### Checkpoint C: Platform complete
 
-- [ ] Every Success Criteria box in SPEC-platform.md checked
-- [ ] Installed on Android from the deployed URL
+- [x] Every Success Criteria box in SPEC-platform.md checked
+- [x] Installed on Android from the deployed URL
 
 ## Risks and Mitigations
 
