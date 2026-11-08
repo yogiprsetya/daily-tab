@@ -12,36 +12,16 @@ import {
   sql,
 } from 'drizzle-orm';
 import { db } from '@/db';
+import {
+  FOREIGN_KEY_VIOLATION,
+  UNIQUE_VIOLATION,
+  translatePgError,
+} from '@/db/pg-errors';
 import { projects, todos } from './schema';
 import type { ProjectFilter } from './validation';
 
 export class UnknownProjectError extends Error {}
 export class DuplicateProjectError extends Error {}
-
-const FOREIGN_KEY_VIOLATION = '23503';
-const UNIQUE_VIOLATION = '23505';
-
-/** Drizzle wraps driver errors, so the Postgres code sits on `cause`. */
-function pgCode(error: unknown): string | undefined {
-  const { code, cause } = error as {
-    code?: string;
-    cause?: { code?: string };
-  };
-  return cause?.code ?? code;
-}
-
-async function translatePgError<T>(
-  code: string,
-  DomainError: new () => Error,
-  write: () => Promise<T>
-): Promise<T> {
-  try {
-    return await write();
-  } catch (error) {
-    if (pgCode(error) === code) throw new DomainError();
-    throw error;
-  }
-}
 
 function matchesFilter(filter: ProjectFilter): SQL | undefined {
   if (filter.kind === 'none') return isNull(todos.projectId);
@@ -115,8 +95,7 @@ type TodoFields = {
 
 export function createTodo(input: TodoFields & { title: string }) {
   return translatePgError(
-    FOREIGN_KEY_VIOLATION,
-    UnknownProjectError,
+    { [FOREIGN_KEY_VIOLATION]: UnknownProjectError },
     async () => {
       const [row] = await db.insert(todos).values(input).returning();
       return row;
@@ -129,8 +108,7 @@ export function updateTodo(
   { completed, ...fields }: TodoFields & { completed?: boolean }
 ) {
   return translatePgError(
-    FOREIGN_KEY_VIOLATION,
-    UnknownProjectError,
+    { [FOREIGN_KEY_VIOLATION]: UnknownProjectError },
     async () => {
       const [row] = await db
         .update(todos)
@@ -174,21 +152,27 @@ export function listProjects() {
 }
 
 export function createProject(name: string) {
-  return translatePgError(UNIQUE_VIOLATION, DuplicateProjectError, async () => {
-    const [row] = await db.insert(projects).values({ name }).returning();
-    return row;
-  });
+  return translatePgError(
+    { [UNIQUE_VIOLATION]: DuplicateProjectError },
+    async () => {
+      const [row] = await db.insert(projects).values({ name }).returning();
+      return row;
+    }
+  );
 }
 
 export function updateProject(id: string, name: string) {
-  return translatePgError(UNIQUE_VIOLATION, DuplicateProjectError, async () => {
-    const [row] = await db
-      .update(projects)
-      .set({ name })
-      .where(eq(projects.id, id))
-      .returning();
-    return row ?? null;
-  });
+  return translatePgError(
+    { [UNIQUE_VIOLATION]: DuplicateProjectError },
+    async () => {
+      const [row] = await db
+        .update(projects)
+        .set({ name })
+        .where(eq(projects.id, id))
+        .returning();
+      return row ?? null;
+    }
+  );
 }
 
 /** Its todos stay and fall back to No project (`ON DELETE SET NULL`). */
