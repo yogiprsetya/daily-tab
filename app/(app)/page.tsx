@@ -1,13 +1,17 @@
 import { Link2, ListTodo } from 'lucide-react';
 import { Today } from '@/components/home/today';
 import { ModulePlaceholder } from '@/components/shell/module-placeholder';
+import { LogoutButton } from '@/components/shell/logout-button';
 
 export default function HomePage() {
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-col gap-10 px-4 py-8 sm:px-8 lg:py-12">
-      <header>
+      <header className="flex items-start justify-between gap-4">
         <h1 className="sr-only">Today</h1>
-        <Today />
+        <div>
+          <Today />
+        </div>
+        <LogoutButton variant="inline" className="-mr-3 lg:hidden" />
       </header>
 
       <section

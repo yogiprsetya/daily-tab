@@ -31,6 +31,8 @@ describe('apiError', () => {
     ['validation_error', 400],
     ['unauthorized', 401],
     ['not_found', 404],
+    ['forbidden', 403],
+    ['rate_limited', 429],
     ['internal', 500],
   ] as const)('maps %s to HTTP %i', async (code, status) => {
     const res = apiError(code, 'Something happened');
