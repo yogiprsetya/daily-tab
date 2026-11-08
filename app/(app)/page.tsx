@@ -1,7 +1,10 @@
-import { Link2, ListTodo } from 'lucide-react';
+import { ListTodo } from 'lucide-react';
+import { Suspense } from 'react';
 import { Today } from '@/components/home/today';
-import { ModulePlaceholder } from '@/components/shell/module-placeholder';
 import { LogoutButton } from '@/components/shell/logout-button';
+import { ModulePlaceholder } from '@/components/shell/module-placeholder';
+import { ShortcutsSection } from '@/features/shortcuts/components/shortcuts-section';
+import { ShortcutsSkeleton } from '@/features/shortcuts/components/shortcuts-skeleton';
 
 export default function HomePage() {
   return (
@@ -18,17 +21,9 @@ export default function HomePage() {
         aria-labelledby="shortcuts-heading"
         className="flex flex-col gap-3"
       >
-        <h2
-          id="shortcuts-heading"
-          className="text-sm font-medium text-muted-foreground"
-        >
-          Shortcuts
-        </h2>
-        <ModulePlaceholder
-          icon={Link2}
-          title="No shortcuts yet"
-          description="Quick links will appear here once the shortcuts module is built."
-        />
+        <Suspense fallback={<ShortcutsSkeleton />}>
+          <ShortcutsSection />
+        </Suspense>
       </section>
 
       <section

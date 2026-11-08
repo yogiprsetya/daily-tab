@@ -1,5 +1,6 @@
 import 'server-only';
 import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
 import { apiError } from '@/lib/api';
 import { getAuthConfig } from './config';
 import { SESSION_COOKIE, type Session, verifySession } from './session';
@@ -21,4 +22,14 @@ export async function requireSession(): Promise<
     };
   }
   return { ok: true, session };
+}
+
+/**
+ * The same check for Server Components that read data. Must run inside a
+ * <Suspense> boundary: it reads cookies, which is request-time data.
+ */
+export async function requirePageSession(): Promise<Session> {
+  const result = await requireSession();
+  if (!result.ok) redirect('/login');
+  return result.session;
 }

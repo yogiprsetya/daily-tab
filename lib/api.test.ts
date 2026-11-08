@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
-import { apiError, json, parseBody, parseQuery } from './api';
+import { apiError, isUuid, json, parseBody, parseQuery } from './api';
 
 const schema = z.object({ title: z.string().min(1) });
 
@@ -11,6 +11,20 @@ function post(body: string) {
     body,
   });
 }
+
+describe('isUuid', () => {
+  it('accepts a UUID in either case', () => {
+    expect(isUuid('6f1d2c3a-9b4e-4f7a-8c21-0d5e6f7a8b9c')).toBe(true);
+    expect(isUuid('6F1D2C3A-9B4E-4F7A-8C21-0D5E6F7A8B9C')).toBe(true);
+  });
+
+  it.each(['', 'abc', '1', '6f1d2c3a-9b4e-4f7a-8c21-0d5e6f7a8b9', "1' or '1"])(
+    'rejects %j',
+    (value) => {
+      expect(isUuid(value)).toBe(false);
+    }
+  );
+});
 
 describe('json', () => {
   it('returns a 200 JSON response by default', async () => {

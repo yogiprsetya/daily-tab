@@ -24,10 +24,10 @@ merge.
 
 ### Shortcuts
 
-- [ ] Task 0: Prep branch, specs, task list
-- [ ] Task 1: Shared session and test foundations
-- [ ] Task 2: Shortcuts data and read API
-- [ ] Task 3: Home shows shortcuts
+- [x] Task 0: Prep branch, specs, task list
+- [x] Task 1: Shared session and test foundations
+- [x] Task 2: Shortcuts data and read API
+- [x] Task 3: Home shows shortcuts
 - [ ] Task 4: Add a shortcut
 - [ ] Task 5: Edit and delete a shortcut
 - [ ] Task 6: Reorder shortcuts

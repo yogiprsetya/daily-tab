@@ -7,40 +7,40 @@ first. Read the relevant guide in `node_modules/next/dist/docs/` before using a 
 
 ## Shortcuts (`feat/shortcuts`)
 
-- [ ] **Task 0: Prep**
+- [x] **Task 0: Prep**
   - Acceptance: spec and plan committed; auth plan archived; `next.config.ts` unchanged from `master`.
   - Scope: XS
 
-- [ ] **Task 1: Shared session and test foundations**
+- [x] **Task 1: Shared session and test foundations**
   - Description: `requirePageSession()` redirects to `/login` without a valid session; `tests/session.ts`
     provides a signed-in cookie jar for Route Handler tests; `isUuid()` in `lib/api.ts`.
   - Acceptance:
-    - [ ] Valid cookie returns the session; missing or forged cookie calls `redirect('/login')`.
-    - [ ] `isUuid` accepts a v4 UUID and rejects other strings.
+    - [x] Valid cookie returns the session; missing or forged cookie calls `redirect('/login')`.
+    - [x] `isUuid` accepts a v4 UUID and rejects other strings.
   - Verify: `pnpm test features/auth lib`
   - Dependencies: none
   - Files: `features/auth/require-session.ts`, `features/auth/require-session.test.ts`, `tests/session.ts`,
     `lib/api.ts`, `lib/api.test.ts`
   - Scope: M
 
-- [ ] **Task 2: Shortcuts data and read API**
+- [x] **Task 2: Shortcuts data and read API**
   - Description: `shortcuts` table, migration, `listShortcuts`, `GET /api/shortcuts`.
   - Acceptance:
-    - [ ] List is ordered by position, then creation time.
-    - [ ] No session → 401; migration only touches `daily_tab`.
+    - [x] List is ordered by position, then creation time.
+    - [x] No session → 401; migration only touches `daily_tab`.
   - Verify: `pnpm test features/shortcuts app/api/shortcuts`; `pnpm db:migrate`
   - Dependencies: Task 1
   - Files: `features/shortcuts/schema.ts`, `features/shortcuts/dal.ts`, `features/shortcuts/dal.test.ts`,
     `app/api/shortcuts/route.ts`, `app/api/shortcuts/route.test.ts`, `drizzle/0002_*`
   - Scope: M
 
-- [ ] **Task 3: Home shows shortcuts**
+- [x] **Task 3: Home shows shortcuts**
   - Description: Server section behind Suspense, tiles as links, icon with letter fallback, skeleton,
     `(app)/error.tsx`.
   - Acceptance:
-    - [ ] The letter shows until the icon has loaded; a failing icon leaves the letter.
-    - [ ] Only the hostname reaches the favicon service (`faviconUrl` test, `no-referrer`).
-    - [ ] Weekday and date do not wait for the list; Home stays in the static shell (`pnpm build`).
+    - [x] The letter shows until the icon has loaded; a failing icon leaves the letter.
+    - [x] Only the hostname reaches the favicon service (`faviconUrl` test, `no-referrer`).
+    - [x] Weekday and date do not wait for the list; Home stays in the static shell (`pnpm build`).
   - Verify: `pnpm test features/shortcuts`; `pnpm build`; screenshot
   - Dependencies: Task 2
   - Files: `features/shortcuts/favicon.ts` (+ test), `features/shortcuts/components/*`,
