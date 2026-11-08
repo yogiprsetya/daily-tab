@@ -3,6 +3,7 @@
 import { ExternalLink, Pencil } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useOptimistic, useState, useTransition } from 'react';
+import { Checkbox } from '@/components/ui/checkbox';
 import { apiRequest } from '@/lib/api-client';
 import { displayHost } from '@/lib/url';
 import { cn } from '@/lib/utils';
@@ -29,11 +30,10 @@ function TodoRow({
     <li className="flex min-w-0 items-center">
       <div className="flex min-w-0 flex-1 flex-col">
         <label className="flex min-h-11 min-w-0 flex-1 cursor-pointer items-center gap-4 rounded-lg px-1 py-2.5 text-sm has-focus-visible:ring-2 has-focus-visible:ring-ring">
-          <input
-            type="checkbox"
+          <Checkbox
             checked={completed}
-            onChange={onToggle}
-            className="mt-0.5 size-5 shrink-0 cursor-pointer accent-primary outline-none"
+            onCheckedChange={onToggle}
+            className="size-5 rounded-md"
           />
           <span className="flex min-w-0 flex-col gap-0.5">
             <span
