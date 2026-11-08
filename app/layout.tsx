@@ -13,6 +13,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: 'Daily Tab',
   description: 'Shortcuts, todos, bookmarks, reading list and notes.',
+  icons: { icon: '/icons/icon.svg' },
 };
 
 export const viewport: Viewport = {
