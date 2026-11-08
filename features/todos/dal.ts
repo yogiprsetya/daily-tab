@@ -30,6 +30,19 @@ function pgCode(error: unknown): string | undefined {
   return cause?.code ?? code;
 }
 
+async function translatePgError<T>(
+  code: string,
+  DomainError: new () => Error,
+  write: () => Promise<T>
+): Promise<T> {
+  try {
+    return await write();
+  } catch (error) {
+    if (pgCode(error) === code) throw new DomainError();
+    throw error;
+  }
+}
+
 function matchesFilter(filter: ProjectFilter): SQL | undefined {
   if (filter.kind === 'none') return isNull(todos.projectId);
   if (filter.kind === 'project') return eq(todos.projectId, filter.id);
@@ -93,49 +106,47 @@ export async function resolveFilter(
   return row ? filter : { kind: 'all' };
 }
 
-export async function createTodo(input: {
+export function createTodo(input: {
   title: string;
   projectId?: string | null;
 }) {
-  try {
-    const [row] = await db.insert(todos).values(input).returning();
-    return row;
-  } catch (error) {
-    if (pgCode(error) === FOREIGN_KEY_VIOLATION) {
-      throw new UnknownProjectError();
+  return translatePgError(
+    FOREIGN_KEY_VIOLATION,
+    UnknownProjectError,
+    async () => {
+      const [row] = await db.insert(todos).values(input).returning();
+      return row;
     }
-    throw error;
-  }
+  );
 }
 
-export async function updateTodo(
+export function updateTodo(
   id: string,
   {
     completed,
     ...fields
   }: { title?: string; projectId?: string | null; completed?: boolean }
 ) {
-  try {
-    const [row] = await db
-      .update(todos)
-      .set({
-        ...fields,
-        updatedAt: new Date(),
-        ...(completed !== undefined && {
-          completedAt: completed
-            ? sql`coalesce(${todos.completedAt}, now())`
-            : null,
-        }),
-      })
-      .where(eq(todos.id, id))
-      .returning();
-    return row ?? null;
-  } catch (error) {
-    if (pgCode(error) === FOREIGN_KEY_VIOLATION) {
-      throw new UnknownProjectError();
+  return translatePgError(
+    FOREIGN_KEY_VIOLATION,
+    UnknownProjectError,
+    async () => {
+      const [row] = await db
+        .update(todos)
+        .set({
+          ...fields,
+          updatedAt: new Date(),
+          ...(completed !== undefined && {
+            completedAt: completed
+              ? sql`coalesce(${todos.completedAt}, now())`
+              : null,
+          }),
+        })
+        .where(eq(todos.id, id))
+        .returning();
+      return row ?? null;
     }
-    throw error;
-  }
+  );
 }
 
 export async function removeTodo(id: string): Promise<boolean> {
@@ -161,28 +172,22 @@ export function listProjects() {
     .orderBy(sql`lower(${projects.name})`);
 }
 
-export async function createProject(name: string) {
-  try {
+export function createProject(name: string) {
+  return translatePgError(UNIQUE_VIOLATION, DuplicateProjectError, async () => {
     const [row] = await db.insert(projects).values({ name }).returning();
     return row;
-  } catch (error) {
-    if (pgCode(error) === UNIQUE_VIOLATION) throw new DuplicateProjectError();
-    throw error;
-  }
+  });
 }
 
-export async function updateProject(id: string, name: string) {
-  try {
+export function updateProject(id: string, name: string) {
+  return translatePgError(UNIQUE_VIOLATION, DuplicateProjectError, async () => {
     const [row] = await db
       .update(projects)
       .set({ name })
       .where(eq(projects.id, id))
       .returning();
     return row ?? null;
-  } catch (error) {
-    if (pgCode(error) === UNIQUE_VIOLATION) throw new DuplicateProjectError();
-    throw error;
-  }
+  });
 }
 
 /** Its todos stay and fall back to No project (`ON DELETE SET NULL`). */
