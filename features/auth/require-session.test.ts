@@ -1,25 +1,26 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { getAuthConfig } from './config';
-import { requireSession } from './require-session';
-import { SESSION_COOKIE, signSession } from './session';
+import { setSessionCookie, signIn, signOut } from '@/tests/session';
+import { requirePageSession, requireSession } from './require-session';
 
-const cookieJar = new Map<string, string>();
-
-vi.mock('next/headers', () => ({
-  cookies: async () => ({
-    get: (name: string) =>
-      cookieJar.has(name) ? { name, value: cookieJar.get(name) } : undefined,
-  }),
+vi.mock('next/headers', async () => ({
+  cookies: (await import('@/tests/session')).mockedCookies,
 }));
 
+const redirect = vi.hoisted(() =>
+  vi.fn((path: string) => {
+    throw new Error(`NEXT_REDIRECT:${path}`);
+  })
+);
+vi.mock('next/navigation', () => ({ redirect }));
+
 beforeEach(() => {
-  cookieJar.clear();
+  signOut();
+  redirect.mockClear();
 });
 
 describe('requireSession', () => {
   it('returns the session when the cookie is valid', async () => {
-    const { token } = await signSession(getAuthConfig().secret);
-    cookieJar.set(SESSION_COOKIE, token);
+    await signIn();
 
     const result = await requireSession();
 
@@ -36,10 +37,29 @@ describe('requireSession', () => {
   });
 
   it('returns 401 for an invalid cookie', async () => {
-    cookieJar.set(SESSION_COOKIE, 'forged');
+    setSessionCookie('forged');
 
     const result = await requireSession();
 
     expect(result.ok).toBe(false);
+  });
+});
+
+describe('requirePageSession', () => {
+  it('returns the session when the cookie is valid', async () => {
+    await signIn();
+
+    await expect(requirePageSession()).resolves.toMatchObject({ sub: 'owner' });
+    expect(redirect).not.toHaveBeenCalled();
+  });
+
+  it('redirects to /login without a cookie', async () => {
+    await expect(requirePageSession()).rejects.toThrow('NEXT_REDIRECT:/login');
+  });
+
+  it('redirects to /login for an invalid cookie', async () => {
+    setSessionCookie('forged');
+
+    await expect(requirePageSession()).rejects.toThrow('NEXT_REDIRECT:/login');
   });
 });

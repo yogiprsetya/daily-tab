@@ -22,6 +22,13 @@ type Issue = { path: PropertyKey[]; message: string };
 export type ParseResult<T> =
   { ok: true; data: T } | { ok: false; response: Response };
 
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/** Route params reach Postgres `uuid` columns; anything else would raise an error there. */
+export function isUuid(value: string): boolean {
+  return UUID.test(value);
+}
+
 export function json<T>(data: T, init?: ResponseInit): Response {
   return Response.json(data, init);
 }
