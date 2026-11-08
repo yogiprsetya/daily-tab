@@ -31,59 +31,59 @@ Local migrations pass a local URL explicitly.
 
 ## Bookmarks
 
-- [ ] **Task 3: Data model and validation**
+- [x] **Task 3: Data model and validation**
   - Description: `features/bookmarks/schema.ts`, migration `0005`, Zod bodies, `parseFolderFilter`, `escapeLike`; move
     `translatePgError` to `db/pg-errors.ts`.
   - Acceptance:
-    - [ ] URL and folder names unique; deleting a folder sets `folder_id` to null.
+    - [x] URL and folder names unique; deleting a folder sets `folder_id` to null.
   - Verify: `pnpm test features/bookmarks`
   - Dependencies: none
   - Scope: M
 
-- [ ] **Task 4: Read API**
+- [x] **Task 4: Read API**
   - Description: `listBookmarks` (folder, `q`, newest first), `listFolders` with counts, `GET /api/bookmarks`,
     `GET /api/bookmark-folders`.
   - Acceptance:
-    - [ ] `%` matches literally; unknown folder behaves as All; 401 without a session.
+    - [x] `%` matches literally; unknown folder behaves as All; 401 without a session.
   - Verify: `pnpm test features/bookmarks app/api/bookmark`
   - Dependencies: Task 3
   - Scope: M
 
-- [ ] **Task 5: `/bookmarks` page**
+- [x] **Task 5: `/bookmarks` page**
   - Description: Replace the placeholder: filter, rows, empty states, skeleton.
   - Acceptance:
-    - [ ] `?folder=garbage` shows All; the page stays partially static.
+    - [x] `?folder=garbage` shows All; the page stays partially static.
   - Verify: `pnpm build`; browser script
   - Dependencies: Tasks 2, 4
   - Scope: M
 
-- [ ] **Task 6: Add, edit and delete**
+- [x] **Task 6: Add, edit and delete**
   - Description: `POST`, `PATCH`, `DELETE`, "Add bookmark" right of the filter, dialog.
   - Acceptance:
-    - [ ] A duplicate URL after normalization returns 409 with the message on the URL field; delete needs a second press.
+    - [x] A duplicate URL after normalization returns 409 with the message on the URL field; delete needs a second press.
   - Verify: `pnpm test app/api/bookmarks`; browser script
   - Dependencies: Task 5
   - Scope: M
 
-- [ ] **Task 7: Manage folders**
+- [x] **Task 7: Manage folders**
   - Description: `POST`, `PATCH`, `DELETE /api/bookmark-folders`, wired to `GroupManager`.
   - Acceptance:
-    - [ ] Deleting a folder keeps its bookmarks under No folder; duplicate name 409.
+    - [x] Deleting a folder keeps its bookmarks under No folder; duplicate name 409.
   - Verify: `pnpm test app/api/bookmark-folders`; browser script
   - Dependencies: Tasks 2, 5
   - Scope: M
 
-- [ ] **Task 8: Search**
+- [x] **Task 8: Search**
   - Description: Input with a short pause, `router.replace` keeps the active folder.
   - Acceptance:
-    - [ ] Combines with the folder, survives a reload, keeps focus while typing.
+    - [x] Combines with the folder, survives a reload, keeps focus while typing.
   - Verify: browser script
   - Dependencies: Task 5
   - Scope: S
 
 ## Checkpoint B: Works locally
 
-- [ ] Gates pass; browser script passes
+- [x] Gates pass; browser script passes
 - [ ] Owner's browser check (desktop + mobile width)
 
 - [ ] **Task 9: Release (human-gated)**

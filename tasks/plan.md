@@ -31,16 +31,16 @@ patterns as todos. Stacked on `chore/remove-home-header` (PR #5) until that merg
 
 ### Bookmarks
 
-- [ ] Task 3: Data model and validation
-- [ ] Task 4: Read API
-- [ ] Task 5: `/bookmarks` page
-- [ ] Task 6: Add, edit and delete
-- [ ] Task 7: Manage folders
-- [ ] Task 8: Search
+- [x] Task 3: Data model and validation
+- [x] Task 4: Read API
+- [x] Task 5: `/bookmarks` page
+- [x] Task 6: Add, edit and delete
+- [x] Task 7: Manage folders
+- [x] Task 8: Search
 
 ### Checkpoint B: Works locally
 
-- [ ] Gates pass; browser script passes
+- [x] Gates pass; browser script passes
 - [ ] Owner checks in a browser (desktop + mobile width)
 
 - [ ] Task 9: Release (human-gated)
