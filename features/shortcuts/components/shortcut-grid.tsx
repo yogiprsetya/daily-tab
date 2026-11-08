@@ -3,11 +3,11 @@
 import { ChevronDown, ChevronUp, Pencil, Plus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { SiteIcon } from '@/components/site-icon';
 import { apiRequest } from '@/lib/api-client';
 import { cn } from '@/lib/utils';
 import { GRID } from './grid-styles';
 import { ShortcutDialog } from './shortcut-dialog';
-import { ShortcutIcon } from './shortcut-icon';
 import type { ShortcutItem } from './types';
 
 const TILE =
@@ -25,7 +25,7 @@ function ShortcutTiles({ items }: { items: ShortcutItem[] }) {
       {items.map((item) => (
         <li key={item.id} className="min-w-0">
           <a href={item.url} className={TILE}>
-            <ShortcutIcon title={item.title} url={item.url} />
+            <SiteIcon title={item.title} url={item.url} />
             <span className="w-full truncate text-center">{item.title}</span>
           </a>
         </li>
@@ -51,7 +51,7 @@ function ShortcutRows({
     <ul className="grid gap-1 lg:grid-cols-2">
       {items.map((item, index) => (
         <li key={item.id} className="flex min-w-0 items-center gap-2">
-          <ShortcutIcon title={item.title} url={item.url} />
+          <SiteIcon title={item.title} url={item.url} />
           <span className="min-w-0 flex-1 truncate text-sm">{item.title}</span>
           <button
             type="button"

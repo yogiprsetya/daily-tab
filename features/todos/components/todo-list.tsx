@@ -4,11 +4,11 @@ import { ExternalLink, Pencil } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useOptimistic, useState, useTransition } from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
+import { ICON_BUTTON } from '@/components/form-styles';
 import { apiRequest } from '@/lib/api-client';
 import { displayHost } from '@/lib/url';
 import { cn } from '@/lib/utils';
 import { type TodoItem, type TodoLists, applyToggle } from '../optimistic';
-import { ICON_BUTTON } from './styles';
 import { TodoDialog } from './todo-dialog';
 
 function TodoRow({

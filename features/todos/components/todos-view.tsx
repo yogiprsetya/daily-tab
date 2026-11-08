@@ -1,3 +1,4 @@
+import { GroupManager } from '@/components/grouping/group-manager';
 import { requirePageSession } from '@/features/auth/require-session';
 import {
   countPending,
@@ -11,8 +12,15 @@ import { toItem } from '../optimistic';
 import { parseProjectFilter } from '../validation';
 import { AddTodoButton } from './add-todo-button';
 import { ProjectFilter } from './project-filter';
-import { ProjectManager } from './project-manager';
 import { TodoList } from './todo-list';
+
+const PROJECT_COPY = {
+  trigger: 'Manage projects',
+  title: 'Projects',
+  description: 'Deleting a project keeps its todos; they move to No project.',
+  placeholder: 'New project',
+  newNameLabel: 'New project name',
+};
 
 /** Reads the session, URL and database: render inside <Suspense>. */
 export async function TodosView({
@@ -52,7 +60,11 @@ export async function TodosView({
           />
         </div>
 
-        <ProjectManager projects={projectOptions} />
+        <GroupManager
+          endpoint="/api/projects"
+          groups={projectOptions}
+          copy={PROJECT_COPY}
+        />
       </div>
 
       <TodoList

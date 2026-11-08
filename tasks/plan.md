@@ -22,8 +22,8 @@ patterns as todos. Stacked on `chore/remove-home-header` (PR #5) until that merg
 
 ### Shared components
 
-- [ ] Task 1: Shared filter (`FilterNav`, `FilterLink`)
-- [ ] Task 2: Shared select, manager and site icon
+- [x] Task 1: Shared filter (`FilterNav`, `FilterLink`)
+- [x] Task 2: Shared select, manager and site icon
 
 ### Checkpoint A: No regressions
 

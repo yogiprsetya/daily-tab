@@ -2,6 +2,7 @@
 
 import { type FormEvent, useState } from 'react';
 import { ACTION, FIELD } from '@/components/form-styles';
+import { GroupSelect, readGroupId } from '@/components/grouping/group-select';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -14,7 +15,6 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { apiRequest } from '@/lib/api-client';
 import type { TodoItem } from '../optimistic';
-import { ProjectSelect, readProjectId } from './project-select';
 
 /** `todo` is null when creating; `defaultProjectId` only applies then. */
 export function TodoDialog({
@@ -42,7 +42,7 @@ export function TodoDialog({
     setError(null);
     const body = {
       title: form.get('title'),
-      projectId: readProjectId(form),
+      projectId: readGroupId(form, 'projectId'),
       url: form.get('url'),
       notes: form.get('notes'),
     };
@@ -105,10 +105,12 @@ export function TodoDialog({
             <Label htmlFor="todo-project" className="text-sm">
               Project
             </Label>
-            <ProjectSelect
+            <GroupSelect
               id="todo-project"
-              defaultProjectId={todo ? todo.projectId : defaultProjectId}
-              projects={projects}
+              name="projectId"
+              noneLabel="No project"
+              defaultGroupId={todo ? todo.projectId : defaultProjectId}
+              groups={projects}
               className="w-full"
             />
           </div>

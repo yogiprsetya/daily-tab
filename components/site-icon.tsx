@@ -2,10 +2,10 @@
 
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
-import { faviconUrl } from '../favicon';
+import { faviconUrl } from '@/lib/favicon';
 
 /** The letter shows until the icon has actually loaded, so a tile is never blank. */
-export function ShortcutIcon({ title, url }: { title: string; url: string }) {
+export function SiteIcon({ title, url }: { title: string; url: string }) {
   const [loaded, setLoaded] = useState(false);
   const [failed, setFailed] = useState(false);
   const src = faviconUrl(url);

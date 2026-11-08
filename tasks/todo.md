@@ -7,27 +7,27 @@ Local migrations pass a local URL explicitly.
 
 ## Shared components
 
-- [ ] **Task 1: Shared filter**
+- [x] **Task 1: Shared filter**
   - Description: Move the scrolling nav and link from `features/todos/components/project-filter{,-nav}.tsx` to
     `components/grouping/{filter-nav,filter-link}.tsx`; todos uses them.
   - Acceptance:
-    - [ ] Todos filter looks and behaves the same; todos tests unchanged.
+    - [x] Todos filter looks and behaves the same; todos tests unchanged.
   - Verify: `pnpm test`; browser script
   - Dependencies: none
   - Scope: M
 
-- [ ] **Task 2: Shared select, manager and site icon**
+- [x] **Task 2: Shared select, manager and site icon**
   - Description: `GroupSelect`, `GroupManager` (endpoint + copy) in `components/grouping/`; `components/site-icon.tsx`
     from `features/shortcuts/components/shortcut-icon.tsx`.
   - Acceptance:
-    - [ ] Existing tests pass unchanged; todos, Select and shortcuts browser scripts pass.
+    - [x] Existing tests pass unchanged; todos, Select and shortcuts browser scripts pass.
   - Verify: `pnpm test`; browser scripts
   - Dependencies: Task 1
   - Scope: M
 
 ## Checkpoint A: No regressions
 
-- [ ] Gates pass; browser scripts pass
+- [x] Gates pass; browser scripts pass
 
 ## Bookmarks
 
