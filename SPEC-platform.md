@@ -21,7 +21,7 @@ User: one person (the owner), on Chrome desktop (later via `newtab-extension`) a
 1. Database
    - `db/schema.ts` exports `dailyTab = pgSchema('daily_tab')`; every module table is declared with
      `dailyTab.table(...)`.
-   - `npm run db:migrate` creates schema `daily_tab`, and Drizzle's migration journal table lives inside
+   - `pnpm db:migrate` creates schema `daily_tab`, and Drizzle's migration journal table lives inside
      `daily_tab` (not `public` / `drizzle`).
    - drizzle-kit only introspects/diffs `daily_tab` (`schemaFilter`), so other schemas in the shared local
      Supabase instance are never touched.
@@ -83,16 +83,16 @@ Infrastructure:
 ## Commands
 
 ```bash
-npm run dev            # next dev
-npm run build          # next build
-npm run lint           # eslint
-npm run typecheck      # next typegen && tsc --noEmit         (new)
-npm run format:check   # prettier --check .
-npm test               # vitest run                            (new)
-npm run test:watch     # vitest                                (new)
-npm run db:generate    # drizzle-kit generate  -> drizzle/*.sql (new)
-npm run db:migrate     # drizzle-kit migrate   (uses DATABASE_URL_MIGRATE ?? DATABASE_URL) (new)
-npm run db:studio      # drizzle-kit studio                    (new)
+pnpm dev            # next dev
+pnpm build          # next build
+pnpm lint           # eslint
+pnpm typecheck      # next typegen && tsc --noEmit         (new)
+pnpm format:check   # prettier --check .
+pnpm test               # vitest run                            (new)
+pnpm test:watch     # vitest                                (new)
+pnpm db:generate    # drizzle-kit generate  -> drizzle/*.sql (new)
+pnpm db:migrate     # drizzle-kit migrate   (uses DATABASE_URL_MIGRATE ?? DATABASE_URL) (new)
+pnpm db:studio      # drizzle-kit studio                    (new)
 ```
 
 ## Environment variables
@@ -235,7 +235,7 @@ API response shape for every module:
 
 - **Always:** keep every table in `dailyTab`; put DB access only in `db/` and `features/*/dal.ts` with
   `import 'server-only'`; validate every request body/query with Zod at the route handler; run
-  `npm run lint && npm run typecheck && npm test` before committing; read the relevant guide in
+  `pnpm lint && pnpm typecheck && pnpm test` before committing; read the relevant guide in
   `node_modules/next/dist/docs/` before using a Next.js API (e.g. `proxy.ts`, not `middleware.ts`).
 - **Ask first:** adding any dependency not in the table above; applying migrations to the Supabase cloud
   project; changing `next.config.ts`; changing Vercel project settings; editing generated `components/ui/*`
@@ -246,8 +246,8 @@ API response shape for every module:
 
 ## Success Criteria
 
-- [x] `npm run build`, `npm run lint`, `npm run typecheck`, `npm test` all pass.
-- [x] `npm run db:migrate` on a fresh database creates schema `daily_tab` with the migration journal inside it
+- [x] `pnpm build`, `pnpm lint`, `pnpm typecheck`, `pnpm test` all pass.
+- [x] `pnpm db:migrate` on a fresh database creates schema `daily_tab` with the migration journal inside it
       (`select table_schema, table_name from information_schema.tables where table_schema = 'daily_tab'`).
 - [x] `curl localhost:3000/api/health` → `200 {"status":"ok","db":"ok"}`; with an unreachable `DATABASE_URL` → `503`.
 - [x] At 1440×900: nav rail visible; each of the 5 destinations navigates to its route;

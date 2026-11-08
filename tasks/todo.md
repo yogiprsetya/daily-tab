@@ -7,14 +7,14 @@ relevant guide in `node_modules/next/dist/docs/` before using a Next.js API. Nev
 
 ## Phase 0: Tooling
 
-- [ ] **Task 0: Switch from npm to pnpm**
+- [x] **Task 0: Switch from npm to pnpm**
   - Description: Track `pnpm-lock.yaml`, delete `package-lock.json`, resolve the `allowBuilds` placeholder
     in `pnpm-workspace.yaml`, change the husky hook to `pnpm exec lint-staged`, replace `npm` with `pnpm` in
     README and specs' command sections.
   - Acceptance:
-    - [ ] `pnpm install --frozen-lockfile` succeeds with no prompts.
-    - [ ] Full gates and build pass under pnpm.
-    - [ ] A commit runs lint-staged through pnpm.
+    - [x] `pnpm install --frozen-lockfile` succeeds with no prompts.
+    - [x] Full gates and build pass under pnpm.
+    - [x] A commit runs lint-staged through pnpm.
   - Verify: `pnpm install --frozen-lockfile && pnpm lint && pnpm typecheck && pnpm test && pnpm build`
   - Dependencies: none
   - Files: `package-lock.json` (deleted), `pnpm-lock.yaml`, `pnpm-workspace.yaml`, `.husky/pre-commit`,

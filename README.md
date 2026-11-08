@@ -12,13 +12,13 @@ postgres.js on Supabase Postgres, Zod, Vitest.
 
 ## Local setup
 
-Requirements: Node 24, Docker, and a running local Supabase stack (Postgres on `127.0.0.1:54322`). The stack
+Requirements: Node 24, pnpm, Docker, and a running local Supabase stack (Postgres on `127.0.0.1:54322`). The stack
 can be shared with other projects: this app keeps every object in the `daily_tab` schema.
 
 1. Install dependencies:
 
    ```bash
-   npm install
+   pnpm install
    ```
 
 2. Create `.env` from the template and fill it in:
@@ -40,32 +40,32 @@ can be shared with other projects: this app keeps every object in the `daily_tab
 4. Apply migrations to the dev database (tests migrate their own database automatically):
 
    ```bash
-   npm run db:migrate
+   pnpm db:migrate
    ```
 
 5. Start the app and check the database round-trip:
 
    ```bash
-   npm run dev
+   pnpm dev
    curl localhost:3000/api/health   # {"status":"ok","db":"ok"}
    ```
 
 ## Scripts
 
-| Command               | What it does                                                             |
-| --------------------- | ------------------------------------------------------------------------ |
-| `npm run dev`         | Next.js dev server                                                       |
-| `npm run build`       | Production build                                                         |
-| `npm start`           | Serve the production build                                               |
-| `npm run lint`        | ESLint                                                                   |
-| `npm run typecheck`   | `next typegen` (route types) then `tsc --noEmit`; works before any build |
-| `npm run format`      | Prettier write (`format:check` to verify only)                           |
-| `npm test`            | Vitest, once (`test:watch` for watch mode); needs `TEST_DATABASE_URL`    |
-| `npm run db:generate` | Generate a SQL migration from `db/schema.ts` + `features/*/schema.ts`    |
-| `npm run db:migrate`  | Apply migrations (uses `DATABASE_URL_MIGRATE`, else `DATABASE_URL`)      |
-| `npm run db:studio`   | Drizzle Studio                                                           |
+| Command            | What it does                                                             |
+| ------------------ | ------------------------------------------------------------------------ |
+| `pnpm dev`         | Next.js dev server                                                       |
+| `pnpm build`       | Production build                                                         |
+| `pnpm start`       | Serve the production build                                               |
+| `pnpm lint`        | ESLint                                                                   |
+| `pnpm typecheck`   | `next typegen` (route types) then `tsc --noEmit`; works before any build |
+| `pnpm format`      | Prettier write (`format:check` to verify only)                           |
+| `pnpm test`        | Vitest, once (`test:watch` for watch mode); needs `TEST_DATABASE_URL`    |
+| `pnpm db:generate` | Generate a SQL migration from `db/schema.ts` + `features/*/schema.ts`    |
+| `pnpm db:migrate`  | Apply migrations (uses `DATABASE_URL_MIGRATE`, else `DATABASE_URL`)      |
+| `pnpm db:studio`   | Drizzle Studio                                                           |
 
-Before committing: `npm run lint && npm run typecheck && npm test`. The pre-commit hook only runs
+Before committing: `pnpm lint && pnpm typecheck && pnpm test`. The pre-commit hook only runs
 lint-staged (ESLint + Prettier on staged files).
 
 ## Database rules
@@ -99,7 +99,7 @@ render icon-maskable 512 public/icons/icon-maskable-512.png
    direct connection:
 
    ```bash
-   DATABASE_URL_MIGRATE='postgresql://…:5432/postgres' npm run db:migrate
+   DATABASE_URL_MIGRATE='postgresql://…:5432/postgres' pnpm db:migrate
    ```
 
 2. In Vercel, set `DATABASE_URL` to the **transaction pooler** (port 6543). The client already uses

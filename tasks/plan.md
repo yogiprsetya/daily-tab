@@ -28,7 +28,7 @@ pnpm.
 
 ### Phase 0: Tooling
 
-- [ ] Task 0: Switch from npm to pnpm
+- [x] Task 0: Switch from npm to pnpm
 
 ### Phase 1: Auth core
 

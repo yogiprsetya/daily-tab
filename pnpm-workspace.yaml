@@ -1,0 +1,3 @@
+allowBuilds:
+  # Postinstall only verifies/links the native binary for this platform (used by drizzle-kit).
+  esbuild: true
