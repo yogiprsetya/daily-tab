@@ -19,6 +19,99 @@ import { ICON_BUTTON } from './styles';
 
 type Project = { id: string; name: string };
 
+function RenameRow({
+  project,
+  pending,
+  onSubmit,
+  onCancel,
+}: {
+  project: Project;
+  pending: boolean;
+  onSubmit: (event: FormEvent<HTMLFormElement>) => void;
+  onCancel: () => void;
+}) {
+  return (
+    <li>
+      <form onSubmit={onSubmit} className="flex items-center gap-1" noValidate>
+        <Input
+          name="name"
+          aria-label={`Rename ${project.name}`}
+          defaultValue={project.name}
+          maxLength={50}
+          autoComplete="off"
+          autoFocus
+          className={cn(FIELD, 'flex-1')}
+        />
+        <button
+          type="submit"
+          disabled={pending}
+          aria-label="Save name"
+          className={ICON_BUTTON}
+        >
+          <Check aria-hidden className="size-4" />
+        </button>
+        <button
+          type="button"
+          aria-label="Cancel rename"
+          onClick={onCancel}
+          className={ICON_BUTTON}
+        >
+          <X aria-hidden className="size-4" />
+        </button>
+      </form>
+    </li>
+  );
+}
+
+function ProjectRow({
+  project,
+  pending,
+  confirmingDelete,
+  onRename,
+  onDelete,
+}: {
+  project: Project;
+  pending: boolean;
+  confirmingDelete: boolean;
+  onRename: () => void;
+  onDelete: () => void;
+}) {
+  return (
+    <li className="flex items-center gap-1">
+      <span className="min-w-0 flex-1 truncate text-sm">{project.name}</span>
+      {confirmingDelete ? (
+        <button
+          type="button"
+          disabled={pending}
+          onClick={onDelete}
+          className="min-h-11 rounded-lg px-3 text-sm text-destructive outline-none hover:bg-destructive/10 focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          Press again to delete
+        </button>
+      ) : (
+        <>
+          <button
+            type="button"
+            aria-label={`Rename ${project.name}`}
+            onClick={onRename}
+            className={ICON_BUTTON}
+          >
+            <Pencil aria-hidden className="size-4" />
+          </button>
+          <button
+            type="button"
+            aria-label={`Delete ${project.name}`}
+            onClick={onDelete}
+            className={ICON_BUTTON}
+          >
+            <Trash2 aria-hidden className="size-4" />
+          </button>
+        </>
+      )}
+    </li>
+  );
+}
+
 export function ProjectManager({ projects }: { projects: Project[] }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -115,77 +208,25 @@ export function ProjectManager({ projects }: { projects: Project[] }) {
             <ul className="flex max-h-72 flex-col overflow-y-auto">
               {projects.map((project) =>
                 renamingId === project.id ? (
-                  <li key={project.id}>
-                    <form
-                      onSubmit={(event) => onRename(event, project.id)}
-                      className="flex items-center gap-1"
-                      noValidate
-                    >
-                      <Input
-                        name="name"
-                        aria-label={`Rename ${project.name}`}
-                        defaultValue={project.name}
-                        maxLength={50}
-                        autoComplete="off"
-                        autoFocus
-                        className={cn(FIELD, 'flex-1')}
-                      />
-                      <button
-                        type="submit"
-                        disabled={pending}
-                        aria-label="Save name"
-                        className={ICON_BUTTON}
-                      >
-                        <Check aria-hidden className="size-4" />
-                      </button>
-                      <button
-                        type="button"
-                        aria-label="Cancel rename"
-                        onClick={() => setRenamingId(null)}
-                        className={ICON_BUTTON}
-                      >
-                        <X aria-hidden className="size-4" />
-                      </button>
-                    </form>
-                  </li>
+                  <RenameRow
+                    key={project.id}
+                    project={project}
+                    pending={pending}
+                    onSubmit={(event) => onRename(event, project.id)}
+                    onCancel={() => setRenamingId(null)}
+                  />
                 ) : (
-                  <li key={project.id} className="flex items-center gap-1">
-                    <span className="min-w-0 flex-1 truncate text-sm">
-                      {project.name}
-                    </span>
-                    {confirmingId === project.id ? (
-                      <button
-                        type="button"
-                        disabled={pending}
-                        onClick={() => onDelete(project.id)}
-                        className="min-h-11 rounded-lg px-3 text-sm text-destructive outline-none hover:bg-destructive/10 focus-visible:ring-2 focus-visible:ring-ring"
-                      >
-                        Press again to delete
-                      </button>
-                    ) : (
-                      <>
-                        <button
-                          type="button"
-                          aria-label={`Rename ${project.name}`}
-                          onClick={() => {
-                            setError(null);
-                            setRenamingId(project.id);
-                          }}
-                          className={ICON_BUTTON}
-                        >
-                          <Pencil aria-hidden className="size-4" />
-                        </button>
-                        <button
-                          type="button"
-                          aria-label={`Delete ${project.name}`}
-                          onClick={() => onDelete(project.id)}
-                          className={ICON_BUTTON}
-                        >
-                          <Trash2 aria-hidden className="size-4" />
-                        </button>
-                      </>
-                    )}
-                  </li>
+                  <ProjectRow
+                    key={project.id}
+                    project={project}
+                    pending={pending}
+                    confirmingDelete={confirmingId === project.id}
+                    onRename={() => {
+                      setError(null);
+                      setRenamingId(project.id);
+                    }}
+                    onDelete={() => onDelete(project.id)}
+                  />
                 )
               )}
             </ul>
