@@ -54,7 +54,8 @@ call `requireSession()`.
 6. Logout
    - `POST /api/auth/logout` clears the cookie (`Max-Age=0`) and returns `200`; the client then goes to
      `/login`.
-   - Logout button: bottom of the nav rail (≥1024px) and in the Home header (<1024px).
+   - Logout button: bottom of the nav rail, so desktop only (≥1024px). Owner decision 2026-11-08: phones have
+     no logout; a session ends after 30 days unused, or by rotating `AUTH_SECRET`.
 7. Credentials
    - `AUTH_EMAIL` (valid email, compared case-insensitively after trim), `AUTH_PIN` (digits only, at least
      6), `AUTH_SECRET` (at least 32 characters). Missing or invalid values fail with a message naming the
@@ -111,7 +112,7 @@ features/auth/
   request.ts                      clientIp(), safeNextPath(), isSameOrigin()
   *.test.ts
 components/shell/
-  logout-button.tsx               client button used by the rail and the Home header
+  logout-button.tsx               client button in the nav rail
 lib/api.ts                        + error codes `forbidden` (403), `rate_limited` (429)
 ```
 

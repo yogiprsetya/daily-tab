@@ -41,9 +41,8 @@ User: one person (the owner), on Chrome desktop (later via `newtab-extension`) a
    - **<1024px:** bottom tab bar with the same 5 destinations (≥44px tap targets, respects
      `env(safe-area-inset-bottom)`).
    - Active destination is indicated visually and with `aria-current="page"`.
-   - **Home `/`** shows: today's day and date (owned by `platform`), shortcut links (slot filled by
-     `shortcuts`), and pending tasks (slot filled by `todos`). Date and day use the device's local time zone
-     and update after midnight without a reload. Until those modules land, their slots show placeholders.
+   - **Home `/`** shows shortcut links (filled by `shortcuts`) and pending tasks (filled by `todos`). _The
+     weekday and date were removed on 2026-11-08 (owner decision)._
 4. Theme
    - Dark only: `<html class="dark">` set in the root layout, shadcn dark tokens, no light theme, no toggle.
      Manifest `theme_color` / `background_color` match the dark background.
@@ -126,8 +125,6 @@ app/
 components/
   ui/                     shadcn primitives (generated, edited only via shadcn CLI or deliberately)
   shell/                  app-shell.tsx, nav-items.ts, nav-rail.tsx, bottom-tab-bar.tsx, module-placeholder.tsx
-  home/                   today.tsx (platform-owned day + date on `/`)
-  inline-script.tsx       pre-paint script helper (Next docs: preventing-flash-before-hydration)
 db/
   index.ts                Drizzle client (server-only)
   schema.ts               export const dailyTab = pgSchema('daily_tab'); re-exports module tables
