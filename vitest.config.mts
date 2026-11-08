@@ -33,8 +33,14 @@ export default defineConfig({
     include: ['**/*.test.ts'],
     exclude: ['node_modules/**', '.next/**'],
     globalSetup: ['tests/global-setup.ts'],
+    // DB-backed tests truncate shared tables; running files in parallel would race.
+    fileParallelism: false,
     env: {
       DATABASE_URL: testDatabaseUrl,
+      // Fixed fake credentials: tests must never see the real AUTH_* values.
+      AUTH_EMAIL: 'owner@example.com',
+      AUTH_PIN: '482913',
+      AUTH_SECRET: 'test-only-secret-0123456789abcdef',
     },
   },
 });

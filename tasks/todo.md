@@ -23,7 +23,7 @@ relevant guide in `node_modules/next/dist/docs/` before using a Next.js API. Nev
 
 ## Phase 1: Auth core
 
-- [ ] **Task 1: Auth config and session primitives**
+- [x] **Task 1: Auth config and session primitives**
   - Description: Add `jose`. `features/auth/config.ts` parses `AUTH_EMAIL`, `AUTH_PIN` (digits, ≥6),
     `AUTH_SECRET` (≥32 chars) lazily, errors name variables only. `features/auth/session.ts`:
     `signSession(now)`, `verifySession(token, now)`, `needsRefresh(payload, now)` (> 24 h),
@@ -31,59 +31,60 @@ relevant guide in `node_modules/next/dist/docs/` before using a Next.js API. Nev
     `requireSession()` reading `cookies()` and returning `{ ok, response }` like `parseBody`. Test values
     for `AUTH_*` in `vitest.config.mts` env.
   - Acceptance:
-    - [ ] Unit tests: valid token verifies; expired, tampered, wrong-secret and garbage tokens → null.
-    - [ ] JWT `exp` and cookie `Max-Age` are both 30 days from the same `now`.
-    - [ ] `needsRefresh` false at 23 h 59 m, true at 24 h 1 m.
-    - [ ] Config errors name the variable and never contain its value.
+    - [x] Unit tests: valid token verifies; expired, tampered, wrong-secret and garbage tokens → null.
+    - [x] JWT `exp` and cookie `Max-Age` are both 30 days from the same `now`.
+    - [x] `needsRefresh` false at 23 h 59 m, true at 24 h 1 m.
+    - [x] Config errors name the variable and never contain its value.
   - Verify: `pnpm test features/auth`
   - Dependencies: Task 0
   - Files: `package.json`, `pnpm-lock.yaml`, `features/auth/config.ts`, `features/auth/session.ts`,
     `features/auth/session.test.ts`, `vitest.config.mts` (+ `config.test.ts`)
+  - Note: `requireSession` lives in `features/auth/require-session.ts` (server-only, uses `cookies()`) so `session.ts` stays importable from `proxy.ts`.
   - Scope: M
 
-- [ ] **Task 2: Credential check, request helpers, new API error codes**
+- [x] **Task 2: Credential check, request helpers, new API error codes**
   - Description: `credentials.ts`: `checkCredentials(email, pin)` with trim + case-insensitive email,
     SHA-256 + `timingSafeEqual` for both. `request.ts`: `clientIp(headers)`, `safeNextPath(value)`,
     `isSameOrigin(request)`. `lib/api.ts`: add `forbidden` (403) and `rate_limited` (429).
   - Acceptance:
-    - [ ] Credentials: right pair true; wrong email, wrong PIN, empty, different length → false;
+    - [x] Credentials: right pair true; wrong email, wrong PIN, empty, different length → false;
           `" Owner@X.com "` matches `owner@x.com`.
-    - [ ] `safeNextPath` keeps `/todos?x=1`; rejects `//evil.com`, `https://evil.com`, `/\evil`, empty → `/`.
-    - [ ] `clientIp` takes the first `x-forwarded-for` entry, falls back to `x-real-ip`, then `"unknown"`.
-    - [ ] `isSameOrigin` false for missing or foreign `Origin`.
+    - [x] `safeNextPath` keeps `/todos?x=1`; rejects `//evil.com`, `https://evil.com`, `/\evil`, empty → `/`.
+    - [x] `clientIp` takes the first `x-forwarded-for` entry, falls back to `x-real-ip`, then `"unknown"`.
+    - [x] `isSameOrigin` false for missing or foreign `Origin`.
   - Verify: `pnpm test features/auth lib`
   - Dependencies: Task 1
   - Files: `features/auth/credentials.ts`, `features/auth/request.ts`, their tests, `lib/api.ts`,
     `lib/api.test.ts`
   - Scope: M
 
-- [ ] **Task 3: `login_attempts` table and rate limiter**
+- [x] **Task 3: `login_attempts` table and rate limiter**
   - Description: `features/auth/schema.ts` per spec, migration via `pnpm db:generate`, applied locally.
     `rate-limit.ts` (server-only): `checkLoginAllowed(ip, now)` → `{ allowed: true } | { allowed: false,
 retryAfterSeconds }` (per-IP 5/15 min first, then global 20/60 min), `recordAttempt(ip, succeeded,
 now)`, `pruneAttempts(now)` (> 24 h). Integration tests truncate `login_attempts` between tests.
   - Acceptance:
-    - [ ] 4 failures from an IP allowed, 5th failure → next check blocked; `retryAfterSeconds` matches the
+    - [x] 4 failures from an IP allowed, 5th failure → next check blocked; `retryAfterSeconds` matches the
           oldest failure + 15 min.
-    - [ ] Failures older than the window do not count; successes never count.
-    - [ ] 20 failures spread over many IPs block every IP.
-    - [ ] Migration only touches `daily_tab`.
+    - [x] Failures older than the window do not count; successes never count.
+    - [x] 20 failures spread over many IPs block every IP.
+    - [x] Migration only touches `daily_tab`.
   - Verify: `pnpm test features/auth/rate-limit`; `pnpm db:migrate`; check `information_schema`
   - Dependencies: Task 1
   - Files: `features/auth/schema.ts`, `features/auth/rate-limit.ts`, `features/auth/rate-limit.test.ts`,
     `drizzle/0001_*.sql`, `db/schema.ts` (re-export if needed)
   - Scope: M
 
-- [ ] **Task 4: Login and logout route handlers**
+- [x] **Task 4: Login and logout route handlers**
   - Description: `POST /api/auth/login`: Zod body `{ email, pin }` → rate limit check (429 + `Retry-After`,
     no record) → `checkCredentials` → record → 401 `invalid_credentials`-style generic message, or 200 with
     `Set-Cookie`. `POST /api/auth/logout`: cleared cookie, 200. Both `await connection()`.
   - Acceptance:
-    - [ ] Integration: success → 200 + cookie with correct attributes + success recorded.
-    - [ ] Wrong PIN → 401 generic message + failure recorded; 6th from the same IP → 429 with
+    - [x] Integration: success → 200 + cookie with correct attributes + success recorded.
+    - [x] Wrong PIN → 401 generic message + failure recorded; 6th from the same IP → 429 with
           `Retry-After`, nothing recorded, even with the right PIN.
-    - [ ] Invalid body → 400 `validation_error` without echoing the PIN.
-    - [ ] Logout → `Max-Age=0` cookie.
+    - [x] Invalid body → 400 `validation_error` without echoing the PIN.
+    - [x] Logout → `Max-Age=0` cookie.
   - Verify: `pnpm test app/api/auth`; curl locally
   - Dependencies: Tasks 2, 3
   - Files: `app/api/auth/login/route.ts`, `app/api/auth/login/route.test.ts`,
@@ -92,8 +93,8 @@ now)`, `pruneAttempts(now)` (> 24 h). Integration tests truncate `login_attempts
 
 ## Checkpoint A: API auth works
 
-- [ ] Gates pass
-- [ ] curl: login cookie, 401, 429, logout recorded below
+- [x] Gates pass
+- [x] curl: login cookie, 401, 429, logout recorded below
 
 ## Phase 2: Gate and UI
 

@@ -32,15 +32,15 @@ pnpm.
 
 ### Phase 1: Auth core
 
-- [ ] Task 1: Auth config and session primitives
-- [ ] Task 2: Credential check, request helpers, new API error codes
-- [ ] Task 3: `login_attempts` table and rate limiter
-- [ ] Task 4: Login and logout route handlers
+- [x] Task 1: Auth config and session primitives
+- [x] Task 2: Credential check, request helpers, new API error codes
+- [x] Task 3: `login_attempts` table and rate limiter
+- [x] Task 4: Login and logout route handlers
 
 ### Checkpoint A: API auth works
 
-- [ ] `pnpm lint && pnpm typecheck && pnpm test && pnpm build` pass
-- [ ] curl: login sets a correct `dt_session` cookie; wrong PIN 401; 6th failure 429; logout clears
+- [x] `pnpm lint && pnpm typecheck && pnpm test && pnpm build` pass
+- [x] curl: login sets a correct `dt_session` cookie; wrong PIN 401; 6th failure 429; logout clears
 
 ### Phase 2: Gate and UI
 

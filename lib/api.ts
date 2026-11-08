@@ -1,12 +1,19 @@
 import type { z } from 'zod';
 
 export type ApiErrorCode =
-  'validation_error' | 'unauthorized' | 'not_found' | 'internal';
+  | 'validation_error'
+  | 'unauthorized'
+  | 'forbidden'
+  | 'not_found'
+  | 'rate_limited'
+  | 'internal';
 
 const STATUS: Record<ApiErrorCode, number> = {
   validation_error: 400,
   unauthorized: 401,
+  forbidden: 403,
   not_found: 404,
+  rate_limited: 429,
   internal: 500,
 };
 

@@ -103,7 +103,8 @@ app/
     logout/route.ts               POST: clear cookie
 features/auth/
   config.ts                       Zod-parsed AUTH_* vars (server-only, lazy)
-  session.ts                      signSession, verifySession, needsRefresh, cookie options, requireSession
+  session.ts                      signSession, verifySession, needsRefresh, cookie builders (pure: proxy uses it)
+  require-session.ts              requireSession() for Route Handlers (server-only, reads cookies())
   credentials.ts                  constant-time email + PIN check
   rate-limit.ts                   DAL over login_attempts (server-only)
   schema.ts                       dailyTab.table('login_attempts', …)
@@ -143,7 +144,7 @@ Same conventions as `platform`. Auth-specific example (the contract every module
 
 ```ts
 // app/api/<module>/route.ts
-import { requireSession } from '@/features/auth/session';
+import { requireSession } from '@/features/auth/require-session';
 
 export async function GET() {
   const session = await requireSession();
