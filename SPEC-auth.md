@@ -1,6 +1,6 @@
 # Spec: auth
 
-Status: **Approved 2026-11-08**
+Status: **Done 2026-11-08**: live at https://daily-tab.vercel.app
 Module id: `auth` (see [CAPABILITY-MAP.md](CAPABILITY-MAP.md)) · Depends on: `platform`
 
 ## Objective
@@ -192,7 +192,7 @@ export async function GET() {
 - [x] `POST /api/auth/login` with `Origin: https://evil.example` → 403.
 - [x] A session older than 24 h gets a new cookie on the next request; a 31-day-old token is rejected.
 - [x] Logout clears the cookie and lands on `/login`.
-- [ ] Deployed: same checks against https://daily-tab.vercel.app; Android PWA can log in and stays logged
+- [x] Deployed: same checks against https://daily-tab.vercel.app; Android PWA can log in and stays logged
       in after closing and reopening.
 
 ## Not Doing (and why)

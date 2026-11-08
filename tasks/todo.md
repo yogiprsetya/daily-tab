@@ -107,7 +107,7 @@ now)`, `pruneAttempts(now)` (> 24 h). Integration tests truncate `login_attempts
     - [x] `/login` builds as static.
     - [x] Errors are announced (`role="alert"`), fields have labels, PIN never echoed in UI state beyond the
           input.
-    - [ ] Manual (owner): login works and lands on `next`.
+    - [x] Manual (owner): login works and lands on `next`.
   - Verify: `pnpm build` route table; manual browser check
   - Dependencies: Task 4
   - Files: `app/login/page.tsx`, `app/login/login-form.tsx`
@@ -132,7 +132,7 @@ now)`, `pruneAttempts(now)` (> 24 h). Integration tests truncate `login_attempts
     `router.replace('/login')`. Rendered at the bottom of the nav rail and in the Home header below 1024px.
   - Acceptance:
     - [x] Visible on desktop rail and mobile Home only; keyboard reachable with a visible label.
-    - [ ] Manual (owner): logout lands on `/login`; back button does not show protected content.
+    - [x] Manual (owner): logout lands on `/login`; back button does not show protected content.
   - Verify: `pnpm build`; manual browser check
   - Dependencies: Task 6
   - Files: `components/shell/logout-button.tsx`, `components/shell/nav-rail.tsx`, `app/(app)/page.tsx`
@@ -140,8 +140,8 @@ now)`, `pruneAttempts(now)` (> 24 h). Integration tests truncate `login_attempts
 
 ## Checkpoint B: Locked locally
 
-- [ ] Local Success Criteria in SPEC-auth.md checked
-- [ ] Owner's manual browser check (desktop + mobile width)
+- [x] Local Success Criteria in SPEC-auth.md checked
+- [x] Owner's manual browser check (desktop + mobile width)
 
 ## Phase 3: Ship
 
@@ -155,18 +155,19 @@ now)`, `pruneAttempts(now)` (> 24 h). Integration tests truncate `login_attempts
   - Files: `README.md`, `.env.example`
   - Scope: XS
 
-- [ ] **Task 9: Deploy (human-gated)**
+- [x] **Task 9: Deploy (human-gated)**
   - Description: Owner sets `AUTH_EMAIL`, `AUTH_PIN`, `AUTH_SECRET` on Vercel, runs `scripts/sql/2026-11-08-move-migration-journal.sql` once in the Supabase SQL editor (journal moves to `drizzle.daily_tab_migration`), then runs the cloud migration
     (`DATABASE_URL_MIGRATE='…' pnpm db:migrate`); PR merged; prod smoke by Claude (curl) and owner
     (Android).
   - Acceptance:
-    - [ ] Prod: `/` 307 `/login`; `/api/health` 200; wrong PIN 401; foreign Origin 403.
-    - [ ] Android PWA logs in and is still logged in after closing and reopening.
+    - [x] Prod: `/` 307 `/login`; `/api/health` 200; wrong PIN 401; foreign Origin 403.
+    - [x] Android PWA logs in and is still logged in after closing and reopening.
+    - Note: owner confirmed the browser and Android checks. In prod, rate limiting was not exercised on purpose (it would count toward the global limit); it is covered by integration tests and the local curl smoke.
   - Dependencies: Tasks 0–8
   - Files: none in repo
   - Scope: S
 
 ## Checkpoint C: Auth complete
 
-- [ ] Every Success Criteria box in SPEC-auth.md checked
-- [ ] Ready for the next module
+- [x] Every Success Criteria box in SPEC-auth.md checked
+- [x] Ready for the next module

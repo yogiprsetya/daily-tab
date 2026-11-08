@@ -1,4 +1,4 @@
-# Implementation Plan: auth
+# Implementation Plan: auth (done 2026-11-08)
 
 Spec: [SPEC-auth.md](../SPEC-auth.md) · Map: [CAPABILITY-MAP.md](../CAPABILITY-MAP.md) · Tasks: [todo.md](todo.md)
 Previous module: [archive/platform-plan.md](archive/platform-plan.md)
@@ -50,17 +50,17 @@ pnpm.
 
 ### Checkpoint B: Locked locally
 
-- [ ] All local Success Criteria in SPEC-auth.md checked
-- [ ] Owner checks login, wrong PIN, `next` redirect, logout in a browser (desktop + mobile width)
+- [x] All local Success Criteria in SPEC-auth.md checked
+- [x] Owner checks login, wrong PIN, `next` redirect, logout in a browser (desktop + mobile width)
 
 ### Phase 3: Ship
 
 - [x] Task 8: Docs (README, .env.example)
-- [ ] Task 9: Deploy with `AUTH_*` on Vercel and cloud migration (human-gated)
+- [x] Task 9: Deploy with `AUTH_*` on Vercel and cloud migration (human-gated)
 
 ### Checkpoint C: Auth complete
 
-- [ ] Deployed Success Criteria checked; Android PWA logs in and stays logged in
+- [x] Deployed Success Criteria checked; Android PWA logs in and stays logged in
 
 ## Risks and Mitigations
 
