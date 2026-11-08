@@ -12,7 +12,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { apiRequest } from '@/lib/api-client';
 import type { TodoItem } from '../optimistic';
-import { ACTION, FIELD, SELECT } from './styles';
+import { ProjectSelect, readProjectId } from './project-select';
+import { ACTION, FIELD } from './styles';
 
 export function TodoDialog({
   todo,
@@ -32,13 +33,12 @@ export function TodoDialog({
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
-    const projectId = String(form.get('projectId') ?? '');
 
     setPending(true);
     setError(null);
     const result = await apiRequest(`/api/todos/${todo.id}`, {
       method: 'PATCH',
-      body: { title: form.get('title'), projectId: projectId || null },
+      body: { title: form.get('title'), projectId: readProjectId(form) },
     });
     setPending(false);
 
@@ -89,19 +89,12 @@ export function TodoDialog({
             <Label htmlFor="todo-project" className="text-sm">
               Project
             </Label>
-            <select
+            <ProjectSelect
               id="todo-project"
-              name="projectId"
-              defaultValue={todo.projectId ?? ''}
-              className={SELECT}
-            >
-              <option value="">No project</option>
-              {projects.map((project) => (
-                <option key={project.id} value={project.id}>
-                  {project.name}
-                </option>
-              ))}
-            </select>
+              defaultProjectId={todo.projectId}
+              projects={projects}
+              className="w-full"
+            />
           </div>
 
           {error && (

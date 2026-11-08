@@ -5,7 +5,8 @@ import { type FormEvent, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { apiRequest } from '@/lib/api-client';
-import { ACTION, FIELD, SELECT } from './styles';
+import { ProjectSelect, readProjectId } from './project-select';
+import { ACTION, FIELD } from './styles';
 
 export function AddTodoForm({
   projects,
@@ -23,13 +24,12 @@ export function AddTodoForm({
     event.preventDefault();
     if (pending) return;
     const form = new FormData(event.currentTarget);
-    const projectId = String(form.get('projectId') ?? '');
 
     setPending(true);
     setError(null);
     const result = await apiRequest('/api/todos', {
       method: 'POST',
-      body: { title: form.get('title'), projectId: projectId || null },
+      body: { title: form.get('title'), projectId: readProjectId(form) },
     });
     setPending(false);
 
@@ -55,21 +55,14 @@ export function AddTodoForm({
           className={`${FIELD} sm:flex-1`}
         />
         {projects.length > 0 && (
-          <select
-            // Follows the active filter when the URL changes.
-            key={defaultProjectId ?? 'none'}
-            name="projectId"
-            aria-label="Project"
-            defaultValue={defaultProjectId ?? ''}
-            className={SELECT}
-          >
-            <option value="">No project</option>
-            {projects.map((project) => (
-              <option key={project.id} value={project.id}>
-                {project.name}
-              </option>
-            ))}
-          </select>
+          <ProjectSelect
+            // Resets when the active filter or the list of projects changes.
+            key={`${defaultProjectId}:${projects.map((p) => p.id).join()}`}
+            label="Project"
+            defaultProjectId={defaultProjectId}
+            projects={projects}
+            className="w-full sm:w-44"
+          />
         )}
         <Button type="submit" className={ACTION}>
           Add
