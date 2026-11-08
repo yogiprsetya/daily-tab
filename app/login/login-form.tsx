@@ -2,12 +2,11 @@
 
 import { useRouter } from 'next/navigation';
 import { type FormEvent, useRef, useState } from 'react';
+import { FIELD } from '@/components/form-styles';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { safeNextPath } from '@/features/auth/request';
-
-const FIELD = 'h-11 rounded-lg px-3 text-base sm:text-sm';
 
 function retryMessage(retryAfter: string | null) {
   const minutes = Math.max(1, Math.ceil(Number(retryAfter || 60) / 60));

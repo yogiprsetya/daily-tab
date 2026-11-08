@@ -110,6 +110,16 @@ Shown on Home; "Edit" switches to rows with move, edit and delete. Spec: [SPEC-s
 - Icons come from `icons.duckduckgo.com`, which receives only the hostname. The title's first letter shows
   until the icon has loaded, or if it never does.
 
+## Todos
+
+`/todos` lists todos with a project filter in the URL (`?project=<id>` or `?project=none`). Spec:
+[SPEC-todos.md](SPEC-todos.md).
+
+- A todo has a title, an optional project, link and notes. Links follow the same rules as shortcuts.
+- Deleting a project keeps its todos; they move to No project.
+- Completed todos stay in the collapsed Completed section until deleted by hand.
+- Home shows the 5 oldest pending todos.
+
 ## PWA icons
 
 Sources are [public/icons/icon.svg](public/icons/icon.svg) (rounded, purpose `any`) and

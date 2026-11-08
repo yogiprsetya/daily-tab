@@ -91,55 +91,69 @@ first. Read the relevant guide in `node_modules/next/dist/docs/` before using a 
 
 ## Todos (`feat/todos`, from `master` after Task 7)
 
-- [ ] **Task 8: Todos data model and validation**
+- [x] **Task 8: Todos data model and validation**
   - Files: `features/todos/schema.ts`, `features/todos/validation.ts` (+ test), `drizzle/0003_*`, `lib/api.ts`
     (+ test)
   - Acceptance:
-    - [ ] Project names unique ignoring case; `ON DELETE SET NULL`; `conflict` maps to 409.
+    - [x] Project names unique ignoring case; `ON DELETE SET NULL`; `conflict` maps to 409.
   - Scope: M
 
-- [ ] **Task 9: Todos read API**
+- [x] **Task 9: Todos read API**
   - Files: `features/todos/dal.ts` (+ test), `app/api/todos/route.ts` (+ test), `app/api/projects/route.ts`
     (+ test)
   - Acceptance:
-    - [ ] Filter handles project, `none` and unknown; pending counts are correct; no session → 401.
+    - [x] Filter handles project, `none` and unknown; pending counts are correct; no session → 401.
   - Scope: M
 
-- [ ] **Task 10: `/todos` page**
+- [x] **Task 10: `/todos` page**
   - Files: `app/(app)/todos/page.tsx`, `features/todos/components/{todos-view,project-filter,todo-list,todos-skeleton}.tsx`
   - Acceptance:
-    - [ ] Filter from the URL; pending oldest first; Completed collapsed; `searchParams` awaited inside Suspense.
+    - [x] Filter from the URL; pending oldest first; Completed collapsed; `searchParams` awaited inside Suspense.
   - Scope: M
 
-- [ ] **Task 11: Add and tick todos**
+- [x] **Task 11: Add and tick todos**
   - Files: `app/api/todos/route.ts`, `app/api/todos/[id]/route.ts` (+ test), `features/todos/dal.ts`,
     `features/todos/components/{add-todo-form,todo-row}.tsx`, `components/ui/checkbox.tsx`
   - Acceptance:
-    - [ ] Enter adds and keeps focus; ticking is immediate and reverts with an error if the request fails.
+    - [x] Enter adds and keeps focus; ticking is immediate and reverts with an error if the request fails.
   - Scope: M
 
-- [ ] **Task 12: Edit and delete todos**
+- [x] **Task 12: Edit and delete todos**
   - Files: `app/api/todos/[id]/route.ts`, `features/todos/dal.ts`, `features/todos/components/todo-dialog.tsx`
   - Acceptance:
-    - [ ] Unknown `projectId` → 400; unknown or malformed id → 404; delete needs a second press.
+    - [x] Unknown `projectId` → 400; unknown or malformed id → 404; delete needs a second press.
   - Scope: M
 
-- [ ] **Task 13: Manage projects**
+- [x] **Task 13: Manage projects**
   - Files: `app/api/projects/route.ts`, `app/api/projects/[id]/route.ts` (+ test), `features/todos/dal.ts`,
     `features/todos/components/project-manager.tsx`
   - Acceptance:
-    - [ ] "Work" when "work" exists → 409; deleting a project keeps its todos under No project.
+    - [x] "Work" when "work" exists → 409; deleting a project keeps its todos under No project.
   - Scope: M
 
-- [ ] **Task 14: Pending tasks on Home**
+- [x] **Task 14: Pending tasks on Home**
   - Files: `features/todos/components/pending-section.tsx`, `features/todos/dal.ts`, `app/(app)/page.tsx`
   - Acceptance:
-    - [ ] At most 5 oldest pending, tickable; "View all (N)" shows the true total.
+    - [x] At most 5 oldest pending, tickable; "View all (N)" shows the true total.
+  - Scope: S
+
+- [x] **Task 14b: Optional link and notes on a todo (added by owner)**
+  - Files: `features/todos/{schema,validation,dal,optimistic}.ts`, `drizzle/0004_*`, `lib/url.ts` (+ test),
+    `features/todos/components/{todo-list,todo-dialog}.tsx`, `components/ui/textarea.tsx`
+  - Acceptance:
+    - [x] Link uses the shortcut URL rules; empty input clears link and notes.
+    - [x] The link does not tick the todo; notes show on `/todos`, not on Home.
+  - Scope: M
+
+- [x] **Task 14c: Create todos in a dialog (added by owner)**
+  - Files: `features/todos/components/{add-todo-button,todo-dialog,todos-view}.tsx`
+  - Acceptance:
+    - [x] "Add todo" opens the dialog; the project defaults to the active filter; delete only shows when editing.
   - Scope: S
 
 ## Checkpoint B: Todos work locally
 
-- [ ] Gates pass; curl CRUD smoke with a session cookie
+- [x] Gates pass; curl CRUD smoke with a session cookie
 - [ ] Owner's browser check (desktop + mobile width)
 
 - [ ] **Task 15: Release todos (human-gated)**

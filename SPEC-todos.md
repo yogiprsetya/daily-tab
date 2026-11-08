@@ -11,20 +11,24 @@ filter; Home shows what is still pending so it is visible on every new tab.
 ### Acceptance criteria
 
 1. Todos
-   - A todo has a title (1–280 characters after trim) and at most one project.
-   - Add from one input at the top of `/todos`: Enter submits, the input clears and keeps focus. The project
-     defaults to the active filter.
+   - A todo has a title (1–280 characters after trim), at most one project, an optional link and optional
+     notes (up to 2000 characters). Links follow the same rules as shortcuts (`http`/`https` only, a bare
+     domain gets `https://`). Empty input clears either field. _Added 2026-11-08 at the owner's request._
+   - The link shows as its hostname, opens in a new tab and sits outside the checkbox's label. Notes show on `/todos` only.
+   - "Add todo" on `/todos` opens a dialog with title, project, link and notes (owner decision 2026-11-08,
+     replacing an inline input). The project defaults to the active filter.
    - Pending todos are listed oldest first.
    - Checking a todo moves it to Completed immediately (optimistic); if the request fails it returns to its
      place and an error is shown.
-   - Edit title and project in a dialog, which also offers Delete with a second press to confirm.
+   - Edit all of a todo's fields in the same dialog, which also offers Delete with a second press to confirm.
 2. Completed
    - Completed todos sit in a collapsed "Completed (N)" section, most recently completed first, respecting
      the active filter.
    - They stay stored until deleted by hand. Unchecking returns one to pending.
 3. Projects and filter
    - Project names are unique ignoring case (1–50 characters after trim). A duplicate returns `409`.
-   - Filter chips: All, each project, and No project, each with its pending count.
+   - Filter as a joined button group: All, each project, and No project, each with its pending count. The
+     group scrolls sideways when it does not fit, and the active filter is scrolled into view.
    - The filter lives in the URL: `/todos?project=<uuid>` or `/todos?project=none`. An unknown or malformed
      value behaves as All.
    - Projects are created, renamed and deleted from `/todos`. Deleting one asks for confirmation and moves
@@ -40,16 +44,16 @@ filter; Home shows what is still pending so it is visible on every new tab.
 
 ## API
 
-| Method and path             | Body or query                                  | Success                             |
-| --------------------------- | ---------------------------------------------- | ----------------------------------- |
-| `GET /api/todos`            | `?project=<uuid>\|none`                        | `200 { items: Todo[] }`             |
-| `POST /api/todos`           | `{ title, projectId? }`                        | `201 Todo`                          |
-| `PATCH /api/todos/[id]`     | `{ title?, projectId?, completed? }` (min one) | `200 Todo`, `404` if unknown        |
-| `DELETE /api/todos/[id]`    | —                                              | `204`, `404` if unknown             |
-| `GET /api/projects`         | —                                              | `200 { items: ProjectWithCount[] }` |
-| `POST /api/projects`        | `{ name }`                                     | `201 Project`, `409` on duplicate   |
-| `PATCH /api/projects/[id]`  | `{ name }`                                     | `200 Project`, `404`, `409`         |
-| `DELETE /api/projects/[id]` | —                                              | `204`, `404` if unknown             |
+| Method and path             | Body or query                                                | Success                             |
+| --------------------------- | ------------------------------------------------------------ | ----------------------------------- |
+| `GET /api/todos`            | `?project=<uuid>\|none`                                      | `200 { items: Todo[] }`             |
+| `POST /api/todos`           | `{ title, projectId?, url?, notes? }`                        | `201 Todo`                          |
+| `PATCH /api/todos/[id]`     | `{ title?, projectId?, url?, notes?, completed? }` (min one) | `200 Todo`, `404` if unknown        |
+| `DELETE /api/todos/[id]`    | —                                                            | `204`, `404` if unknown             |
+| `GET /api/projects`         | —                                                            | `200 { items: ProjectWithCount[] }` |
+| `POST /api/projects`        | `{ name }`                                                   | `201 Project`, `409` on duplicate   |
+| `PATCH /api/projects/[id]`  | `{ name }`                                                   | `200 Project`, `404`, `409`         |
+| `DELETE /api/projects/[id]` | —                                                            | `204`, `404` if unknown             |
 
 `projectId` may be `null`. A `projectId` that does not exist returns `400`. A malformed `id` returns `404`.
 `lib/api.ts` gains the error code `conflict` (409).
@@ -78,6 +82,8 @@ export const todos = dailyTab.table(
     projectId: uuid('project_id').references(() => projects.id, {
       onDelete: 'set null',
     }),
+    url: text('url'),
+    notes: text('notes'),
     completedAt: timestamp('completed_at', { withTimezone: true }),
     createdAt: timestamp('created_at', { withTimezone: true })
       .notNull()
@@ -107,7 +113,7 @@ features/todos/
     pending-section.tsx         async Server Component for Home
     project-filter.tsx          chips (links)
     project-manager.tsx         client: create, rename, delete
-    add-todo-form.tsx           client
+    add-todo-button.tsx           client: opens the dialog
     todo-list.tsx, todo-row.tsx client: optimistic toggle
     todo-dialog.tsx             client: edit, delete
     todos-skeleton.tsx          Suspense fallbacks
@@ -152,7 +158,7 @@ Cloud migration: `DATABASE_URL_MIGRATE='…' pnpm db:migrate` (owner runs it).
 
 ## Not Doing (and why)
 
-- **Due dates, priority, notes, subtasks, reminders:** owner chose title + project only.
+- **Due dates, priority, subtasks, reminders:** owner chose title, project, link and notes only.
 - **Manual ordering of todos:** oldest first is predictable; add it only if it proves necessary.
 - **Automatic cleanup of completed todos:** owner chose to keep them until deleted by hand.
 - **Reading tasks from Obsidian:** todos are managed entirely in Supabase (owner decision).

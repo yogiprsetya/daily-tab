@@ -1,6 +1,7 @@
 'use client';
 
 import { type FormEvent, useState } from 'react';
+import { ACTION, FIELD } from '@/components/form-styles';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -12,9 +13,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { apiRequest } from '@/lib/api-client';
 import type { ShortcutItem } from './types';
-
-const FIELD = 'h-11 rounded-lg px-3 text-base sm:text-sm';
-const ACTION = 'h-11 rounded-lg px-4 text-sm';
 
 /** Mount per use (with a key): form state starts fresh every time it opens. */
 export function ShortcutDialog({

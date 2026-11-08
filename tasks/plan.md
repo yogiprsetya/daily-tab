@@ -41,17 +41,19 @@ merge.
 
 ### Todos
 
-- [ ] Task 8: Todos data model and validation
-- [ ] Task 9: Todos read API
-- [ ] Task 10: `/todos` page
-- [ ] Task 11: Add and tick todos
-- [ ] Task 12: Edit and delete todos
-- [ ] Task 13: Manage projects
-- [ ] Task 14: Pending tasks on Home
+- [x] Task 8: Todos data model and validation
+- [x] Task 9: Todos read API
+- [x] Task 10: `/todos` page
+- [x] Task 11: Add and tick todos
+- [x] Task 12: Edit and delete todos
+- [x] Task 13: Manage projects
+- [x] Task 14: Pending tasks on Home
+- [x] Task 14b: Optional link and notes on a todo
+- [x] Task 14c: Create todos in a dialog
 
 ### Checkpoint B: Todos work locally
 
-- [ ] Gates pass; curl CRUD smoke with a session cookie
+- [x] Gates pass; curl CRUD smoke with a session cookie
 - [ ] Owner checks todos in a browser (desktop + mobile width)
 
 - [ ] Task 15: Release todos (human-gated)
