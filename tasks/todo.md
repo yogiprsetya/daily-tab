@@ -84,9 +84,9 @@ Local migrations pass a local URL explicitly.
 ## Checkpoint B: Works locally
 
 - [x] Gates pass; browser script passes
-- [ ] Owner's browser check (desktop + mobile width)
+- [x] Owner's browser check (desktop + mobile width)
 
-- [ ] **Task 9: Release (human-gated)**
+- [x] **Task 9: Release (human-gated)**
   - Acceptance:
-    - [ ] Owner ran the cloud migration before merge.
-    - [ ] Production smoke passes; bookmarks work in the Android PWA.
+    - [x] Owner ran the cloud migration before merge.
+    - [x] Production smoke passes; bookmarks work in the Android PWA.

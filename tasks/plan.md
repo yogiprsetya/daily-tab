@@ -27,7 +27,7 @@ patterns as todos. Stacked on `chore/remove-home-header` (PR #5) until that merg
 
 ### Checkpoint A: No regressions
 
-- [ ] Gates pass; todos, Select and shortcuts browser scripts pass
+- [x] Gates pass; todos, Select and shortcuts browser scripts pass
 
 ### Bookmarks
 
@@ -41,9 +41,9 @@ patterns as todos. Stacked on `chore/remove-home-header` (PR #5) until that merg
 ### Checkpoint B: Works locally
 
 - [x] Gates pass; browser script passes
-- [ ] Owner checks in a browser (desktop + mobile width)
+- [x] Owner checks in a browser (desktop + mobile width)
 
-- [ ] Task 9: Release (human-gated)
+- [x] Task 9: Release (human-gated)
 
 ## Risks and Mitigations
 
