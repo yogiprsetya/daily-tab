@@ -10,7 +10,7 @@ Single-user personal dashboard: Chrome New Tab on desktop, installed PWA on Andr
 | `todos`            | Todo CRUD, projects, filter by project                                                                                                              | auth       |
 | `shortcuts`        | Quick-access links (CRUD, ordering)                                                                                                                 | auth       |
 | `bookmarks`        | Bookmark manager inside the app (CRUD, grouping). No browser bookmark integration                                                                   | auth       |
-| `reading-list`     | Things to read (add, mark as read)                                                                                                                  | auth       |
+| `reading-list`     | Things to read (add, mark as read, group by topic)                                                                                                  | auth       |
 | `obsidian`         | Read-only access to the Obsidian vault synced to Google Drive by Remotely Save; usable on desktop and mobile                                        | auth       |
 
 Build order: `platform` → `auth` → (`newtab-extension`, `shortcuts`, `todos`, `reading-list`, `bookmarks`, `obsidian`)
