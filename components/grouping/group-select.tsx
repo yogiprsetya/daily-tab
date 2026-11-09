@@ -9,42 +9,41 @@ import {
 } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 
-const NO_PROJECT = 'none';
-const FIELD_NAME = 'projectId';
+const NO_GROUP = 'none';
 
-/** Reads the value submitted by <ProjectSelect>, as the API expects it. */
-export function readProjectId(form: FormData): string | null {
-  const value = form.get(FIELD_NAME);
-  return typeof value === 'string' && value !== NO_PROJECT ? value : null;
+/** Reads the value submitted by <GroupSelect>, as the API expects it. */
+export function readGroupId(form: FormData, name: string): string | null {
+  const value = form.get(name);
+  return typeof value === 'string' && value !== NO_GROUP ? value : null;
 }
 
-export function ProjectSelect({
+export function GroupSelect({
   id,
+  name,
   label,
-  defaultProjectId,
-  projects,
+  noneLabel,
+  defaultGroupId,
+  groups,
   className,
 }: {
   id?: string;
+  name: string;
   label?: string;
-  defaultProjectId: string | null;
-  projects: { id: string; name: string }[];
+  noneLabel: string;
+  defaultGroupId: string | null;
+  groups: { id: string; name: string }[];
   className?: string;
 }) {
   const items = [
-    { value: NO_PROJECT, label: 'No project' },
-    ...projects.map((project) => ({
-      value: project.id,
-      label: project.name,
+    { value: NO_GROUP, label: noneLabel },
+    ...groups.map((group) => ({
+      value: group.id,
+      label: group.name,
     })),
   ];
 
   return (
-    <Select
-      name={FIELD_NAME}
-      items={items}
-      defaultValue={defaultProjectId ?? NO_PROJECT}
-    >
+    <Select name={name} items={items} defaultValue={defaultGroupId ?? NO_GROUP}>
       <SelectTrigger
         id={id}
         aria-label={label}

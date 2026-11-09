@@ -3,7 +3,7 @@
 import { Check, Pencil, Settings2, Trash2, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { type FormEvent, useState } from 'react';
-import { ACTION, FIELD } from '@/components/form-styles';
+import { ACTION, FIELD, ICON_BUTTON } from '@/components/form-styles';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -15,17 +15,24 @@ import {
 import { Input } from '@/components/ui/input';
 import { apiRequest } from '@/lib/api-client';
 import { cn } from '@/lib/utils';
-import { ICON_BUTTON } from './styles';
 
-type Project = { id: string; name: string };
+type Group = { id: string; name: string };
+
+export type GroupManagerCopy = {
+  trigger: string;
+  title: string;
+  description: string;
+  placeholder: string;
+  newNameLabel: string;
+};
 
 function RenameRow({
-  project,
+  group,
   pending,
   onSubmit,
   onCancel,
 }: {
-  project: Project;
+  group: Group;
   pending: boolean;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
   onCancel: () => void;
@@ -35,8 +42,8 @@ function RenameRow({
       <form onSubmit={onSubmit} className="flex items-center gap-1" noValidate>
         <Input
           name="name"
-          aria-label={`Rename ${project.name}`}
-          defaultValue={project.name}
+          aria-label={`Rename ${group.name}`}
+          defaultValue={group.name}
           maxLength={50}
           autoComplete="off"
           autoFocus
@@ -63,14 +70,14 @@ function RenameRow({
   );
 }
 
-function ProjectRow({
-  project,
+function GroupRow({
+  group,
   pending,
   confirmingDelete,
   onRename,
   onDelete,
 }: {
-  project: Project;
+  group: Group;
   pending: boolean;
   confirmingDelete: boolean;
   onRename: () => void;
@@ -78,7 +85,7 @@ function ProjectRow({
 }) {
   return (
     <li className="flex items-center gap-1">
-      <span className="min-w-0 flex-1 truncate text-sm">{project.name}</span>
+      <span className="min-w-0 flex-1 truncate text-sm">{group.name}</span>
       {confirmingDelete ? (
         <button
           type="button"
@@ -92,7 +99,7 @@ function ProjectRow({
         <>
           <button
             type="button"
-            aria-label={`Rename ${project.name}`}
+            aria-label={`Rename ${group.name}`}
             onClick={onRename}
             className={ICON_BUTTON}
           >
@@ -100,7 +107,7 @@ function ProjectRow({
           </button>
           <button
             type="button"
-            aria-label={`Delete ${project.name}`}
+            aria-label={`Delete ${group.name}`}
             onClick={onDelete}
             className={ICON_BUTTON}
           >
@@ -112,7 +119,15 @@ function ProjectRow({
   );
 }
 
-export function ProjectManager({ projects }: { projects: Project[] }) {
+export function GroupManager({
+  endpoint,
+  groups,
+  copy,
+}: {
+  endpoint: string;
+  groups: Group[];
+  copy: GroupManagerCopy;
+}) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [renamingId, setRenamingId] = useState<string | null>(null);
@@ -138,32 +153,28 @@ export function ProjectManager({ projects }: { projects: Project[] }) {
     event.preventDefault();
     const formElement = event.currentTarget;
     const name = new FormData(formElement).get('name');
-    if (await request('/api/projects', 'POST', { name })) formElement.reset();
+    if (await request(endpoint, 'POST', { name })) formElement.reset();
   }
 
   async function onRename(event: FormEvent<HTMLFormElement>, id: string) {
     event.preventDefault();
     const name = new FormData(event.currentTarget).get('name');
-    if (await request(`/api/projects/${id}`, 'PATCH', { name })) {
+    if (await request(`${endpoint}/${id}`, 'PATCH', { name })) {
       setRenamingId(null);
     }
   }
 
   async function onDelete(id: string) {
     if (confirmingId !== id) return setConfirmingId(id);
-    if (await request(`/api/projects/${id}`, 'DELETE')) setConfirmingId(null);
+    if (await request(`${endpoint}/${id}`, 'DELETE')) setConfirmingId(null);
   }
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        className="flex min-h-11 items-center gap-2 self-start rounded-lg text-sm text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
-      >
+      <Button type="button" onClick={() => setOpen(true)} variant="link">
         <Settings2 aria-hidden className="size-4" />
-        Manage projects
-      </button>
+        {copy.trigger}
+      </Button>
 
       <Dialog
         open={open}
@@ -178,17 +189,17 @@ export function ProjectManager({ projects }: { projects: Project[] }) {
       >
         <DialogContent className="rounded-lg p-5 sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-base">Projects</DialogTitle>
+            <DialogTitle className="text-base">{copy.title}</DialogTitle>
             <DialogDescription className="text-sm">
-              Deleting a project keeps its todos; they move to No project.
+              {copy.description}
             </DialogDescription>
           </DialogHeader>
 
           <form onSubmit={onAdd} className="flex gap-2" noValidate>
             <Input
               name="name"
-              aria-label="New project name"
-              placeholder="New project"
+              aria-label={copy.newNameLabel}
+              placeholder={copy.placeholder}
               maxLength={50}
               autoComplete="off"
               className={cn(FIELD, 'flex-1')}
@@ -204,28 +215,28 @@ export function ProjectManager({ projects }: { projects: Project[] }) {
             </p>
           )}
 
-          {projects.length > 0 && (
+          {groups.length > 0 && (
             <ul className="flex max-h-72 flex-col overflow-y-auto">
-              {projects.map((project) =>
-                renamingId === project.id ? (
+              {groups.map((group) =>
+                renamingId === group.id ? (
                   <RenameRow
-                    key={project.id}
-                    project={project}
+                    key={group.id}
+                    group={group}
                     pending={pending}
-                    onSubmit={(event) => onRename(event, project.id)}
+                    onSubmit={(event) => onRename(event, group.id)}
                     onCancel={() => setRenamingId(null)}
                   />
                 ) : (
-                  <ProjectRow
-                    key={project.id}
-                    project={project}
+                  <GroupRow
+                    key={group.id}
+                    group={group}
                     pending={pending}
-                    confirmingDelete={confirmingId === project.id}
+                    confirmingDelete={confirmingId === group.id}
                     onRename={() => {
                       setError(null);
-                      setRenamingId(project.id);
+                      setRenamingId(group.id);
                     }}
-                    onDelete={() => onDelete(project.id)}
+                    onDelete={() => onDelete(group.id)}
                   />
                 )
               )}

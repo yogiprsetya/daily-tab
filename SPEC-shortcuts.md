@@ -125,7 +125,7 @@ Cloud migration: `DATABASE_URL_MIGRATE='…' pnpm db:migrate` (owner runs it).
 - [ ] Without a session, every `/api/shortcuts*` route returns 401.
 - [ ] `POST` with `javascript:alert(1)` returns 400; with `github.com` stores `https://github.com/`.
 - [ ] Moving the first item earlier and the last item later changes nothing and returns 200.
-- [ ] Home's weekday and date render before the shortcut list arrives.
+- [ ] Home's frame renders before the shortcut list arrives.
 - [ ] A tile with a failing icon shows the title's first letter.
 - [ ] Owner: add, edit, reorder, delete and open shortcuts at desktop and mobile width.
 - [ ] Deployed: the same flow works on https://daily-tab.vercel.app and the Android PWA.

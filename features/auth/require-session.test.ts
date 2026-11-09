@@ -13,9 +13,13 @@ const redirect = vi.hoisted(() =>
 );
 vi.mock('next/navigation', () => ({ redirect }));
 
+const connection = vi.hoisted(() => vi.fn(async () => {}));
+vi.mock('next/server', () => ({ connection }));
+
 beforeEach(() => {
   signOut();
   redirect.mockClear();
+  connection.mockClear();
 });
 
 describe('requireSession', () => {
@@ -46,6 +50,13 @@ describe('requireSession', () => {
 });
 
 describe('requirePageSession', () => {
+  it('waits for the request before checking the session', async () => {
+    connection.mockRejectedValueOnce(new Error('prerender halted'));
+
+    await expect(requirePageSession()).rejects.toThrow('prerender halted');
+    expect(redirect).not.toHaveBeenCalled();
+  });
+
   it('returns the session when the cookie is valid', async () => {
     await signIn();
 

@@ -34,7 +34,7 @@ export function NavRail({ className }: { className?: string }) {
           </Link>
         );
       })}
-      <LogoutButton variant="rail" className="mt-auto" />
+      <LogoutButton className="mt-auto" />
     </nav>
   );
 }

@@ -1,6 +1,7 @@
 import 'server-only';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
+import { connection } from 'next/server';
 import { apiError } from '@/lib/api';
 import { getAuthConfig } from './config';
 import { SESSION_COOKIE, type Session, verifySession } from './session';
@@ -29,6 +30,8 @@ export async function requireSession(): Promise<
  * <Suspense> boundary: it reads cookies, which is request-time data.
  */
 export async function requirePageSession(): Promise<Session> {
+  // Verifying the token reads the clock, which can't happen while prerendering.
+  await connection();
   const result = await requireSession();
   if (!result.ok) redirect('/login');
   return result.session;

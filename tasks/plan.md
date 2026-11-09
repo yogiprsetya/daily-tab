@@ -1,73 +1,58 @@
-# Implementation Plan: shortcuts and todos
+# Implementation Plan: bookmarks
 
-Specs: [SPEC-shortcuts.md](../SPEC-shortcuts.md), [SPEC-todos.md](../SPEC-todos.md) · Map: [CAPABILITY-MAP.md](../CAPABILITY-MAP.md) · Tasks: [todo.md](todo.md)
+Spec: [SPEC-bookmarks.md](../SPEC-bookmarks.md) · Map: [CAPABILITY-MAP.md](../CAPABILITY-MAP.md) · Tasks: [todo.md](todo.md)
 Previous modules: [archive/](archive/)
 
 ## Overview
 
-Fill Home with the owner's shortcuts and pending todos, and turn `/todos` into the full list with a project
-filter. Shipped as two sequential PRs: `feat/shortcuts`, then `feat/todos` from `master` after the first
-merge.
+Save, group and find links inside the app: one-level folders, a search field, and the same popup and button-group
+patterns as todos. Stacked on `chore/remove-home-header` (PR #5) until that merges.
 
 ## Architecture Decisions
 
-- **Vertical slices by user capability.** Each task leaves the app working; a placeholder is replaced only
-  when its slice is ready.
-- **Reads in Server Components** behind `<Suspense>`, calling `requirePageSession()`. `cookies()` makes them
-  request-time, so no `connection()` is needed and the page frame stays static.
-- **Mutations through Route Handlers**, then `router.refresh()`. Ticking a todo uses `useOptimistic`.
-- **Ordering:** `order by position, created_at`; a move swaps `position` inside `db.transaction`.
-- **Duplicate project names:** catch Postgres `23505` in the DAL (read from `error.cause`, as Drizzle wraps
-  driver errors), return 409.
+- **Extract before building.** The filter, group select, group manager and site icon move to shared components first,
+  with todos and shortcuts tests unchanged.
+- **Generic `GroupManager`** takes an endpoint and UI copy, so todos' wording stays exactly the same.
+- **No `useSearchParams` for search:** the server passes `q` and the folder as props, so no extra Suspense is needed.
+  Filter links carry `q`.
+- **Search** uses `ilike` through Drizzle parameters, with `%`, `_` and `\` escaped.
+- **`translatePgError`** moves from `features/todos/dal.ts` to `db/pg-errors.ts`.
 
 ## Task List
 
-### Shortcuts
+### Shared components
 
-- [x] Task 0: Prep branch, specs, task list
-- [x] Task 1: Shared session and test foundations
-- [x] Task 2: Shortcuts data and read API
-- [x] Task 3: Home shows shortcuts
-- [x] Task 4: Add a shortcut
-- [x] Task 5: Edit and delete a shortcut
-- [x] Task 6: Reorder shortcuts
+- [x] Task 1: Shared filter (`FilterNav`, `FilterLink`)
+- [x] Task 2: Shared select, manager and site icon
 
-### Checkpoint A: Shortcuts work locally
+### Checkpoint A: No regressions
 
-- [x] Gates pass; curl CRUD smoke with a session cookie
-- [x] Owner checks shortcuts in a browser (desktop + mobile width)
+- [x] Gates pass; todos, Select and shortcuts browser scripts pass
 
-- [ ] Task 7: Release shortcuts (human-gated)
+### Bookmarks
 
-### Todos
+- [x] Task 3: Data model and validation
+- [x] Task 4: Read API
+- [x] Task 5: `/bookmarks` page
+- [x] Task 6: Add, edit and delete
+- [x] Task 7: Manage folders
+- [x] Task 8: Search
 
-- [x] Task 8: Todos data model and validation
-- [x] Task 9: Todos read API
-- [x] Task 10: `/todos` page
-- [x] Task 11: Add and tick todos
-- [x] Task 12: Edit and delete todos
-- [x] Task 13: Manage projects
-- [x] Task 14: Pending tasks on Home
-- [x] Task 14b: Optional link and notes on a todo
-- [x] Task 14c: Create todos in a dialog
+### Checkpoint B: Works locally
 
-### Checkpoint B: Todos work locally
+- [x] Gates pass; browser script passes
+- [x] Owner checks in a browser (desktop + mobile width)
 
-- [x] Gates pass; curl CRUD smoke with a session cookie
-- [ ] Owner checks todos in a browser (desktop + mobile width)
-
-- [ ] Task 15: Release todos (human-gated)
+- [x] Task 9: Release (human-gated)
 
 ## Risks and Mitigations
 
-| Risk                                                                     | Impact | Mitigation                                                                            |
-| ------------------------------------------------------------------------ | ------ | ------------------------------------------------------------------------------------- |
-| Merging before the cloud migration: queries on new tables fail on Home   | High   | Required step in each PR checklist; `(app)/error.tsx` contains the blast radius       |
-| DB read outside `<Suspense>` fails the Cache Components build            | Med    | Session and queries only in async components inside Suspense; `pnpm build` every task |
-| Deleting a project deletes todos                                         | High   | `ON DELETE SET NULL` + integration test                                               |
-| DuckDuckGo favicons slow or blocked (timed out from the agent's network) | Low    | Letter shows first; owner checks at Checkpoint A                                      |
-| `useOptimistic` out of sync after `router.refresh()`                     | Med    | Toggle in `startTransition`; refresh after success; manual check                      |
-| DB tests racing                                                          | Med    | `fileParallelism: false`; truncate in `beforeEach`                                    |
+| Risk                                                          | Impact | Mitigation                                                     |
+| ------------------------------------------------------------- | ------ | -------------------------------------------------------------- |
+| Extraction changes todos behaviour                            | Med    | Separate first step, tests unchanged, browser scripts re-run   |
+| `db:migrate` hits the cloud database (`.env` may point there) | High   | Always pass a local URL explicitly                             |
+| Merging before migration `0005`                               | Med    | Only `/bookmarks` is affected; required step in the PR         |
+| Search input loses focus on `router.replace`                  | Med    | Client component stays mounted outside Suspense; browser check |
 
 ## Open Questions
 
