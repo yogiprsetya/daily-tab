@@ -1,120 +1,126 @@
-# Tasks: reading-list
+# Tasks: newtab-extension
 
-Plan: [plan.md](plan.md) · Spec: [SPEC-reading-list.md](../SPEC-reading-list.md)
+Plan: [plan.md](plan.md) · Spec: [SPEC-newtab-extension.md](../SPEC-newtab-extension.md)
 
-Standing verification for every task: `pnpm lint && pnpm typecheck && pnpm test && pnpm build`. Write tests first.
-Local migrations pass a local URL explicitly. File counts below exclude tests.
+Standing verification for every task that changes code: `pnpm lint && pnpm typecheck && pnpm test && pnpm build`. Write
+tests first where logic can run outside a browser.
 
 ## Before starting
 
-- [x] Owner approves the spec and this plan; group name confirmed (`topics`)
-- [x] Set the spec status to Approved; add grouping to the `reading-list` row in `CAPABILITY-MAP.md`
+- [x] Owner approves this plan
+- [ ] `feat/reading-list` merged, migration `0006` run on the cloud database, reading list live in production
+- [ ] Branch `feat/newtab-extension` from `master`
 
-## Queue on screen
+## Feasibility
 
-- [x] **Task 1: Data model and validation**
-  - Description: `features/reading-list/schema.ts`, migration `0006_reading_list`, Zod bodies (including `read`) and
-    `parseTopicFilter` in `validation.ts`.
+- [ ] **Task 1: Extension shell with the app in an iframe**
+  - Description: `manifest.json` with a fixed `key`, `newtab.html` and `newtab.js` showing the deployed app full-viewport,
+    icons from `public/icons`. No app changes.
   - Acceptance:
-    - [x] URL and lower-cased topic name are unique; deleting a topic sets `topic_id` to null.
-    - [x] Bodies enforce the title, note and URL rules; an empty `PATCH` is rejected.
-    - [x] `?topic=` parses to a uuid, `none`, or All for anything else.
-  - Verify: `pnpm test features/reading-list`; migration applied to a local database
-  - Dependencies: none
-  - Files: `schema.ts`, `validation.ts`, `drizzle/0006_*`
+    - [ ] The extension id is the same after removing and re-adding it; no private key is in the repo.
+    - [ ] A new tab shows Home signed in, and signing in from inside the frame survives a browser restart.
+    - [ ] A `fetch` to `/api/reading-topics` from the service worker console returns `200`, which shows the cookie is sent.
+  - Verify: owner, in their real Chrome profile; `git grep -l 'PRIVATE KEY'` finds nothing
+  - Dependencies: reading list live in production
+  - Files: `extension/manifest.json`, `newtab.html`, `newtab.js`, `icons/*`
   - Scope: S
 
-- [x] **Task 2: Read queries and `GET /api/reading-items`**
-  - Description: `listUnread`, `listRead`, `countUnread`, `unreadWithoutTopic`, `resolveTopicFilter`, `listTopics` with
-    unread counts, and the `GET` handler.
+## Checkpoint A: Feasibility gate (owner)
+
+- [ ] Cookie reaches the frame and the service worker, or the redirect fallback is applied and the spec updated
+
+## App changes
+
+- [ ] **Task 2: Allow only the extension to frame the app**
+  - Description: `EXTENSION_ORIGIN` in `features/auth/request.ts`, and `headers()` in `next.config.ts` sending
+    `frame-ancestors` with that origin on all routes.
   - Acceptance:
-    - [x] Unread is oldest first; Read is most recently read first; the filter applies to both.
-    - [x] Topic counts include unread items only; an unknown topic behaves as All.
-    - [x] 401 without a session.
-  - Verify: `pnpm test features/reading-list app/api/reading-items`
+    - [ ] The policy names only the extension origin and applies to every route.
+    - [ ] `/` and `/reading-list` stay partially static in `pnpm build`.
+  - Verify: `pnpm test next.config`; HTTP smoke reads the header from a page
   - Dependencies: Task 1
-  - Files: `dal.ts`, `app/api/reading-items/route.ts`
-  - Scope: M
+  - Files: `next.config.ts`, `next.config.test.ts`, `features/auth/request.ts`
+  - Scope: S
 
-- [x] **Task 3: `/reading-list` page with filter**
-  - Description: Replace the placeholder: `reading-view.tsx`, read-only rows and Read section in `reading-list.tsx`,
-    filter from `FilterNav` and `FilterLink`, empty states, skeleton.
+- [ ] **Task 3: Shortcut tiles replace the whole tab**
+  - Description: `target="_top"` on the tile link. In a normal tab and the PWA this behaves as today.
   - Acceptance:
-    - [x] `?topic=garbage` shows All; a valid topic filters both sections.
-    - [x] Both empty states appear as specified; the page stays partially static in `pnpm build`.
-  - Verify: `pnpm build`; browser check with seeded local data
+    - [ ] Inside the frame, a tile replaces the whole tab, including for a site that refuses framing.
+    - [ ] Ctrl/Cmd+click and middle-click still open a new tab.
+  - Verify: `pnpm test features/shortcuts`; owner check at Checkpoint C
+  - Dependencies: Task 1
+  - Files: `features/shortcuts/components/shortcut-grid.tsx`
+  - Scope: XS
+
+- [ ] **Task 4: Accept the extension origin on `POST /api/reading-items`**
+  - Description: `isAllowedMutation(method, pathname, headers, appOrigin)`, used by `proxy.ts`. Auth change, approved in
+    the spec for exactly this route.
+  - Acceptance:
+    - [ ] Same origin passes on every route, as today.
+    - [ ] The extension origin passes only for `POST /api/reading-items`; `PATCH`, `DELETE` and other paths return `403`.
+    - [ ] A foreign or missing origin returns `403`; without a session the allowed route still returns `401`.
+  - Verify: `pnpm test features/auth proxy`; HTTP smoke with the extension origin
   - Dependencies: Task 2
-  - Files: `app/(app)/reading-list/page.tsx`, `reading-view.tsx`, `reading-list.tsx`, `reading-filter.tsx`,
-    `reading-skeleton.tsx`
-  - Scope: M
+  - Files: `features/auth/request.ts`, `request.test.ts`, `proxy.ts`, `proxy.test.ts`
+  - Scope: S
 
-## Checkpoint A: Page renders
+## Checkpoint B: App changes live (human-gated)
 
-- [ ] Gates pass; seeded items and filter render at desktop and phone width
+- [ ] Gates and HTTP smoke pass
+- [ ] Owner deploys the app changes
+- [ ] The frame still loads with the policy in place, and a cross-site page cannot frame the app
 
-## Managing items
+## Finish the extension
 
-- [x] **Task 4: Add a link**
-  - Description: `createReadingItem`, `POST /api/reading-items`, `api-errors.ts`, create mode of `reading-dialog.tsx`,
-    "Add link" right of the filter, defaulting to the active topic.
+- [ ] **Task 5: Dark wrapper and unreachable message**
+  - Description: the wrapper page follows `prefers-color-scheme` before the app paints. A `fetch` of `/api/health` beside
+    the iframe swaps in "Can't reach Daily Tab" and Retry on a network failure.
   - Acceptance:
-    - [x] A duplicate URL returns 409 with the spec's message on the URL field, after normalization and when the
-          existing item is read.
-    - [x] A `topicId` that doesn't exist returns 400.
-  - Verify: `pnpm test features/reading-list app/api/reading-items`; browser check
-  - Dependencies: Task 3
-  - Files: `dal.ts`, `route.ts`, `api-errors.ts`, `reading-dialog.tsx`, `add-reading-button.tsx`
-  - Scope: M
+    - [ ] No white flash in dark mode; the tab title is "New Tab".
+    - [ ] Offline shows the message, Retry recovers once back online, and a `503` from the app does not show it.
+  - Verify: owner, using DevTools offline mode
+  - Dependencies: Task 1
+  - Files: `extension/newtab.html`, `newtab.js`
+  - Scope: S
 
-- [x] **Task 5: Edit and delete**
-  - Description: `updateReadingItem`, `removeReadingItem`, `PATCH` and `DELETE` on `/api/reading-items/[id]`, edit
-    button on rows, edit mode of the dialog.
+- [ ] **Task 6: Request body and badge logic**
+  - Description: `save.js`, pure functions from a tab to a request body and from a status to a badge and tooltip.
   - Acceptance:
-    - [x] 200, 400, 404 and 409 as specified; a malformed id returns 404.
-    - [ ] Delete needs a second press.
-  - Verify: `pnpm test features/reading-list app/api/reading-items`; browser check
-  - Dependencies: Task 4
-  - Files: `dal.ts`, `[id]/route.ts`, `reading-dialog.tsx`, `reading-list.tsx`
-  - Scope: M
+    - [ ] The title is trimmed and cut to 120 characters; an empty title falls back to the hostname.
+    - [ ] A page that is not http or https produces no request.
+    - [ ] Every row of the spec's badge table is covered.
+  - Verify: `pnpm test extension`
+  - Dependencies: none
+  - Files: `extension/save.js`, `save.test.ts`
+  - Scope: S
 
-- [x] **Task 6: Mark read and unread**
-  - Description: `read` in `updateReadingItem`, `optimistic.ts` that inserts by `createdAt`, checkbox with its own 44px
-    label, transition and error handling as in `TodoList`.
+- [ ] **Task 7: Toolbar button saves the current page**
+  - Description: `background.js` on `chrome.action.onClicked`: builds the body, calls the API with credentials, sets the
+    badge and tooltip for that tab.
   - Acceptance:
-    - [x] Reading then unreading restores the item's place in the queue, with no jump while refreshing.
-    - [x] A repeated `read: true` keeps the original `readAt`.
-    - [ ] A failed request reverts the row and shows an error; clicking the title doesn't tick the box.
-  - Verify: `pnpm test features/reading-list app/api/reading-items`; browser check at phone width
-  - Dependencies: Task 5
-  - Files: `dal.ts`, `optimistic.ts`, `reading-list.tsx`
-  - Scope: M
+    - [ ] A saved page appears on `/reading-list` under No topic.
+    - [ ] Each badge result appears on the right tab and clears on navigation.
+    - [ ] Permissions are exactly `activeTab` and the one host.
+  - Verify: owner, at Checkpoint C
+  - Dependencies: Tasks 4, 6, Checkpoint B
+  - Files: `extension/background.js`, `manifest.json`
+  - Scope: S
 
-## Checkpoint B: Queue works
+## Checkpoint C: Works end to end (owner)
 
-- [ ] Gates pass; add, edit, delete and read flow works in a browser
+- [ ] Gates pass
+- [ ] Owner runs every owner item in the spec's Success Criteria
 
-## Topics
-
-- [x] **Task 7: Manage topics**
-  - Description: `createTopic`, `updateTopic`, `removeTopic`, `/api/reading-topics` and `[id]` routes (`GET`, `POST`,
-    `PATCH`, `DELETE`), `GroupSelect` in the dialog, `GroupManager` in the view.
+- [ ] **Task 8: Install notes in the README**
   - Acceptance:
-    - [x] A duplicate name ignoring case returns 409.
-    - [x] Deleting a topic keeps its items under No topic.
-    - [x] Every route returns 401 without a session.
-  - Verify: `pnpm test features/reading-list app/api/reading-topics`; browser check
-  - Dependencies: Task 4
-  - Files: `dal.ts`, `app/api/reading-topics/route.ts`, `[id]/route.ts`, `reading-view.tsx`, `reading-dialog.tsx`
-  - Scope: M
-
-## Checkpoint C: Works locally
-
-- [ ] Gates pass; browser script passes
-- [ ] Owner checks in a browser (desktop + mobile width)
-
-- [ ] **Task 8: Release (human-gated)**
-  - Acceptance:
-    - [ ] Owner ran the cloud migration before merge.
-    - [ ] Production smoke passes; the reading list works in the Android PWA.
+    - [ ] Load unpacked, reload after changes, and what breaks if the manifest key changes are documented.
   - Dependencies: Checkpoint C
+  - Files: `README.md`
+  - Scope: XS
+
+- [ ] **Task 9: Release (human-gated)**
+  - Acceptance:
+    - [ ] Branch merged and deployed; the extension is loaded from the merged code.
+    - [ ] A new tab and a save both work against production.
+  - Dependencies: Task 8
   - Scope: XS
