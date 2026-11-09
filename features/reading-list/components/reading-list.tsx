@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { SiteIcon } from '@/components/site-icon';
 import { displayHost } from '@/lib/url';
 import { cn } from '@/lib/utils';
@@ -47,18 +48,23 @@ export function ReadingList({
   read,
   showTopic,
   filtered,
+  addAction,
 }: ReadingLists & {
   showTopic: boolean;
   filtered: boolean;
+  addAction: ReactNode;
 }) {
   const queueIsEmpty = !filtered && unread.length === 0 && read.length === 0;
 
   return (
     <div className="flex flex-col gap-3">
       {unread.length === 0 ? (
-        <p className="text-sm text-muted-foreground">
-          {queueIsEmpty ? 'Nothing to read yet' : 'Nothing unread here'}
-        </p>
+        <div className="flex flex-col items-start gap-3">
+          <p className="text-sm text-muted-foreground">
+            {queueIsEmpty ? 'Nothing to read yet' : 'Nothing unread here'}
+          </p>
+          {queueIsEmpty && addAction}
+        </div>
       ) : (
         <ul className="flex flex-col">
           {unread.map((item) => (

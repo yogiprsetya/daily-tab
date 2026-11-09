@@ -54,13 +54,13 @@ Local migrations pass a local URL explicitly. File counts below exclude tests.
 
 ## Managing items
 
-- [ ] **Task 4: Add a link**
+- [x] **Task 4: Add a link**
   - Description: `createReadingItem`, `POST /api/reading-items`, `api-errors.ts`, create mode of `reading-dialog.tsx`,
     "Add link" right of the filter, defaulting to the active topic.
   - Acceptance:
-    - [ ] A duplicate URL returns 409 with the spec's message on the URL field, after normalization and when the
+    - [x] A duplicate URL returns 409 with the spec's message on the URL field, after normalization and when the
           existing item is read.
-    - [ ] A `topicId` that doesn't exist returns 400.
+    - [x] A `topicId` that doesn't exist returns 400.
   - Verify: `pnpm test features/reading-list app/api/reading-items`; browser check
   - Dependencies: Task 3
   - Files: `dal.ts`, `route.ts`, `api-errors.ts`, `reading-dialog.tsx`, `add-reading-button.tsx`

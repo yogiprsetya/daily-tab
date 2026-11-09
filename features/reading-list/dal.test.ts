@@ -2,7 +2,10 @@ import { sql } from 'drizzle-orm';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { db } from '@/db';
 import {
+  DuplicateReadingItemError,
+  UnknownTopicError,
   countUnread,
+  createReadingItem,
   listRead,
   listTopics,
   listUnread,
@@ -138,6 +141,41 @@ describe('listTopics', () => {
       ['Alpha', 0],
       ['beta', 1],
     ]);
+  });
+});
+
+describe('createReadingItem', () => {
+  const input = { title: 'A', url: 'https://a.example/' };
+
+  it('creates unread, with null notes and topic by default', async () => {
+    expect(await createReadingItem(input)).toMatchObject({
+      ...input,
+      notes: null,
+      topicId: null,
+      readAt: null,
+    });
+  });
+
+  it('rejects a URL that is already unread', async () => {
+    await createReadingItem(input);
+
+    await expect(
+      createReadingItem({ title: 'B', url: input.url })
+    ).rejects.toBeInstanceOf(DuplicateReadingItemError);
+  });
+
+  it('rejects a URL that has already been read', async () => {
+    await db.insert(readingItems).values({ ...input, readAt: at(1) });
+
+    await expect(
+      createReadingItem({ title: 'B', url: input.url })
+    ).rejects.toBeInstanceOf(DuplicateReadingItemError);
+  });
+
+  it('rejects a topic that does not exist', async () => {
+    await expect(
+      createReadingItem({ ...input, topicId: UNKNOWN })
+    ).rejects.toBeInstanceOf(UnknownTopicError);
   });
 });
 

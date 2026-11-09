@@ -11,8 +11,28 @@ import {
   sql,
 } from 'drizzle-orm';
 import { db } from '@/db';
+import {
+  FOREIGN_KEY_VIOLATION,
+  UNIQUE_VIOLATION,
+  translatePgError,
+} from '@/db/pg-errors';
 import { readingItems, readingTopics } from './schema';
 import type { TopicFilter } from './validation';
+
+export class DuplicateReadingItemError extends Error {}
+export class UnknownTopicError extends Error {}
+
+const ITEM_ERRORS = {
+  [UNIQUE_VIOLATION]: DuplicateReadingItemError,
+  [FOREIGN_KEY_VIOLATION]: UnknownTopicError,
+};
+
+type ItemFields = {
+  title?: string;
+  url?: string;
+  notes?: string | null;
+  topicId?: string | null;
+};
 
 function matchesFilter(filter: TopicFilter) {
   if (filter.kind === 'none') return isNull(readingItems.topicId);
@@ -68,6 +88,15 @@ export async function resolveTopicFilter(
     .from(readingTopics)
     .where(eq(readingTopics.id, filter.id));
   return row ? filter : { kind: 'all' };
+}
+
+export function createReadingItem(
+  input: ItemFields & { title: string; url: string }
+) {
+  return translatePgError(ITEM_ERRORS, async () => {
+    const [row] = await db.insert(readingItems).values(input).returning();
+    return row;
+  });
 }
 
 export function listTopics() {

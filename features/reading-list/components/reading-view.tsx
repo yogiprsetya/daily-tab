@@ -9,6 +9,7 @@ import {
 } from '../dal';
 import { toRow } from '../optimistic';
 import { parseTopicFilter } from '../validation';
+import { AddReadingButton } from './add-reading-button';
 import { ReadingFilter } from './reading-filter';
 import { ReadingList } from './reading-list';
 
@@ -30,6 +31,13 @@ export async function ReadingView({
     unreadWithoutTopic(),
   ]);
 
+  const addLink = (
+    <AddReadingButton
+      topics={topics.map(({ id, name }) => ({ id, name }))}
+      defaultTopicId={filter.kind === 'topic' ? filter.id : null}
+    />
+  );
+
   return (
     <>
       <div className="flex w-full items-start justify-between gap-3">
@@ -39,6 +47,7 @@ export async function ReadingView({
           total={total}
           withoutTopic={withoutTopic}
         />
+        {addLink}
       </div>
 
       <ReadingList
@@ -46,6 +55,7 @@ export async function ReadingView({
         read={read.map(toRow)}
         showTopic={filter.kind === 'all'}
         filtered={filter.kind !== 'all'}
+        addAction={addLink}
       />
     </>
   );

@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { db } from '@/db';
 import { readingItems, readingTopics } from '@/features/reading-list/schema';
 import { signIn, signOut } from '@/tests/session';
-import { GET } from './route';
+import { GET, POST } from './route';
 
 vi.mock('next/headers', async () => ({
   cookies: (await import('@/tests/session')).mockedCookies,
@@ -44,6 +44,94 @@ function seed(
 beforeEach(async () => {
   signOut();
   await db.execute(sql`truncate ${readingItems}, ${readingTopics}`);
+});
+
+function post(body: unknown) {
+  return POST(
+    new Request('http://localhost/api/reading-items', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(body),
+    })
+  );
+}
+
+describe('POST /api/reading-items', () => {
+  const DUPLICATE = 'This URL is already on your reading list';
+
+  it('returns 401 without a session', async () => {
+    expect((await post({ title: 'A', url: 'a.example' })).status).toBe(401);
+  });
+
+  it('creates an unread item with a normalized URL', async () => {
+    await signIn();
+
+    const res = await post({ title: ' A ', url: 'a.example', notes: 'why' });
+
+    expect(res.status).toBe(201);
+    expect(await res.json()).toMatchObject({
+      title: 'A',
+      url: 'https://a.example/',
+      notes: 'why',
+      topicId: null,
+      readAt: null,
+    });
+  });
+
+  it('accepts an existing topic', async () => {
+    await signIn();
+    const dev = await seedTopic('Dev');
+
+    const res = await post({ title: 'A', url: 'a.example', topicId: dev.id });
+
+    expect(res.status).toBe(201);
+    expect((await res.json()).topicId).toBe(dev.id);
+  });
+
+  it('returns 409 on the url field for a duplicate after normalization', async () => {
+    await signIn();
+    await post({ title: 'A', url: 'github.com' });
+
+    const res = await post({ title: 'B', url: 'https://github.com/' });
+
+    expect(res.status).toBe(409);
+    const { error } = await res.json();
+    expect(error.code).toBe('conflict');
+    expect(error.message).toBe(DUPLICATE);
+    expect(error.issues[0]).toMatchObject({
+      path: ['url'],
+      message: DUPLICATE,
+    });
+  });
+
+  it('returns 409 when the existing item has been read', async () => {
+    await signIn();
+    await seed('done', 1, { readAt: at(5) });
+
+    const res = await post({ title: 'B', url: 'done.example' });
+
+    expect(res.status).toBe(409);
+    expect((await res.json()).error.message).toBe(DUPLICATE);
+  });
+
+  it('returns 400 for a topic that does not exist', async () => {
+    await signIn();
+
+    const res = await post({ title: 'A', url: 'a.example', topicId: UNKNOWN });
+
+    expect(res.status).toBe(400);
+    expect((await res.json()).error.issues[0].path).toEqual(['topicId']);
+  });
+
+  it.each([
+    { title: '', url: 'a.example' },
+    { title: 'A', url: 'javascript:alert(1)' },
+    { title: 'A', url: 'https://user:pw@a.example' },
+  ])('returns 400 for %j', async (body) => {
+    await signIn();
+
+    expect((await post(body)).status).toBe(400);
+  });
 });
 
 describe('GET /api/reading-items', () => {
