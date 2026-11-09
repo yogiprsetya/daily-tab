@@ -43,6 +43,13 @@
       "when": 1794155994532,
       "tag": "0005_bookmarks",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1794231118683,
+      "tag": "0006_reading_list",
+      "breakpoints": true
     }
   ]
 }

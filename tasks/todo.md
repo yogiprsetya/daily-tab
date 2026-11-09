@@ -12,13 +12,13 @@ Local migrations pass a local URL explicitly. File counts below exclude tests.
 
 ## Queue on screen
 
-- [ ] **Task 1: Data model and validation**
+- [x] **Task 1: Data model and validation**
   - Description: `features/reading-list/schema.ts`, migration `0006_reading_list`, Zod bodies (including `read`) and
     `parseTopicFilter` in `validation.ts`.
   - Acceptance:
-    - [ ] URL and lower-cased topic name are unique; deleting a topic sets `topic_id` to null.
-    - [ ] Bodies enforce the title, note and URL rules; an empty `PATCH` is rejected.
-    - [ ] `?topic=` parses to a uuid, `none`, or All for anything else.
+    - [x] URL and lower-cased topic name are unique; deleting a topic sets `topic_id` to null.
+    - [x] Bodies enforce the title, note and URL rules; an empty `PATCH` is rejected.
+    - [x] `?topic=` parses to a uuid, `none`, or All for anything else.
   - Verify: `pnpm test features/reading-list`; migration applied to a local database
   - Dependencies: none
   - Files: `schema.ts`, `validation.ts`, `drizzle/0006_*`
