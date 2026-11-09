@@ -36,12 +36,12 @@ Local migrations pass a local URL explicitly. File counts below exclude tests.
   - Files: `dal.ts`, `app/api/reading-items/route.ts`
   - Scope: M
 
-- [ ] **Task 3: `/reading-list` page with filter**
+- [x] **Task 3: `/reading-list` page with filter**
   - Description: Replace the placeholder: `reading-view.tsx`, read-only rows and Read section in `reading-list.tsx`,
     filter from `FilterNav` and `FilterLink`, empty states, skeleton.
   - Acceptance:
-    - [ ] `?topic=garbage` shows All; a valid topic filters both sections.
-    - [ ] Both empty states appear as specified; the page stays partially static in `pnpm build`.
+    - [x] `?topic=garbage` shows All; a valid topic filters both sections.
+    - [x] Both empty states appear as specified; the page stays partially static in `pnpm build`.
   - Verify: `pnpm build`; browser check with seeded local data
   - Dependencies: Task 2
   - Files: `app/(app)/reading-list/page.tsx`, `reading-view.tsx`, `reading-list.tsx`, `reading-filter.tsx`,
