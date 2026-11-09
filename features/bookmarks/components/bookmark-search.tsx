@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useRef } from 'react';
 import { FIELD } from '@/components/form-styles';
 import { Input } from '@/components/ui/input';
+import { bookmarksHref } from '../href';
 
 const PAUSE_MS = 300;
 
@@ -22,11 +23,7 @@ export function BookmarkSearch({
   function onChange(value: string) {
     clearTimeout(timer.current);
     timer.current = setTimeout(() => {
-      const params = new URLSearchParams();
-      if (folderParam) params.set('folder', folderParam);
-      if (value.trim()) params.set('q', value.trim());
-      const query = params.toString();
-      router.replace(query ? `/bookmarks?${query}` : '/bookmarks', {
+      router.replace(bookmarksHref(folderParam, value.trim()), {
         scroll: false,
       });
     }, PAUSE_MS);

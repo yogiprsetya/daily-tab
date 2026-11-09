@@ -1,6 +1,5 @@
 import { FilterLink } from '@/components/grouping/filter-link';
 import { FilterNav } from '@/components/grouping/filter-nav';
-import { ButtonGroup } from '@/components/ui/button-group';
 import type { ProjectFilter as Filter } from '../validation';
 
 export function ProjectFilter({
@@ -19,29 +18,27 @@ export function ProjectFilter({
       label="Filter by project"
       activeKey={filter.kind === 'project' ? filter.id : filter.kind}
     >
-      <ButtonGroup className="[&>[data-slot]:first-child]:rounded-l-lg [&>[data-slot]:last-child]:rounded-r-lg">
+      <FilterLink
+        href="/todos"
+        label="All"
+        count={total}
+        active={filter.kind === 'all'}
+      />
+      {projects.map((project) => (
         <FilterLink
-          href="/todos"
-          label="All"
-          count={total}
-          active={filter.kind === 'all'}
+          key={project.id}
+          href={`/todos?project=${project.id}`}
+          label={project.name}
+          count={project.pendingCount}
+          active={filter.kind === 'project' && filter.id === project.id}
         />
-        {projects.map((project) => (
-          <FilterLink
-            key={project.id}
-            href={`/todos?project=${project.id}`}
-            label={project.name}
-            count={project.pendingCount}
-            active={filter.kind === 'project' && filter.id === project.id}
-          />
-        ))}
-        <FilterLink
-          href="/todos?project=none"
-          label="No project"
-          count={withoutProject}
-          active={filter.kind === 'none'}
-        />
-      </ButtonGroup>
+      ))}
+      <FilterLink
+        href="/todos?project=none"
+        label="No project"
+        count={withoutProject}
+        active={filter.kind === 'none'}
+      />
     </FilterNav>
   );
 }

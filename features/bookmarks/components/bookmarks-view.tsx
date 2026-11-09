@@ -1,7 +1,6 @@
 import { FilterLink } from '@/components/grouping/filter-link';
 import { FilterNav } from '@/components/grouping/filter-nav';
 import { GroupManager } from '@/components/grouping/group-manager';
-import { ButtonGroup } from '@/components/ui/button-group';
 import { requirePageSession } from '@/features/auth/require-session';
 import {
   countBookmarks,
@@ -10,6 +9,7 @@ import {
   listFolders,
   resolveFolderFilter,
 } from '../dal';
+import { bookmarksHref } from '../href';
 import { parseFolderFilter, parseSearch } from '../validation';
 import { AddBookmarkButton } from './add-bookmark-button';
 import { BookmarkList } from './bookmark-list';
@@ -22,14 +22,6 @@ const FOLDER_COPY = {
   placeholder: 'New folder',
   newNameLabel: 'New folder name',
 };
-
-function filterHref(folder: string | null, query: string | undefined) {
-  const params = new URLSearchParams();
-  if (folder) params.set('folder', folder);
-  if (query) params.set('q', query);
-  const search = params.toString();
-  return search ? `/bookmarks?${search}` : '/bookmarks';
-}
 
 /** Reads the session, URL and database: render inside <Suspense>. */
 export async function BookmarksView({
@@ -64,29 +56,27 @@ export async function BookmarksView({
             label="Filter by folder"
             activeKey={activeFolderId ?? filter.kind}
           >
-            <ButtonGroup className="[&>[data-slot]:first-child]:rounded-l-lg [&>[data-slot]:last-child]:rounded-r-lg">
+            <FilterLink
+              href={bookmarksHref(null, query)}
+              label="All"
+              count={total}
+              active={filter.kind === 'all'}
+            />
+            {folders.map((folder) => (
               <FilterLink
-                href={filterHref(null, query)}
-                label="All"
-                count={total}
-                active={filter.kind === 'all'}
+                key={folder.id}
+                href={bookmarksHref(folder.id, query)}
+                label={folder.name}
+                count={folder.bookmarkCount}
+                active={activeFolderId === folder.id}
               />
-              {folders.map((folder) => (
-                <FilterLink
-                  key={folder.id}
-                  href={filterHref(folder.id, query)}
-                  label={folder.name}
-                  count={folder.bookmarkCount}
-                  active={activeFolderId === folder.id}
-                />
-              ))}
-              <FilterLink
-                href={filterHref('none', query)}
-                label="No folder"
-                count={withoutFolder}
-                active={filter.kind === 'none'}
-              />
-            </ButtonGroup>
+            ))}
+            <FilterLink
+              href={bookmarksHref('none', query)}
+              label="No folder"
+              count={withoutFolder}
+              active={filter.kind === 'none'}
+            />
           </FilterNav>
           <AddBookmarkButton
             folders={folderOptions}

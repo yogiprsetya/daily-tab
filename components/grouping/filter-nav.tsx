@@ -1,6 +1,7 @@
 'use client';
 
 import { type ReactNode, useEffect, useRef } from 'react';
+import { ButtonGroup } from '@/components/ui/button-group';
 
 /**
  * A joined button group cannot wrap, so a long list scrolls sideways. This
@@ -37,7 +38,9 @@ export function FilterNav({
       aria-label={label}
       className="min-w-0 flex-1 [scrollbar-width:none] overflow-x-auto p-px"
     >
-      {children}
+      <ButtonGroup className="[&>[data-slot]:first-child]:rounded-l-lg [&>[data-slot]:last-child]:rounded-r-lg">
+        {children}
+      </ButtonGroup>
     </nav>
   );
 }
