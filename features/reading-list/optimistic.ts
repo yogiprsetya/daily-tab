@@ -1,4 +1,4 @@
-export type ReadingRow = {
+export type ReadingItem = {
   id: string;
   title: string;
   url: string;
@@ -8,10 +8,10 @@ export type ReadingRow = {
   createdAt: Date;
 };
 
-export type ReadingLists = { unread: ReadingRow[]; read: ReadingRow[] };
+export type ReadingLists = { unread: ReadingItem[]; read: ReadingItem[] };
 
 /** The server's queue order: oldest first, then by title. */
-function byQueueOrder(a: ReadingRow, b: ReadingRow): number {
+function byQueueOrder(a: ReadingItem, b: ReadingItem): number {
   return (
     a.createdAt.getTime() - b.createdAt.getTime() ||
     a.title.localeCompare(b.title)
@@ -38,7 +38,7 @@ export function applyToggle(
 }
 
 /** Strips a database row down to what the client needs. */
-export const toRow = ({
+export const toItem = ({
   id,
   title,
   url,
@@ -46,7 +46,7 @@ export const toRow = ({
   topicId,
   topicName,
   createdAt,
-}: ReadingRow): ReadingRow => ({
+}: ReadingItem): ReadingItem => ({
   id,
   title,
   url,

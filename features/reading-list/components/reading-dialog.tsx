@@ -14,7 +14,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { apiRequest } from '@/lib/api-client';
-import type { ReadingRow } from '../optimistic';
+import type { ReadingItem } from '../optimistic';
 
 /** `item` is null when creating; `defaultTopicId` only applies then. */
 export function ReadingDialog({
@@ -24,7 +24,7 @@ export function ReadingDialog({
   onClose,
   onSaved,
 }: {
-  item: ReadingRow | null;
+  item: ReadingItem | null;
   defaultTopicId?: string | null;
   topics: { id: string; name: string }[];
   onClose: () => void;

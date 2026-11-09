@@ -8,7 +8,7 @@ import {
   resolveTopicFilter,
   unreadWithoutTopic,
 } from '../dal';
-import { toRow } from '../optimistic';
+import { toItem } from '../optimistic';
 import { parseTopicFilter } from '../validation';
 import { AddReadingButton } from './add-reading-button';
 import { ReadingFilter } from './reading-filter';
@@ -69,10 +69,9 @@ export async function ReadingView({
       </div>
 
       <ReadingList
-        unread={unread.map(toRow)}
-        read={read.map(toRow)}
+        unread={unread.map(toItem)}
+        read={read.map(toItem)}
         topics={topicOptions}
-        showTopic={filter.kind === 'all'}
         filtered={filter.kind !== 'all'}
         addAction={addLink}
       />

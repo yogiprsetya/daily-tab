@@ -10,8 +10,8 @@ import { apiRequest } from '@/lib/api-client';
 import { displayHost } from '@/lib/url';
 import { cn } from '@/lib/utils';
 import {
+  type ReadingItem,
   type ReadingLists,
-  type ReadingRow as Row,
   applyToggle,
 } from '../optimistic';
 import { ReadingDialog } from './reading-dialog';
@@ -23,7 +23,7 @@ function ReadingRow({
   onToggle,
   onEdit,
 }: {
-  item: Row;
+  item: ReadingItem;
   read: boolean;
   showTopic: boolean;
   onToggle: () => void;
@@ -80,12 +80,10 @@ export function ReadingList({
   unread,
   read,
   topics,
-  showTopic,
   filtered,
   addAction,
 }: ReadingLists & {
   topics: { id: string; name: string }[];
-  showTopic: boolean;
   filtered: boolean;
   addAction: ReactNode;
 }) {
@@ -96,11 +94,11 @@ export function ReadingList({
   );
   const [, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
-  const [editing, setEditing] = useState<Row | null>(null);
+  const [editing, setEditing] = useState<ReadingItem | null>(null);
   const queueIsEmpty =
     !filtered && lists.unread.length === 0 && lists.read.length === 0;
 
-  function toggle(item: Row, nextRead: boolean) {
+  function toggle(item: ReadingItem, nextRead: boolean) {
     setError(null);
     startTransition(async () => {
       toggleOptimistic({ id: item.id, read: nextRead });
@@ -136,7 +134,7 @@ export function ReadingList({
               key={item.id}
               item={item}
               read={false}
-              showTopic={showTopic}
+              showTopic={!filtered}
               onToggle={() => toggle(item, true)}
               onEdit={() => setEditing(item)}
             />
@@ -145,7 +143,7 @@ export function ReadingList({
       )}
 
       {lists.read.length > 0 && (
-        <details className="group">
+        <details>
           <summary className="flex min-h-11 cursor-pointer items-center rounded-lg text-sm text-muted-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring">
             Read ({lists.read.length})
           </summary>
@@ -155,7 +153,7 @@ export function ReadingList({
                 key={item.id}
                 item={item}
                 read
-                showTopic={showTopic}
+                showTopic={!filtered}
                 onToggle={() => toggle(item, false)}
                 onEdit={() => setEditing(item)}
               />
