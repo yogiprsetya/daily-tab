@@ -33,7 +33,7 @@ section. Migration `0006` is additive.
 ### Queue on screen
 
 - [x] Task 1: Data model and validation
-- [ ] Task 2: Read queries and `GET /api/reading-items`
+- [x] Task 2: Read queries and `GET /api/reading-items`
 - [ ] Task 3: `/reading-list` page with filter
 
 ### Checkpoint A: Page renders

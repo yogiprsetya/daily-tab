@@ -24,13 +24,13 @@ Local migrations pass a local URL explicitly. File counts below exclude tests.
   - Files: `schema.ts`, `validation.ts`, `drizzle/0006_*`
   - Scope: S
 
-- [ ] **Task 2: Read queries and `GET /api/reading-items`**
+- [x] **Task 2: Read queries and `GET /api/reading-items`**
   - Description: `listUnread`, `listRead`, `countUnread`, `unreadWithoutTopic`, `resolveTopicFilter`, `listTopics` with
     unread counts, and the `GET` handler.
   - Acceptance:
-    - [ ] Unread is oldest first; Read is most recently read first; the filter applies to both.
-    - [ ] Topic counts include unread items only; an unknown topic behaves as All.
-    - [ ] 401 without a session.
+    - [x] Unread is oldest first; Read is most recently read first; the filter applies to both.
+    - [x] Topic counts include unread items only; an unknown topic behaves as All.
+    - [x] 401 without a session.
   - Verify: `pnpm test features/reading-list app/api/reading-items`
   - Dependencies: Task 1
   - Files: `dal.ts`, `app/api/reading-items/route.ts`
