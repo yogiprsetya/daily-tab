@@ -238,6 +238,65 @@ describe('updateReadingItem / removeReadingItem', () => {
   });
 });
 
+describe('marking as read', () => {
+  it('sets readAt and moves the item to the read list', async () => {
+    const row = await seed('a', 1);
+
+    const updated = await updateReadingItem(row.id, { read: true });
+
+    expect(updated?.readAt).toBeInstanceOf(Date);
+    expect(await listUnread(ALL)).toEqual([]);
+    expect(titles(await listRead(ALL))).toEqual(['a']);
+  });
+
+  it('keeps the original readAt on a repeat', async () => {
+    const row = await seed('a', 1, { readMinute: 5 });
+
+    const updated = await updateReadingItem(row.id, { read: true });
+
+    expect(updated?.readAt).toEqual(at(5));
+  });
+
+  it('clears readAt when marked unread', async () => {
+    const row = await seed('a', 1, { readMinute: 5 });
+
+    const updated = await updateReadingItem(row.id, { read: false });
+
+    expect(updated?.readAt).toBeNull();
+  });
+
+  it('returns a re-opened item to its original place in the queue', async () => {
+    await seed('first', 1);
+    const middle = await seed('middle', 2);
+    await seed('last', 3);
+
+    await updateReadingItem(middle.id, { read: true });
+    await updateReadingItem(middle.id, { read: false });
+
+    expect(titles(await listUnread(ALL))).toEqual(['first', 'middle', 'last']);
+  });
+
+  it('leaves readAt alone when read is not given', async () => {
+    const row = await seed('a', 1, { readMinute: 5 });
+
+    const updated = await updateReadingItem(row.id, { title: 'renamed' });
+
+    expect(updated?.readAt).toEqual(at(5));
+  });
+
+  it('applies read together with other fields', async () => {
+    const row = await seed('a', 1);
+
+    expect(
+      await updateReadingItem(row.id, { read: true, title: 'renamed' })
+    ).toMatchObject({ title: 'renamed', readAt: expect.any(Date) });
+  });
+
+  it('returns null for an unknown id', async () => {
+    expect(await updateReadingItem(UNKNOWN, { read: true })).toBeNull();
+  });
+});
+
 describe('resolveTopicFilter', () => {
   it('resolves an unknown topic to all', async () => {
     expect(await resolveTopicFilter({ kind: 'topic', id: UNKNOWN })).toEqual(

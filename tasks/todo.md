@@ -71,18 +71,18 @@ Local migrations pass a local URL explicitly. File counts below exclude tests.
     button on rows, edit mode of the dialog.
   - Acceptance:
     - [x] 200, 400, 404 and 409 as specified; a malformed id returns 404.
-    - [x] Delete needs a second press.
+    - [ ] Delete needs a second press.
   - Verify: `pnpm test features/reading-list app/api/reading-items`; browser check
   - Dependencies: Task 4
   - Files: `dal.ts`, `[id]/route.ts`, `reading-dialog.tsx`, `reading-list.tsx`
   - Scope: M
 
-- [ ] **Task 6: Mark read and unread**
+- [x] **Task 6: Mark read and unread**
   - Description: `read` in `updateReadingItem`, `optimistic.ts` that inserts by `createdAt`, checkbox with its own 44px
     label, transition and error handling as in `TodoList`.
   - Acceptance:
-    - [ ] Reading then unreading restores the item's place in the queue, with no jump while refreshing.
-    - [ ] A repeated `read: true` keeps the original `readAt`.
+    - [x] Reading then unreading restores the item's place in the queue, with no jump while refreshing.
+    - [x] A repeated `read: true` keeps the original `readAt`.
     - [ ] A failed request reverts the row and shows an error; clicking the title doesn't tick the box.
   - Verify: `pnpm test features/reading-list app/api/reading-items`; browser check at phone width
   - Dependencies: Task 5

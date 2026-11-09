@@ -44,7 +44,7 @@ section. Migration `0006` is additive.
 
 - [x] Task 4: Add a link
 - [x] Task 5: Edit and delete
-- [ ] Task 6: Mark read and unread
+- [x] Task 6: Mark read and unread
 
 ### Checkpoint B: Queue works
 

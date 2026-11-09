@@ -99,11 +99,22 @@ export function createReadingItem(
   });
 }
 
-export function updateReadingItem(id: string, fields: ItemFields) {
+/** `coalesce` so that marking a read item as read keeps its original time. */
+function readAtFor(read: boolean | undefined) {
+  if (read === undefined) return {};
+  return {
+    readAt: read ? sql`coalesce(${readingItems.readAt}, now())` : null,
+  };
+}
+
+export function updateReadingItem(
+  id: string,
+  { read, ...fields }: ItemFields & { read?: boolean }
+) {
   return translatePgError(ITEM_ERRORS, async () => {
     const [row] = await db
       .update(readingItems)
-      .set({ ...fields, updatedAt: new Date() })
+      .set({ ...fields, ...readAtFor(read), updatedAt: new Date() })
       .where(eq(readingItems.id, id))
       .returning();
     return row ?? null;

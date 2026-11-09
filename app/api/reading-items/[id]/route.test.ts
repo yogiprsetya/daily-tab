@@ -52,6 +52,36 @@ describe('PATCH /api/reading-items/[id]', () => {
     });
   });
 
+  it('marks an item read and unread', async () => {
+    await signIn();
+    const row = await seed();
+
+    const read = await patch(row.id, { read: true });
+
+    expect(read.status).toBe(200);
+    expect((await read.json()).readAt).not.toBeNull();
+    expect((await (await patch(row.id, { read: false })).json()).readAt).toBe(
+      null
+    );
+  });
+
+  it('keeps the original readAt when marked read twice', async () => {
+    await signIn();
+    const row = await seed();
+
+    const first = await (await patch(row.id, { read: true })).json();
+    const second = await (await patch(row.id, { read: true })).json();
+
+    expect(second.readAt).toBe(first.readAt);
+  });
+
+  it('returns 400 for a read value that is not a boolean', async () => {
+    await signIn();
+    const row = await seed();
+
+    expect((await patch(row.id, { read: 'yes' })).status).toBe(400);
+  });
+
   it('returns 409 when the URL is taken', async () => {
     await signIn();
     await seed();
