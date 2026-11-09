@@ -2,6 +2,9 @@ import { apiError } from '@/lib/api';
 
 const DUPLICATE_URL = 'This URL is already on your reading list';
 
+export const readingItemNotFound = () =>
+  apiError('not_found', 'Reading item not found');
+
 export const duplicateReadingItem = () =>
   apiError('conflict', DUPLICATE_URL, [
     { path: ['url'], message: DUPLICATE_URL },

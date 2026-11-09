@@ -30,6 +30,7 @@ export function AddReadingButton({
 
       {open && (
         <ReadingDialog
+          item={null}
           defaultTopicId={defaultTopicId}
           topics={topics}
           onClose={() => setOpen(false)}

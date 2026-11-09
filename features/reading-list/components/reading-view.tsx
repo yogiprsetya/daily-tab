@@ -31,9 +31,10 @@ export async function ReadingView({
     unreadWithoutTopic(),
   ]);
 
+  const topicOptions = topics.map(({ id, name }) => ({ id, name }));
   const addLink = (
     <AddReadingButton
-      topics={topics.map(({ id, name }) => ({ id, name }))}
+      topics={topicOptions}
       defaultTopicId={filter.kind === 'topic' ? filter.id : null}
     />
   );
@@ -53,6 +54,7 @@ export async function ReadingView({
       <ReadingList
         unread={unread.map(toRow)}
         read={read.map(toRow)}
+        topics={topicOptions}
         showTopic={filter.kind === 'all'}
         filtered={filter.kind !== 'all'}
         addAction={addLink}

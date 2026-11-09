@@ -1,17 +1,25 @@
-import type { ReactNode } from 'react';
+'use client';
+
+import { Pencil } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { type ReactNode, useState } from 'react';
+import { ICON_BUTTON } from '@/components/form-styles';
 import { SiteIcon } from '@/components/site-icon';
 import { displayHost } from '@/lib/url';
 import { cn } from '@/lib/utils';
 import type { ReadingLists, ReadingRow as Row } from '../optimistic';
+import { ReadingDialog } from './reading-dialog';
 
 function ReadingRow({
   item,
   read,
   showTopic,
+  onEdit,
 }: {
   item: Row;
   read: boolean;
   showTopic: boolean;
+  onEdit: () => void;
 }) {
   const host = displayHost(item.url);
   const meta =
@@ -39,6 +47,14 @@ function ReadingRow({
           </p>
         )}
       </div>
+      <button
+        type="button"
+        aria-label={`Edit ${item.title}`}
+        onClick={onEdit}
+        className={ICON_BUTTON}
+      >
+        <Pencil aria-hidden className="size-4" />
+      </button>
     </li>
   );
 }
@@ -46,14 +62,18 @@ function ReadingRow({
 export function ReadingList({
   unread,
   read,
+  topics,
   showTopic,
   filtered,
   addAction,
 }: ReadingLists & {
+  topics: { id: string; name: string }[];
   showTopic: boolean;
   filtered: boolean;
   addAction: ReactNode;
 }) {
+  const router = useRouter();
+  const [editing, setEditing] = useState<Row | null>(null);
   const queueIsEmpty = !filtered && unread.length === 0 && read.length === 0;
 
   return (
@@ -73,6 +93,7 @@ export function ReadingList({
               item={item}
               read={false}
               showTopic={showTopic}
+              onEdit={() => setEditing(item)}
             />
           ))}
         </ul>
@@ -90,10 +111,24 @@ export function ReadingList({
                 item={item}
                 read
                 showTopic={showTopic}
+                onEdit={() => setEditing(item)}
               />
             ))}
           </ul>
         </details>
+      )}
+
+      {editing && (
+        <ReadingDialog
+          key={editing.id}
+          item={editing}
+          topics={topics}
+          onClose={() => setEditing(null)}
+          onSaved={() => {
+            setEditing(null);
+            router.refresh();
+          }}
+        />
       )}
     </div>
   );

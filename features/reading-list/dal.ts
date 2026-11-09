@@ -99,6 +99,25 @@ export function createReadingItem(
   });
 }
 
+export function updateReadingItem(id: string, fields: ItemFields) {
+  return translatePgError(ITEM_ERRORS, async () => {
+    const [row] = await db
+      .update(readingItems)
+      .set({ ...fields, updatedAt: new Date() })
+      .where(eq(readingItems.id, id))
+      .returning();
+    return row ?? null;
+  });
+}
+
+export async function removeReadingItem(id: string): Promise<boolean> {
+  const rows = await db
+    .delete(readingItems)
+    .where(eq(readingItems.id, id))
+    .returning({ id: readingItems.id });
+  return rows.length > 0;
+}
+
 export function listTopics() {
   return db
     .select({

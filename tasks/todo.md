@@ -66,12 +66,12 @@ Local migrations pass a local URL explicitly. File counts below exclude tests.
   - Files: `dal.ts`, `route.ts`, `api-errors.ts`, `reading-dialog.tsx`, `add-reading-button.tsx`
   - Scope: M
 
-- [ ] **Task 5: Edit and delete**
+- [x] **Task 5: Edit and delete**
   - Description: `updateReadingItem`, `removeReadingItem`, `PATCH` and `DELETE` on `/api/reading-items/[id]`, edit
     button on rows, edit mode of the dialog.
   - Acceptance:
-    - [ ] 200, 400, 404 and 409 as specified; a malformed id returns 404.
-    - [ ] Delete needs a second press.
+    - [x] 200, 400, 404 and 409 as specified; a malformed id returns 404.
+    - [x] Delete needs a second press.
   - Verify: `pnpm test features/reading-list app/api/reading-items`; browser check
   - Dependencies: Task 4
   - Files: `dal.ts`, `[id]/route.ts`, `reading-dialog.tsx`, `reading-list.tsx`

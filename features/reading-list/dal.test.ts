@@ -9,8 +9,10 @@ import {
   listRead,
   listTopics,
   listUnread,
+  removeReadingItem,
   resolveTopicFilter,
   unreadWithoutTopic,
+  updateReadingItem,
 } from './dal';
 import { readingItems, readingTopics } from './schema';
 
@@ -176,6 +178,63 @@ describe('createReadingItem', () => {
     await expect(
       createReadingItem({ ...input, topicId: UNKNOWN })
     ).rejects.toBeInstanceOf(UnknownTopicError);
+  });
+});
+
+describe('updateReadingItem / removeReadingItem', () => {
+  const input = { title: 'A', url: 'https://a.example/' };
+
+  it('updates only the given fields and clears with null', async () => {
+    const row = await createReadingItem({ ...input, notes: 'why' });
+
+    expect(await updateReadingItem(row.id, { title: 'B' })).toMatchObject({
+      title: 'B',
+      notes: 'why',
+    });
+    expect(await updateReadingItem(row.id, { notes: null })).toMatchObject({
+      title: 'B',
+      notes: null,
+    });
+  });
+
+  it('keeps createdAt, so an edit does not move the item in the queue', async () => {
+    const row = await seed('a', 1);
+
+    const updated = await updateReadingItem(row.id, { title: 'renamed' });
+
+    expect(updated?.createdAt).toEqual(at(1));
+  });
+
+  it('rejects changing to a URL that is taken', async () => {
+    await createReadingItem(input);
+    const other = await createReadingItem({
+      title: 'B',
+      url: 'https://b.example/',
+    });
+
+    await expect(
+      updateReadingItem(other.id, { url: input.url })
+    ).rejects.toBeInstanceOf(DuplicateReadingItemError);
+  });
+
+  it('rejects a topic that does not exist', async () => {
+    const row = await createReadingItem(input);
+
+    await expect(
+      updateReadingItem(row.id, { topicId: UNKNOWN })
+    ).rejects.toBeInstanceOf(UnknownTopicError);
+  });
+
+  it('returns null or false for an unknown id', async () => {
+    expect(await updateReadingItem(UNKNOWN, { title: 'x' })).toBeNull();
+    expect(await removeReadingItem(UNKNOWN)).toBe(false);
+  });
+
+  it('removes an item', async () => {
+    const row = await createReadingItem(input);
+
+    expect(await removeReadingItem(row.id)).toBe(true);
+    expect(await db.select().from(readingItems)).toHaveLength(0);
   });
 });
 
