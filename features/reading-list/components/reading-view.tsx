@@ -1,3 +1,4 @@
+import { GroupManager } from '@/components/grouping/group-manager';
 import { requirePageSession } from '@/features/auth/require-session';
 import {
   countUnread,
@@ -12,6 +13,14 @@ import { parseTopicFilter } from '../validation';
 import { AddReadingButton } from './add-reading-button';
 import { ReadingFilter } from './reading-filter';
 import { ReadingList } from './reading-list';
+
+const TOPIC_COPY = {
+  trigger: 'Manage topics',
+  title: 'Topics',
+  description: 'Deleting a topic keeps its links; they move to No topic.',
+  placeholder: 'New topic',
+  newNameLabel: 'New topic name',
+};
 
 /** Reads the session, URL and database: render inside <Suspense>. */
 export async function ReadingView({
@@ -41,14 +50,22 @@ export async function ReadingView({
 
   return (
     <>
-      <div className="flex w-full items-start justify-between gap-3">
-        <ReadingFilter
-          filter={filter}
-          topics={topics}
-          total={total}
-          withoutTopic={withoutTopic}
+      <div className="flex flex-col items-start gap-1">
+        <div className="flex w-full items-start justify-between gap-3">
+          <ReadingFilter
+            filter={filter}
+            topics={topics}
+            total={total}
+            withoutTopic={withoutTopic}
+          />
+          {addLink}
+        </div>
+
+        <GroupManager
+          endpoint="/api/reading-topics"
+          groups={topicOptions}
+          copy={TOPIC_COPY}
         />
-        {addLink}
       </div>
 
       <ReadingList

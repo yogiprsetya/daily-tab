@@ -5,6 +5,11 @@ const DUPLICATE_URL = 'This URL is already on your reading list';
 export const readingItemNotFound = () =>
   apiError('not_found', 'Reading item not found');
 
+export const topicNotFound = () => apiError('not_found', 'Topic not found');
+
+export const duplicateTopic = () =>
+  apiError('conflict', 'A topic with this name already exists');
+
 export const duplicateReadingItem = () =>
   apiError('conflict', DUPLICATE_URL, [
     { path: ['url'], message: DUPLICATE_URL },

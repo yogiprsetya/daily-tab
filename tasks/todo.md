@@ -95,13 +95,13 @@ Local migrations pass a local URL explicitly. File counts below exclude tests.
 
 ## Topics
 
-- [ ] **Task 7: Manage topics**
+- [x] **Task 7: Manage topics**
   - Description: `createTopic`, `updateTopic`, `removeTopic`, `/api/reading-topics` and `[id]` routes (`GET`, `POST`,
     `PATCH`, `DELETE`), `GroupSelect` in the dialog, `GroupManager` in the view.
   - Acceptance:
-    - [ ] A duplicate name ignoring case returns 409.
-    - [ ] Deleting a topic keeps its items under No topic.
-    - [ ] Every route returns 401 without a session.
+    - [x] A duplicate name ignoring case returns 409.
+    - [x] Deleting a topic keeps its items under No topic.
+    - [x] Every route returns 401 without a session.
   - Verify: `pnpm test features/reading-list app/api/reading-topics`; browser check
   - Dependencies: Task 4
   - Files: `dal.ts`, `app/api/reading-topics/route.ts`, `[id]/route.ts`, `reading-view.tsx`, `reading-dialog.tsx`

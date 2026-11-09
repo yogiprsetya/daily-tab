@@ -3,16 +3,20 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { db } from '@/db';
 import {
   DuplicateReadingItemError,
+  DuplicateTopicError,
   UnknownTopicError,
   countUnread,
   createReadingItem,
+  createTopic,
   listRead,
   listTopics,
   listUnread,
   removeReadingItem,
+  removeTopic,
   resolveTopicFilter,
   unreadWithoutTopic,
   updateReadingItem,
+  updateTopic,
 } from './dal';
 import { readingItems, readingTopics } from './schema';
 
@@ -294,6 +298,51 @@ describe('marking as read', () => {
 
   it('returns null for an unknown id', async () => {
     expect(await updateReadingItem(UNKNOWN, { read: true })).toBeNull();
+  });
+});
+
+describe('topic writes', () => {
+  it('creates a topic', async () => {
+    expect(await createTopic('Dev')).toMatchObject({ name: 'Dev' });
+  });
+
+  it('rejects a duplicate name in any case', async () => {
+    await createTopic('dev');
+
+    await expect(createTopic('Dev')).rejects.toBeInstanceOf(
+      DuplicateTopicError
+    );
+  });
+
+  it('renames a topic, including changing only its case', async () => {
+    const dev = await createTopic('dev');
+
+    expect(await updateTopic(dev.id, 'DEV')).toMatchObject({ name: 'DEV' });
+  });
+
+  it('rejects renaming onto another topic', async () => {
+    await createTopic('dev');
+    const home = await createTopic('home');
+
+    await expect(updateTopic(home.id, 'DEV')).rejects.toBeInstanceOf(
+      DuplicateTopicError
+    );
+  });
+
+  it('returns null or false for an unknown id', async () => {
+    expect(await updateTopic(UNKNOWN, 'x')).toBeNull();
+    expect(await removeTopic(UNKNOWN)).toBe(false);
+  });
+
+  it('keeps unread and read items when their topic is deleted', async () => {
+    const dev = await createTopic('Dev');
+    await seed('unread', 1, { topicId: dev.id });
+    await seed('read', 2, { topicId: dev.id, readMinute: 5 });
+
+    expect(await removeTopic(dev.id)).toBe(true);
+
+    expect(titles(await listUnread({ kind: 'none' }))).toEqual(['unread']);
+    expect(titles(await listRead({ kind: 'none' }))).toEqual(['read']);
   });
 });
 

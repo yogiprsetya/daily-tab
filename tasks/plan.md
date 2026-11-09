@@ -52,7 +52,7 @@ section. Migration `0006` is additive.
 
 ### Topics
 
-- [ ] Task 7: Manage topics
+- [x] Task 7: Manage topics
 
 ### Checkpoint C: Works locally
 

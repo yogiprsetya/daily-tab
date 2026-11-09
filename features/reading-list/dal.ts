@@ -21,11 +21,13 @@ import type { TopicFilter } from './validation';
 
 export class DuplicateReadingItemError extends Error {}
 export class UnknownTopicError extends Error {}
+export class DuplicateTopicError extends Error {}
 
 const ITEM_ERRORS = {
   [UNIQUE_VIOLATION]: DuplicateReadingItemError,
   [FOREIGN_KEY_VIOLATION]: UnknownTopicError,
 };
+const TOPIC_ERRORS = { [UNIQUE_VIOLATION]: DuplicateTopicError };
 
 type ItemFields = {
   title?: string;
@@ -145,4 +147,31 @@ export function listTopics() {
     )
     .groupBy(readingTopics.id)
     .orderBy(sql`lower(${readingTopics.name})`);
+}
+
+export function createTopic(name: string) {
+  return translatePgError(TOPIC_ERRORS, async () => {
+    const [row] = await db.insert(readingTopics).values({ name }).returning();
+    return row;
+  });
+}
+
+export function updateTopic(id: string, name: string) {
+  return translatePgError(TOPIC_ERRORS, async () => {
+    const [row] = await db
+      .update(readingTopics)
+      .set({ name })
+      .where(eq(readingTopics.id, id))
+      .returning();
+    return row ?? null;
+  });
+}
+
+/** Its items stay and fall back to No topic (`ON DELETE SET NULL`). */
+export async function removeTopic(id: string): Promise<boolean> {
+  const rows = await db
+    .delete(readingTopics)
+    .where(eq(readingTopics.id, id))
+    .returning({ id: readingTopics.id });
+  return rows.length > 0;
 }
