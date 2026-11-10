@@ -100,7 +100,8 @@ Single owner, static credentials from env. Spec: [SPEC-auth.md](SPEC-auth.md).
   assets. Everything else needs a session: pages redirect to `/login?next=…`, API routes return 401.
 - **Writing a new API route:** call `requireSession()` from
   [features/auth/require-session.ts](features/auth/require-session.ts) first, even though `proxy.ts`
-  already checks. Mutating requests (`POST`/`PUT`/`PATCH`/`DELETE`) must come from the app's own origin.
+  already checks. Mutating requests (`POST`/`PUT`/`PATCH`/`DELETE`) must come from the app's own origin. The
+  one exception is the Chrome extension's `POST /api/reading-items` (see below).
 
 ## Shortcuts
 
@@ -119,6 +120,30 @@ Shown on Home; "Edit" switches to rows with move, edit and delete. Spec: [SPEC-s
 - Deleting a project keeps its todos; they move to No project.
 - Completed todos stay in the collapsed Completed section until deleted by hand.
 - Home shows the 5 oldest pending todos.
+
+## Chrome extension
+
+[extension/](extension/) shows the deployed app on every new tab, in a full-page frame, and adds a toolbar
+button that saves the current page to the reading list. Spec:
+[SPEC-newtab-extension.md](SPEC-newtab-extension.md).
+
+- **Install:** open `chrome://extensions`, turn on Developer mode, choose **Load unpacked** and select
+  `extension/`. On Windows with WSL, load it straight from `\\wsl.localhost\<distro>\…\daily-tab\extension`;
+  a copy on a Windows drive goes stale. Keep the New Tab change when Chrome asks, and pin the button from the
+  puzzle-piece menu.
+- **After changing a file:** press reload on the extension's card. Chrome keeps running the old version until
+  then.
+- **Saving:** one click saves the tab's title and URL, with No topic and no note. The badge shows ✓ for saved
+  or already saved, and ! for signed out, a page that can't be saved, or a failed request; it clears when the
+  tab loads a new page. Chrome's "can't read or change site data" label is expected: with `activeTab`, the
+  extension only gets access to a tab when you click its button.
+- **The id is fixed by `key` in `extension/manifest.json`** (`jfockggajegdlihmoaildfbifdlonidp`). The app
+  trusts that id in two places: `frame-ancestors` in [next.config.ts](next.config.ts) and the CSRF exception in
+  [features/auth/request.ts](features/auth/request.ts). A changed or removed key gives a new id, so the New
+  Tab frame is refused and saves return 403; a test fails when `EXTENSION_ORIGIN` and the key disagree. The
+  private key was not kept, and unpacked installs don't need it.
+- **App URL:** production only, set in `extension/config.js`. It must match `host_permissions` in the
+  manifest.
 
 ## PWA icons
 

@@ -18,10 +18,13 @@ describe('extension manifest', () => {
     expect(manifest.host_permissions).toEqual([`${APP_URL}/*`]);
   });
 
-  it('asks for no permission beyond activeTab', () => {
-    for (const permission of manifest.permissions ?? []) {
-      expect(['activeTab']).toContain(permission);
-    }
+  it('asks for activeTab and nothing else', () => {
+    expect(manifest.permissions).toEqual(['activeTab']);
+    expect(manifest.content_scripts).toBeUndefined();
+  });
+
+  it('has a toolbar button that saves to the reading list', () => {
+    expect(manifest.action.default_title).toBe('Save to reading list');
   });
 
   it('points only at files that exist', () => {
