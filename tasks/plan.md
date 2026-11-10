@@ -50,7 +50,7 @@ whole tab, and one route opened to the extension's origin. There is no migration
 
 ### Finish the extension
 
-- [ ] Task 5: Dark wrapper and unreachable message
+- [x] Task 5: Dark wrapper and unreachable message
 - [ ] Task 6: Request body and badge logic
 - [ ] Task 7: Toolbar button saves the current page
 

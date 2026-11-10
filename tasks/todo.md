@@ -72,7 +72,7 @@ tests first where logic can run outside a browser.
 
 ## Finish the extension
 
-- [ ] **Task 5: Dark wrapper and unreachable message**
+- [x] **Task 5: Dark wrapper and unreachable message**
   - Description: the wrapper page follows `prefers-color-scheme` before the app paints. A `fetch` of `/api/health` beside
     the iframe swaps in "Can't reach Daily Tab" and Retry on a network failure.
   - Acceptance:
