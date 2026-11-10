@@ -8,10 +8,20 @@ const optionalPostgresUrl = z.preprocess(
   postgresUrl.optional()
 );
 
+// Only meaningful when the app runs on the owner's PC; never set in Vercel.
+const optionalAbsolutePath = z.preprocess(
+  (value) => (value === '' ? undefined : value),
+  z
+    .string()
+    .refine((value) => value.startsWith('/'), 'must be an absolute path')
+    .optional()
+);
+
 const envSchema = z.object({
   DATABASE_URL: postgresUrl,
   DATABASE_URL_MIGRATE: optionalPostgresUrl,
   TEST_DATABASE_URL: optionalPostgresUrl,
+  OBSIDIAN_VAULT_PATH: optionalAbsolutePath,
 });
 
 export type Env = z.infer<typeof envSchema>;
@@ -23,10 +33,13 @@ export function parseEnv(source: Record<string, string | undefined>): Env {
     // Only variable names and generic reasons: values may contain credentials.
     const problems = result.error.issues.map((issue) => {
       const name = issue.path.join('.');
+      // Custom messages are fixed strings, so they never contain the value.
       const reason =
         issue.code === 'invalid_type'
           ? 'is missing'
-          : 'must be a postgres:// or postgresql:// URL';
+          : issue.code === 'custom'
+            ? issue.message
+            : 'must be a postgres:// or postgresql:// URL';
       return `- ${name} ${reason}`;
     });
     throw new Error(`Invalid environment variables:\n${problems.join('\n')}`);

@@ -10,13 +10,13 @@ Standing verification for every task: `pnpm lint && pnpm typecheck && pnpm test 
 
 ## Foundation
 
-- [ ] **Task 1: Availability switch and the page shell**
+- [x] **Task 1: Availability switch and the page shell**
   - Description: optional `OBSIDIAN_VAULT_PATH` in `lib/env.ts`; `openVault()` reporting off, missing or ready;
     `/obsidian` replaced with `obsidian-view.tsx` behind `<Suspense>`, showing the two messages; skeleton.
   - Acceptance:
-    - [ ] Unset: "The vault is available when Daily Tab runs on your PC", with no file access.
-    - [ ] A folder that does not exist: "Vault folder not found", without the path.
-    - [ ] Relative paths are rejected by the env schema; other pages are unaffected; `/obsidian` stays partially static.
+    - [x] Unset: "The vault is available when Daily Tab runs on your PC", with no file access.
+    - [x] A folder that does not exist: "Vault folder not found", without the path.
+    - [x] Relative paths are rejected by the env schema; other pages are unaffected; `/obsidian` stays partially static.
   - Verify: `pnpm test lib/env features/obsidian`; `pnpm build` output has no tracing warnings for the vault
   - Dependencies: none
   - Files: `lib/env.ts`, `features/obsidian/vault.ts`, `components/obsidian-view.tsx`, `obsidian-skeleton.tsx`,
