@@ -27,22 +27,22 @@ whole tab, and one route opened to the extension's origin. There is no migration
 ### Before starting
 
 - [x] Owner approves this plan
-- [ ] `feat/reading-list` merged, migration `0006` run on the cloud database, reading list live in production
-- [ ] Branch `feat/newtab-extension` from `master`
+- [x] `feat/reading-list` merged, migration `0006` run on the cloud database, reading list live in production
+- [x] Branch `feat/newtab-extension` from `master`
 
 ### Feasibility
 
-- [ ] Task 1: Extension shell with the app in an iframe
+- [x] Task 1: Extension shell with the app in an iframe
 
 ### Checkpoint A: Feasibility gate (owner)
 
-- [ ] Cookie reaches the frame and the service worker, or the redirect fallback is applied and the spec updated
+- [x] Cookie reaches the frame and the service worker, or the redirect fallback is applied and the spec updated
 
 ### App changes
 
-- [ ] Task 2: Allow only the extension to frame the app
-- [ ] Task 3: Shortcut tiles replace the whole tab
-- [ ] Task 4: Accept the extension origin on `POST /api/reading-items`
+- [x] Task 2: Allow only the extension to frame the app
+- [x] Task 3: Shortcut tiles replace the whole tab
+- [x] Task 4: Accept the extension origin on `POST /api/reading-items`
 
 ### Checkpoint B: App changes live (human-gated)
 
@@ -50,8 +50,8 @@ whole tab, and one route opened to the extension's origin. There is no migration
 
 ### Finish the extension
 
-- [ ] Task 5: Dark wrapper and unreachable message
-- [ ] Task 6: Request body and badge logic
+- [x] Task 5: Dark wrapper and unreachable message
+- [x] Task 6: Request body and badge logic
 - [ ] Task 7: Toolbar button saves the current page
 
 ### Checkpoint C: Works end to end (owner)

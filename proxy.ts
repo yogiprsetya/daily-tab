@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { getAuthConfig } from '@/features/auth/config';
-import { isSameOrigin } from '@/features/auth/request';
+import { isAllowedMutation } from '@/features/auth/request';
 import {
   SESSION_COOKIE,
   needsRefresh,
@@ -24,7 +24,7 @@ export async function proxy(request: NextRequest) {
 
   // CSRF: browsers always send Origin on cross-site and same-origin mutations.
   if (isApi && MUTATING.has(request.method)) {
-    if (!isSameOrigin(request.headers, origin)) {
+    if (!isAllowedMutation(request.method, pathname, request.headers, origin)) {
       return apiError('forbidden', 'Cross-origin request rejected');
     }
   }

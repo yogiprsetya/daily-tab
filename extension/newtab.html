@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>New Tab</title>
+    <style>
+      /* The app is dark only; match its background so nothing flashes white. */
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        overflow: hidden;
+        background: #090b0c;
+        color: #e7e9ea;
+        color-scheme: dark;
+        font-family: system-ui, sans-serif;
+      }
+
+      #app {
+        display: block;
+        width: 100%;
+        height: 100%;
+        border: 0;
+      }
+
+      #offline {
+        display: flex;
+        height: 100%;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        padding: 0 16px;
+        text-align: center;
+      }
+
+      #offline[hidden] {
+        display: none;
+      }
+
+      #offline h1 {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 600;
+      }
+
+      #offline p {
+        margin: 0;
+        font-size: 14px;
+        color: #9ba1a6;
+      }
+
+      #retry {
+        min-height: 44px;
+        padding: 0 16px;
+        border: 0;
+        border-radius: 8px;
+        background: #e7e9ea;
+        color: #090b0c;
+        font: inherit;
+        font-size: 14px;
+        cursor: pointer;
+      }
+
+      #retry:focus-visible {
+        outline: 2px solid #9ba1a6;
+        outline-offset: 2px;
+      }
+    </style>
+  </head>
+  <body>
+    <iframe id="app" title="Daily Tab"></iframe>
+    <main id="offline" hidden>
+      <h1>Can't reach Daily Tab</h1>
+      <p>Check your connection, then try again.</p>
+      <button id="retry" type="button">Retry</button>
+    </main>
+    <script type="module" src="newtab.js"></script>
+  </body>
+</html>

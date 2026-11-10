@@ -26,6 +26,28 @@ export function safeNextPath(value: string | null | undefined): string {
   return `${url.pathname}${url.search}${url.hash}`;
 }
 
+/** The newtab-extension, whose id is fixed by the `key` in extension/manifest.json. */
+export const EXTENSION_ORIGIN =
+  'chrome-extension://jfockggajegdlihmoaildfbifdlonidp';
+
 export function isSameOrigin(headers: Headers, appOrigin: string): boolean {
   return headers.get('origin') === appOrigin;
+}
+
+/**
+ * The CSRF rule for writes: the app itself may write anywhere; the extension
+ * may only save to the reading list (SPEC-newtab-extension.md, acceptance 5).
+ */
+export function isAllowedMutation(
+  method: string,
+  pathname: string,
+  headers: Headers,
+  appOrigin: string
+): boolean {
+  if (isSameOrigin(headers, appOrigin)) return true;
+  return (
+    method === 'POST' &&
+    pathname === '/api/reading-items' &&
+    headers.get('origin') === EXTENSION_ORIGIN
+  );
 }
