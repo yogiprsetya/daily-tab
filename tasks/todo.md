@@ -13,13 +13,13 @@ tests first where logic can run outside a browser.
 
 ## Feasibility
 
-- [ ] **Task 1: Extension shell with the app in an iframe**
+- [x] **Task 1: Extension shell with the app in an iframe**
   - Description: `manifest.json` with a fixed `key`, `newtab.html` and `newtab.js` showing the deployed app full-viewport,
     icons from `public/icons`. No app changes.
   - Acceptance:
-    - [ ] The extension id is the same after removing and re-adding it; no private key is in the repo.
-    - [ ] A new tab shows Home signed in, and signing in from inside the frame survives a browser restart.
-    - [ ] A `fetch` to `/api/reading-topics` from the service worker console returns `200`, which shows the cookie is sent.
+    - [x] The extension id is the same after removing and re-adding it; no private key is in the repo.
+    - [x] A new tab shows Home signed in, and signing in from inside the frame survives a browser restart.
+    - [x] A `fetch` to `/api/reading-topics` from the service worker console returns `200`, which shows the cookie is sent.
   - Verify: owner, in their real Chrome profile; `pnpm test extension` checks the shipped files hold no key material
   - Dependencies: reading list live in production
   - Files: `extension/manifest.json`, `newtab.html`, `newtab.js`, `icons/*`
@@ -27,16 +27,16 @@ tests first where logic can run outside a browser.
 
 ## Checkpoint A: Feasibility gate (owner)
 
-- [ ] Cookie reaches the frame and the service worker, or the redirect fallback is applied and the spec updated
+- [x] Cookie reaches the frame and the service worker, or the redirect fallback is applied and the spec updated
 
 ## App changes
 
-- [ ] **Task 2: Allow only the extension to frame the app**
+- [x] **Task 2: Allow only the extension to frame the app**
   - Description: `EXTENSION_ORIGIN` in `features/auth/request.ts`, and `headers()` in `next.config.ts` sending
     `frame-ancestors` with that origin on all routes.
   - Acceptance:
-    - [ ] The policy names only the extension origin and applies to every route.
-    - [ ] `/` and `/reading-list` stay partially static in `pnpm build`.
+    - [x] The policy names only the extension origin and applies to every route.
+    - [x] `/` and `/reading-list` stay partially static in `pnpm build`.
   - Verify: `pnpm test next.config`; HTTP smoke reads the header from a page
   - Dependencies: Task 1
   - Files: `next.config.ts`, `next.config.test.ts`, `features/auth/request.ts`

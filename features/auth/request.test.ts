@@ -1,5 +1,12 @@
+import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { clientIp, isSameOrigin, safeNextPath } from './request';
+import {
+  EXTENSION_ORIGIN,
+  clientIp,
+  isSameOrigin,
+  safeNextPath,
+} from './request';
 
 describe('clientIp', () => {
   it('takes the first x-forwarded-for entry', () => {
@@ -44,6 +51,20 @@ describe('safeNextPath', () => {
     '/login?next=/todos',
   ])('falls back to / for %j', (input) => {
     expect(safeNextPath(input)).toBe('/');
+  });
+});
+
+describe('EXTENSION_ORIGIN', () => {
+  it('matches the id fixed by the extension manifest key', () => {
+    const { key } = JSON.parse(readFileSync('extension/manifest.json', 'utf8'));
+    // Chrome's id: the first 32 hex digits of the key's SHA-256, mapped 0-f to a-p.
+    const id = createHash('sha256')
+      .update(Buffer.from(key, 'base64'))
+      .digest('hex')
+      .slice(0, 32)
+      .replace(/[0-9a-f]/g, (digit) => 'abcdefghijklmnop'[parseInt(digit, 16)]);
+
+    expect(EXTENSION_ORIGIN).toBe(`chrome-extension://${id}`);
   });
 });
 

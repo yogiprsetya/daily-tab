@@ -32,15 +32,15 @@ whole tab, and one route opened to the extension's origin. There is no migration
 
 ### Feasibility
 
-- [ ] Task 1: Extension shell with the app in an iframe
+- [x] Task 1: Extension shell with the app in an iframe
 
 ### Checkpoint A: Feasibility gate (owner)
 
-- [ ] Cookie reaches the frame and the service worker, or the redirect fallback is applied and the spec updated
+- [x] Cookie reaches the frame and the service worker, or the redirect fallback is applied and the spec updated
 
 ### App changes
 
-- [ ] Task 2: Allow only the extension to frame the app
+- [x] Task 2: Allow only the extension to frame the app
 - [ ] Task 3: Shortcut tiles replace the whole tab
 - [ ] Task 4: Accept the extension origin on `POST /api/reading-items`
 

@@ -26,6 +26,10 @@ export function safeNextPath(value: string | null | undefined): string {
   return `${url.pathname}${url.search}${url.hash}`;
 }
 
+/** The newtab-extension, whose id is fixed by the `key` in extension/manifest.json. */
+export const EXTENSION_ORIGIN =
+  'chrome-extension://jfockggajegdlihmoaildfbifdlonidp';
+
 export function isSameOrigin(headers: Headers, appOrigin: string): boolean {
   return headers.get('origin') === appOrigin;
 }
