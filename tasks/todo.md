@@ -45,8 +45,8 @@ tests first where logic can run outside a browser.
 - [x] **Task 3: Shortcut tiles replace the whole tab**
   - Description: `target="_top"` on the tile link. In a normal tab and the PWA this behaves as today.
   - Acceptance:
-    - [ ] Inside the frame, a tile replaces the whole tab, including for a site that refuses framing.
-    - [ ] Ctrl/Cmd+click and middle-click still open a new tab.
+    - [x] Inside the frame, a tile replaces the whole tab, including for a site that refuses framing.
+    - [x] Ctrl/Cmd+click and middle-click still open a new tab.
   - Verify: `pnpm test features/shortcuts`; owner check at Checkpoint C
   - Dependencies: Task 1
   - Files: `features/shortcuts/components/shortcut-grid.tsx`
@@ -68,7 +68,7 @@ tests first where logic can run outside a browser.
 
 - [x] Gates and HTTP smoke pass
 - [x] Owner deploys the app changes
-- [ ] The frame still loads with the policy in place, and a cross-site page cannot frame the app
+- [x] The frame still loads with the policy in place, and a cross-site page cannot frame the app
 
 ## Finish the extension
 
@@ -76,8 +76,8 @@ tests first where logic can run outside a browser.
   - Description: the wrapper page follows `prefers-color-scheme` before the app paints. A `fetch` of `/api/health` beside
     the iframe swaps in "Can't reach Daily Tab" and Retry on a network failure.
   - Acceptance:
-    - [ ] No white flash in dark mode; the tab title is "New Tab".
-    - [ ] Offline shows the message, Retry recovers once back online, and a `503` from the app does not show it.
+    - [x] No white flash in dark mode; the tab title is "New Tab".
+    - [x] Offline shows the message, Retry recovers once back online, and a `503` from the app does not show it.
   - Verify: owner, using DevTools offline mode
   - Dependencies: Task 1
   - Files: `extension/newtab.html`, `newtab.js`
@@ -98,8 +98,8 @@ tests first where logic can run outside a browser.
   - Description: `background.js` on `chrome.action.onClicked`: builds the body, calls the API with credentials, sets the
     badge and tooltip for that tab.
   - Acceptance:
-    - [ ] A saved page appears on `/reading-list` under No topic.
-    - [ ] Each badge result appears on the right tab and clears on navigation.
+    - [x] A saved page appears on `/reading-list` under No topic.
+    - [x] Each badge result appears on the right tab and clears on navigation.
     - [x] Permissions are exactly `activeTab` and the one host.
   - Verify: owner, at Checkpoint C
   - Dependencies: Tasks 4, 6, Checkpoint B
@@ -108,12 +108,12 @@ tests first where logic can run outside a browser.
 
 ## Checkpoint C: Works end to end (owner)
 
-- [ ] Gates pass
-- [ ] Owner runs every owner item in the spec's Success Criteria
+- [x] Gates pass
+- [x] Owner runs every owner item in the spec's Success Criteria
 
-- [ ] **Task 8: Install notes in the README**
+- [x] **Task 8: Install notes in the README**
   - Acceptance:
-    - [ ] Load unpacked, reload after changes, and what breaks if the manifest key changes are documented.
+    - [x] Load unpacked, reload after changes, and what breaks if the manifest key changes are documented.
   - Dependencies: Checkpoint C
   - Files: `README.md`
   - Scope: XS
