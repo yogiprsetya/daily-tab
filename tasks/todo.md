@@ -1,126 +1,95 @@
-# Tasks: newtab-extension
+# Tasks: obsidian
 
-Plan: [plan.md](plan.md) · Spec: [SPEC-newtab-extension.md](../SPEC-newtab-extension.md)
+Plan: [plan.md](plan.md) · Spec: [SPEC-obsidian.md](../SPEC-obsidian.md)
 
-Standing verification for every task that changes code: `pnpm lint && pnpm typecheck && pnpm test && pnpm build`. Write
-tests first where logic can run outside a browser.
+Standing verification for every task: `pnpm lint && pnpm typecheck && pnpm test && pnpm build`. Write tests first.
 
 ## Before starting
 
 - [x] Owner approves this plan
-- [x] `feat/reading-list` merged, migration `0006` run on the cloud database, reading list live in production
-- [x] Branch `feat/newtab-extension` from `master`
 
-## Feasibility
+## Foundation
 
-- [x] **Task 1: Extension shell with the app in an iframe**
-  - Description: `manifest.json` with a fixed `key`, `newtab.html` and `newtab.js` showing the deployed app full-viewport,
-    icons from `public/icons`. No app changes.
+- [ ] **Task 1: Availability switch and the page shell**
+  - Description: optional `OBSIDIAN_VAULT_PATH` in `lib/env.ts`; `openVault()` reporting off, missing or ready;
+    `/obsidian` replaced with `obsidian-view.tsx` behind `<Suspense>`, showing the two messages; skeleton.
   - Acceptance:
-    - [x] The extension id is the same after removing and re-adding it; no private key is in the repo.
-    - [x] A new tab shows Home signed in, and signing in from inside the frame survives a browser restart.
-    - [x] A `fetch` to `/api/reading-topics` from the service worker console returns `200`, which shows the cookie is sent.
-  - Verify: owner, in their real Chrome profile; `pnpm test extension` checks the shipped files hold no key material
-  - Dependencies: reading list live in production
-  - Files: `extension/manifest.json`, `newtab.html`, `newtab.js`, `icons/*`
-  - Scope: S
-
-## Checkpoint A: Feasibility gate (owner)
-
-- [x] Cookie reaches the frame and the service worker, or the redirect fallback is applied and the spec updated
-
-## App changes
-
-- [x] **Task 2: Allow only the extension to frame the app**
-  - Description: `EXTENSION_ORIGIN` in `features/auth/request.ts`, and `headers()` in `next.config.ts` sending
-    `frame-ancestors` with that origin on all routes.
-  - Acceptance:
-    - [x] The policy names only the extension origin and applies to every route.
-    - [x] `/` and `/reading-list` stay partially static in `pnpm build`.
-  - Verify: `pnpm test next.config`; HTTP smoke reads the header from a page
-  - Dependencies: Task 1
-  - Files: `next.config.ts`, `next.config.test.ts`, `features/auth/request.ts`
-  - Scope: S
-
-- [x] **Task 3: Shortcut tiles replace the whole tab**
-  - Description: `target="_top"` on the tile link. In a normal tab and the PWA this behaves as today.
-  - Acceptance:
-    - [x] Inside the frame, a tile replaces the whole tab, including for a site that refuses framing.
-    - [x] Ctrl/Cmd+click and middle-click still open a new tab.
-  - Verify: `pnpm test features/shortcuts`; owner check at Checkpoint C
-  - Dependencies: Task 1
-  - Files: `features/shortcuts/components/shortcut-grid.tsx`
-  - Scope: XS
-
-- [x] **Task 4: Accept the extension origin on `POST /api/reading-items`**
-  - Description: `isAllowedMutation(method, pathname, headers, appOrigin)`, used by `proxy.ts`. Auth change, approved in
-    the spec for exactly this route.
-  - Acceptance:
-    - [x] Same origin passes on every route, as today.
-    - [x] The extension origin passes only for `POST /api/reading-items`; `PATCH`, `DELETE` and other paths return `403`.
-    - [x] A foreign or missing origin returns `403`; without a session the allowed route still returns `401`.
-  - Verify: `pnpm test features/auth proxy`; HTTP smoke with the extension origin
-  - Dependencies: Task 2
-  - Files: `features/auth/request.ts`, `request.test.ts`, `proxy.ts`, `proxy.test.ts`
-  - Scope: S
-
-## Checkpoint B: App changes live (human-gated)
-
-- [x] Gates and HTTP smoke pass
-- [x] Owner deploys the app changes
-- [x] The frame still loads with the policy in place, and a cross-site page cannot frame the app
-
-## Finish the extension
-
-- [x] **Task 5: Dark wrapper and unreachable message**
-  - Description: the wrapper page follows `prefers-color-scheme` before the app paints. A `fetch` of `/api/health` beside
-    the iframe swaps in "Can't reach Daily Tab" and Retry on a network failure.
-  - Acceptance:
-    - [x] No white flash in dark mode; the tab title is "New Tab".
-    - [x] Offline shows the message, Retry recovers once back online, and a `503` from the app does not show it.
-  - Verify: owner, using DevTools offline mode
-  - Dependencies: Task 1
-  - Files: `extension/newtab.html`, `newtab.js`
-  - Scope: S
-
-- [x] **Task 6: Request body and badge logic**
-  - Description: `save.js`, pure functions from a tab to a request body and from a status to a badge and tooltip.
-  - Acceptance:
-    - [x] The title is trimmed and cut to 120 characters; an empty title falls back to the hostname.
-    - [x] A page that is not http or https produces no request.
-    - [x] Every row of the spec's badge table is covered.
-  - Verify: `pnpm test extension`
+    - [ ] Unset: "The vault is available when Daily Tab runs on your PC", with no file access.
+    - [ ] A folder that does not exist: "Vault folder not found", without the path.
+    - [ ] Relative paths are rejected by the env schema; other pages are unaffected; `/obsidian` stays partially static.
+  - Verify: `pnpm test lib/env features/obsidian`; `pnpm build` output has no tracing warnings for the vault
   - Dependencies: none
-  - Files: `extension/save.js`, `save.test.ts`
+  - Files: `lib/env.ts`, `features/obsidian/vault.ts`, `components/obsidian-view.tsx`, `obsidian-skeleton.tsx`,
+    `app/(app)/obsidian/page.tsx`
+  - Scope: M
+
+- [ ] **Task 2: Safe paths and folder browsing**
+  - Description: `resolveInVault` and `listFolder` in `vault.ts`, the fixture vault, `folder-list.tsx` with a
+    breadcrumb, and `?folder=` handling.
+  - Acceptance:
+    - [ ] Folders first, then notes, sorted by name ignoring case; only folders and `.md`; hidden names left out.
+    - [ ] `..`, absolute paths, encoded forms, hidden names, non-`.md` files and a symlink out all resolve to `null`.
+    - [ ] Notes show without `.md`; an unknown folder shows "Note not found".
+  - Verify: `pnpm test features/obsidian`; HTTP smoke on the fixture vault
+  - Dependencies: Task 1
+  - Files: `vault.ts`, `vault.test.ts`, `fixtures/vault/*`, `components/folder-list.tsx`, `obsidian-view.tsx`
+  - Scope: M
+
+## Checkpoint A: Browse locally
+
+- [ ] Gates and HTTP smoke on the fixture vault pass
+- [ ] Owner sets `OBSIDIAN_VAULT_PATH` and browses the real vault
+
+## Reading and search
+
+- [ ] **Task 3: Read a note**
+  - Description: add `react-markdown` and `remark-gfm`; `markdown.ts` strips frontmatter and filters links; `readNote`
+    with the 1 MB limit; `note-view.tsx` for `?note=`.
+  - Acceptance:
+    - [ ] Headings, lists, read-only task lists, tables, code and quotes render; frontmatter is hidden.
+    - [ ] Raw HTML shows as text; only `http`/`https` links are links and open in a new tab.
+    - [ ] Over 1 MB shows "This note is too large to show".
+  - Verify: `pnpm test features/obsidian`; HTTP smoke reads a fixture note
+  - Dependencies: Task 2
+  - Files: `package.json`, `markdown.ts`, `markdown.test.ts`, `vault.ts`, `components/note-view.tsx`
+  - Scope: M
+
+- [ ] **Task 4: Search by note name**
+  - Description: `vault-search.tsx` above the list, replacing `?q=` after a pause; `searchNames` in `search.ts`.
+  - Acceptance:
+    - [ ] Matches ignore case and show each note's folder.
+    - [ ] Fewer than 2 characters shows nothing; no match shows "No notes match".
+  - Verify: `pnpm test features/obsidian`
+  - Dependencies: Task 2
+  - Files: `search.ts`, `search.test.ts`, `components/vault-search.tsx`, `obsidian-view.tsx`
   - Scope: S
 
-- [x] **Task 7: Toolbar button saves the current page**
-  - Description: `background.js` on `chrome.action.onClicked`: builds the body, calls the API with credentials, sets the
-    badge and tooltip for that tab.
+- [ ] **Task 5: Search note contents**
+  - Description: content matches after name matches, each with a one-line snippet; the in-memory text cache.
   - Acceptance:
-    - [x] A saved page appears on `/reading-list` under No topic.
-    - [x] Each badge result appears on the right tab and clears on navigation.
-    - [x] Permissions are exactly `activeTab` and the one host.
-  - Verify: owner, at Checkpoint C
-  - Dependencies: Tasks 4, 6, Checkpoint B
-  - Files: `extension/background.js`, `manifest.json`
-  - Scope: S
+    - [ ] Name matches come first; content matches carry a snippet around the first hit; at most 50 results.
+    - [ ] A changed note is re-read on the next search; unchanged notes are not.
+    - [ ] Hidden folders and files over 1 MB are not searched.
+  - Verify: `pnpm test features/obsidian`; owner times a search on the real vault
+  - Dependencies: Task 4
+  - Files: `search.ts`, `search.test.ts`, `components/folder-list.tsx`
+  - Scope: M
 
-## Checkpoint C: Works end to end (owner)
+## Checkpoint B: Works on the real vault (owner)
 
-- [x] Gates pass
-- [x] Owner runs every owner item in the spec's Success Criteria
+- [ ] Gates pass
+- [ ] Owner browses, reads and searches the real vault at desktop and phone width
 
-- [x] **Task 8: Install notes in the README**
+- [ ] **Task 6: README section**
   - Acceptance:
-    - [x] Load unpacked, reload after changes, and what breaks if the manifest key changes are documented.
-  - Dependencies: Checkpoint C
+    - [ ] How to set `OBSIDIAN_VAULT_PATH` from WSL, that it only works locally, and what is not rendered.
+  - Dependencies: Checkpoint B
   - Files: `README.md`
   - Scope: XS
 
-- [ ] **Task 9: Release (human-gated)**
+- [ ] **Task 7: Release (human-gated)**
   - Acceptance:
-    - [ ] Branch merged and deployed; the extension is loaded from the merged code.
-    - [ ] A new tab and a save both work against production.
-  - Dependencies: Task 8
+    - [ ] Merged and deployed with `OBSIDIAN_VAULT_PATH` unset in Vercel.
+    - [ ] Production `/obsidian` shows the unavailable message; every other page is unchanged.
+  - Dependencies: Task 6
   - Scope: XS
