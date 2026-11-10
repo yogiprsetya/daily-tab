@@ -31,7 +31,7 @@ locally. No database, migration or API routes; two new dependencies for Markdown
 ### Foundation
 
 - [x] Task 1: Availability switch and the page shell
-- [ ] Task 2: Safe paths and folder browsing
+- [x] Task 2: Safe paths and folder browsing
 
 ### Checkpoint A: Browse locally
 

@@ -1,10 +1,25 @@
 import { requirePageSession } from '@/features/auth/require-session';
 import { getEnv } from '@/lib/env';
-import { openVault } from '../vault';
+import { listFolder, openVault, resolveInVault } from '../vault';
+import { FolderList } from './folder-list';
+import { VaultBreadcrumb } from './vault-breadcrumb';
 import { VaultNotice } from './vault-notice';
 
-/** Reads the session and the vault folder: render inside <Suspense>. */
-export async function ObsidianView() {
+type Params = { folder?: string | string[] };
+
+const NOT_FOUND = (
+  <VaultNotice
+    title="Note not found"
+    description="It may have been moved, renamed or deleted in Obsidian."
+  />
+);
+
+/** Reads the session, URL and vault folder: render inside <Suspense>. */
+export async function ObsidianView({
+  searchParams,
+}: {
+  searchParams: Promise<Params>;
+}) {
   await requirePageSession();
   const vault = await openVault(getEnv().OBSIDIAN_VAULT_PATH);
 
@@ -24,5 +39,19 @@ export async function ObsidianView() {
       />
     );
   }
-  return null;
+
+  const { folder } = await searchParams;
+  const relative = (typeof folder === 'string' ? folder : '').replace(
+    /\/$/,
+    ''
+  );
+  const dir = await resolveInVault(vault.root, relative, 'folder');
+  if (!dir) return NOT_FOUND;
+
+  return (
+    <div className="flex flex-col gap-2">
+      <VaultBreadcrumb folder={relative} />
+      <FolderList entries={await listFolder(vault.root, dir)} />
+    </div>
+  );
 }

@@ -23,13 +23,13 @@ Standing verification for every task: `pnpm lint && pnpm typecheck && pnpm test 
     `app/(app)/obsidian/page.tsx`
   - Scope: M
 
-- [ ] **Task 2: Safe paths and folder browsing**
+- [x] **Task 2: Safe paths and folder browsing**
   - Description: `resolveInVault` and `listFolder` in `vault.ts`, the fixture vault, `folder-list.tsx` with a
     breadcrumb, and `?folder=` handling.
   - Acceptance:
-    - [ ] Folders first, then notes, sorted by name ignoring case; only folders and `.md`; hidden names left out.
-    - [ ] `..`, absolute paths, encoded forms, hidden names, non-`.md` files and a symlink out all resolve to `null`.
-    - [ ] Notes show without `.md`; an unknown folder shows "Note not found".
+    - [x] Folders first, then notes, sorted by name ignoring case; only folders and `.md`; hidden names left out.
+    - [x] `..`, absolute paths, encoded forms, hidden names, non-`.md` files and a symlink out all resolve to `null`.
+    - [x] Notes show without `.md`; an unknown folder shows "Note not found".
   - Verify: `pnpm test features/obsidian`; HTTP smoke on the fixture vault
   - Dependencies: Task 1
   - Files: `vault.ts`, `vault.test.ts`, `fixtures/vault/*`, `components/folder-list.tsx`, `obsidian-view.tsx`
@@ -37,7 +37,7 @@ Standing verification for every task: `pnpm lint && pnpm typecheck && pnpm test 
 
 ## Checkpoint A: Browse locally
 
-- [ ] Gates and HTTP smoke on the fixture vault pass
+- [x] Gates and HTTP smoke on the fixture vault pass
 - [ ] Owner sets `OBSIDIAN_VAULT_PATH` and browses the real vault
 
 ## Reading and search
