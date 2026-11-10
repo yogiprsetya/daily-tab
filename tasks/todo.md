@@ -67,7 +67,7 @@ tests first where logic can run outside a browser.
 ## Checkpoint B: App changes live (human-gated)
 
 - [x] Gates and HTTP smoke pass
-- [ ] Owner deploys the app changes
+- [x] Owner deploys the app changes
 - [ ] The frame still loads with the policy in place, and a cross-site page cannot frame the app
 
 ## Finish the extension
@@ -94,13 +94,13 @@ tests first where logic can run outside a browser.
   - Files: `extension/save.js`, `save.test.ts`
   - Scope: S
 
-- [ ] **Task 7: Toolbar button saves the current page**
+- [x] **Task 7: Toolbar button saves the current page**
   - Description: `background.js` on `chrome.action.onClicked`: builds the body, calls the API with credentials, sets the
     badge and tooltip for that tab.
   - Acceptance:
     - [ ] A saved page appears on `/reading-list` under No topic.
     - [ ] Each badge result appears on the right tab and clears on navigation.
-    - [ ] Permissions are exactly `activeTab` and the one host.
+    - [x] Permissions are exactly `activeTab` and the one host.
   - Verify: owner, at Checkpoint C
   - Dependencies: Tasks 4, 6, Checkpoint B
   - Files: `extension/background.js`, `manifest.json`

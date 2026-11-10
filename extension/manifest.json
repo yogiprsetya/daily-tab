@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Daily Tab",
   "version": "0.1.0",
-  "description": "Opens Daily Tab on every new tab.",
+  "description": "Opens Daily Tab on every new tab and saves pages to its reading list.",
   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzgvvCoCk9wN6i2W/D9gwYreA8to0Z8UmN6d8kUIs8FzheJS9iBLOSGnZ8d9+tUZJtt8UUNtxB9bXnT0jns5e1k5ku5Z1AewkeX+riOdVUSvxdb9b8Vk+H/QQVJaxfaaGqAwHcDOWnEK/yJfBPdLzI4R152M/YFdVjoayh6dwJhGU5/NyLuO+4xmFwKxJHzuRVbCq5wDh8WfLYrPoC9OACMdU9MXaz1B/3wIMaPW0N+/oo3ZTfNOxSQGWD+IyJZj+YtTrDjvyVI6X1gBSOZxxJJMOiPMuAAMVVCUU0hyMISAyEnis/y/junGlT0M+nLVfVUldTQm3g0t9LNLNigVidwIDAQAB",
   "chrome_url_overrides": {
     "newtab": "newtab.html"
@@ -11,6 +11,14 @@
     "service_worker": "background.js",
     "type": "module"
   },
+  "action": {
+    "default_title": "Save to reading list",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "48": "icons/icon-48.png"
+    }
+  },
+  "permissions": ["activeTab"],
   "host_permissions": ["https://daily-tab.vercel.app/*"],
   "icons": {
     "16": "icons/icon-16.png",
