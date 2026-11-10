@@ -27,8 +27,8 @@ whole tab, and one route opened to the extension's origin. There is no migration
 ### Before starting
 
 - [x] Owner approves this plan
-- [ ] `feat/reading-list` merged, migration `0006` run on the cloud database, reading list live in production
-- [ ] Branch `feat/newtab-extension` from `master`
+- [x] `feat/reading-list` merged, migration `0006` run on the cloud database, reading list live in production
+- [x] Branch `feat/newtab-extension` from `master`
 
 ### Feasibility
 

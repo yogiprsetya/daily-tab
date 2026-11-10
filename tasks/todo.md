@@ -8,8 +8,8 @@ tests first where logic can run outside a browser.
 ## Before starting
 
 - [x] Owner approves this plan
-- [ ] `feat/reading-list` merged, migration `0006` run on the cloud database, reading list live in production
-- [ ] Branch `feat/newtab-extension` from `master`
+- [x] `feat/reading-list` merged, migration `0006` run on the cloud database, reading list live in production
+- [x] Branch `feat/newtab-extension` from `master`
 
 ## Feasibility
 
@@ -20,7 +20,7 @@ tests first where logic can run outside a browser.
     - [ ] The extension id is the same after removing and re-adding it; no private key is in the repo.
     - [ ] A new tab shows Home signed in, and signing in from inside the frame survives a browser restart.
     - [ ] A `fetch` to `/api/reading-topics` from the service worker console returns `200`, which shows the cookie is sent.
-  - Verify: owner, in their real Chrome profile; `git grep -l 'PRIVATE KEY'` finds nothing
+  - Verify: owner, in their real Chrome profile; `pnpm test extension` checks the shipped files hold no key material
   - Dependencies: reading list live in production
   - Files: `extension/manifest.json`, `newtab.html`, `newtab.js`, `icons/*`
   - Scope: S
