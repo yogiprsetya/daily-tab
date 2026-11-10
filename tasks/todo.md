@@ -42,7 +42,7 @@ tests first where logic can run outside a browser.
   - Files: `next.config.ts`, `next.config.test.ts`, `features/auth/request.ts`
   - Scope: S
 
-- [ ] **Task 3: Shortcut tiles replace the whole tab**
+- [x] **Task 3: Shortcut tiles replace the whole tab**
   - Description: `target="_top"` on the tile link. In a normal tab and the PWA this behaves as today.
   - Acceptance:
     - [ ] Inside the frame, a tile replaces the whole tab, including for a site that refuses framing.

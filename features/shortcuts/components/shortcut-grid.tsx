@@ -24,7 +24,8 @@ function ShortcutTiles({ items }: { items: ShortcutItem[] }) {
     <ul className={GRID}>
       {items.map((item) => (
         <li key={item.id} className="min-w-0">
-          <a href={item.url} className={TILE}>
+          {/* _top: inside the extension's New Tab frame, open the site in the whole tab. */}
+          <a href={item.url} target="_top" className={TILE}>
             <SiteIcon title={item.title} url={item.url} />
             <span className="w-full truncate text-center">{item.title}</span>
           </a>
