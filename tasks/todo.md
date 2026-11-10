@@ -52,13 +52,13 @@ tests first where logic can run outside a browser.
   - Files: `features/shortcuts/components/shortcut-grid.tsx`
   - Scope: XS
 
-- [ ] **Task 4: Accept the extension origin on `POST /api/reading-items`**
+- [x] **Task 4: Accept the extension origin on `POST /api/reading-items`**
   - Description: `isAllowedMutation(method, pathname, headers, appOrigin)`, used by `proxy.ts`. Auth change, approved in
     the spec for exactly this route.
   - Acceptance:
-    - [ ] Same origin passes on every route, as today.
-    - [ ] The extension origin passes only for `POST /api/reading-items`; `PATCH`, `DELETE` and other paths return `403`.
-    - [ ] A foreign or missing origin returns `403`; without a session the allowed route still returns `401`.
+    - [x] Same origin passes on every route, as today.
+    - [x] The extension origin passes only for `POST /api/reading-items`; `PATCH`, `DELETE` and other paths return `403`.
+    - [x] A foreign or missing origin returns `403`; without a session the allowed route still returns `401`.
   - Verify: `pnpm test features/auth proxy`; HTTP smoke with the extension origin
   - Dependencies: Task 2
   - Files: `features/auth/request.ts`, `request.test.ts`, `proxy.ts`, `proxy.test.ts`
@@ -66,7 +66,7 @@ tests first where logic can run outside a browser.
 
 ## Checkpoint B: App changes live (human-gated)
 
-- [ ] Gates and HTTP smoke pass
+- [x] Gates and HTTP smoke pass
 - [ ] Owner deploys the app changes
 - [ ] The frame still loads with the policy in place, and a cross-site page cannot frame the app
 

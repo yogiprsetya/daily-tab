@@ -5,6 +5,7 @@ import {
 import { NextRequest, type NextResponse } from 'next/server';
 import { describe, expect, it } from 'vitest';
 import { getAuthConfig } from '@/features/auth/config';
+import { EXTENSION_ORIGIN } from '@/features/auth/request';
 import {
   SESSION_COOKIE,
   signSession,
@@ -121,6 +122,46 @@ describe('Origin check on mutations', () => {
       request('/api/auth/login', {
         method: 'POST',
         origin: 'https://evil.example',
+      })
+    );
+
+    expect(res.status).toBe(403);
+  });
+
+  it('lets the extension save to the reading list when logged in', async () => {
+    const res = await run(
+      request('/api/reading-items', {
+        method: 'POST',
+        origin: EXTENSION_ORIGIN,
+        session: await token(),
+      })
+    );
+
+    expect(passesThrough(res)).toBe(true);
+  });
+
+  it('still requires a session for the extension', async () => {
+    const res = await run(
+      request('/api/reading-items', {
+        method: 'POST',
+        origin: EXTENSION_ORIGIN,
+      })
+    );
+
+    expect(res.status).toBe(401);
+  });
+
+  it.each([
+    ['PATCH', '/api/reading-items/6f1d2c3a-9b4e-4f7a-8c21-0d5e6f7a8b9c'],
+    ['DELETE', '/api/reading-items/6f1d2c3a-9b4e-4f7a-8c21-0d5e6f7a8b9c'],
+    ['POST', '/api/reading-topics'],
+    ['POST', '/api/auth/logout'],
+  ])('rejects the extension on %s %s', async (method, path) => {
+    const res = await run(
+      request(path, {
+        method,
+        origin: EXTENSION_ORIGIN,
+        session: await token(),
       })
     );
 

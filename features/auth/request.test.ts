@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 import {
   EXTENSION_ORIGIN,
   clientIp,
+  isAllowedMutation,
   isSameOrigin,
   safeNextPath,
 } from './request';
@@ -65,6 +66,58 @@ describe('EXTENSION_ORIGIN', () => {
       .replace(/[0-9a-f]/g, (digit) => 'abcdefghijklmnop'[parseInt(digit, 16)]);
 
     expect(EXTENSION_ORIGIN).toBe(`chrome-extension://${id}`);
+  });
+});
+
+describe('isAllowedMutation', () => {
+  const app = 'https://daily-tab.vercel.app';
+  const from = (origin?: string) =>
+    new Headers(origin ? { origin } : undefined);
+
+  it.each([
+    ['POST', '/api/reading-items'],
+    ['PATCH', '/api/todos/1'],
+    ['DELETE', '/api/auth/logout'],
+  ])('allows the app itself on %s %s', (method, path) => {
+    expect(isAllowedMutation(method, path, from(app), app)).toBe(true);
+  });
+
+  it('allows the extension to save to the reading list', () => {
+    expect(
+      isAllowedMutation(
+        'POST',
+        '/api/reading-items',
+        from(EXTENSION_ORIGIN),
+        app
+      )
+    ).toBe(true);
+  });
+
+  it.each([
+    ['PATCH', '/api/reading-items/1'],
+    ['DELETE', '/api/reading-items/1'],
+    ['POST', '/api/reading-items/1'],
+    ['POST', '/api/reading-items/'],
+    ['POST', '/api/reading-topics'],
+    ['POST', '/api/auth/logout'],
+    ['PUT', '/api/reading-items'],
+  ])('rejects the extension on %s %s', (method, path) => {
+    expect(isAllowedMutation(method, path, from(EXTENSION_ORIGIN), app)).toBe(
+      false
+    );
+  });
+
+  it.each([
+    ['another site', 'https://evil.example'],
+    [
+      'another extension',
+      'chrome-extension://abcdefghijklmnopabcdefghijklmnop',
+    ],
+    ['no Origin', undefined],
+  ])('rejects %s on the reading list', (_, origin) => {
+    expect(
+      isAllowedMutation('POST', '/api/reading-items', from(origin), app)
+    ).toBe(false);
   });
 });
 

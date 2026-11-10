@@ -42,7 +42,7 @@ whole tab, and one route opened to the extension's origin. There is no migration
 
 - [x] Task 2: Allow only the extension to frame the app
 - [x] Task 3: Shortcut tiles replace the whole tab
-- [ ] Task 4: Accept the extension origin on `POST /api/reading-items`
+- [x] Task 4: Accept the extension origin on `POST /api/reading-items`
 
 ### Checkpoint B: App changes live (human-gated)
 

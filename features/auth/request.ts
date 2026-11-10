@@ -33,3 +33,21 @@ export const EXTENSION_ORIGIN =
 export function isSameOrigin(headers: Headers, appOrigin: string): boolean {
   return headers.get('origin') === appOrigin;
 }
+
+/**
+ * The CSRF rule for writes: the app itself may write anywhere; the extension
+ * may only save to the reading list (SPEC-newtab-extension.md, acceptance 5).
+ */
+export function isAllowedMutation(
+  method: string,
+  pathname: string,
+  headers: Headers,
+  appOrigin: string
+): boolean {
+  if (isSameOrigin(headers, appOrigin)) return true;
+  return (
+    method === 'POST' &&
+    pathname === '/api/reading-items' &&
+    headers.get('origin') === EXTENSION_ORIGIN
+  );
+}
