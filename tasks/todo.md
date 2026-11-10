@@ -83,12 +83,12 @@ tests first where logic can run outside a browser.
   - Files: `extension/newtab.html`, `newtab.js`
   - Scope: S
 
-- [ ] **Task 6: Request body and badge logic**
+- [x] **Task 6: Request body and badge logic**
   - Description: `save.js`, pure functions from a tab to a request body and from a status to a badge and tooltip.
   - Acceptance:
-    - [ ] The title is trimmed and cut to 120 characters; an empty title falls back to the hostname.
-    - [ ] A page that is not http or https produces no request.
-    - [ ] Every row of the spec's badge table is covered.
+    - [x] The title is trimmed and cut to 120 characters; an empty title falls back to the hostname.
+    - [x] A page that is not http or https produces no request.
+    - [x] Every row of the spec's badge table is covered.
   - Verify: `pnpm test extension`
   - Dependencies: none
   - Files: `extension/save.js`, `save.test.ts`
