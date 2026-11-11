@@ -26,24 +26,32 @@ export function parsePath(relative: string): string[] | null {
   return segments;
 }
 
+/**
+ * Walks already-validated segments from the root. Null when one is missing or is
+ * a file: `getDirectoryHandle` throws for both, and neither is an error here.
+ */
+export async function walkFolders(
+  root: FileSystemDirectoryHandle,
+  segments: string[]
+): Promise<FileSystemDirectoryHandle | null> {
+  let dir = root;
+  for (const segment of segments) {
+    try {
+      dir = await dir.getDirectoryHandle(segment);
+    } catch {
+      return null;
+    }
+  }
+  return dir;
+}
+
 /** Walks `relative` from the vault root, or null when it is not a folder there. */
 export async function resolveFolder(
   root: FileSystemDirectoryHandle,
   relative: string
 ): Promise<FileSystemDirectoryHandle | null> {
   const segments = parsePath(relative);
-  if (!segments) return null;
-
-  let dir = root;
-  for (const segment of segments) {
-    try {
-      dir = await dir.getDirectoryHandle(segment);
-    } catch {
-      // NotFoundError or TypeMismatchError: no such folder, or it is a file.
-      return null;
-    }
-  }
-  return dir;
+  return segments ? walkFolders(root, segments) : null;
 }
 
 /**
@@ -57,7 +65,7 @@ export async function listFolder(
   const segments = parsePath(relative);
   if (!segments) return null;
 
-  const dir = await resolveFolder(root, relative);
+  const dir = await walkFolders(root, segments);
   if (!dir) return null;
 
   const entries: Entry[] = [];

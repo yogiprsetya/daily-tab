@@ -1,4 +1,4 @@
-import { parsePath } from './entries';
+import { parsePath, walkFolders } from './entries';
 
 /** A note over this size is not read: one huge file should not freeze the tab. */
 export const MAX_NOTE_BYTES = 1024 * 1024;
@@ -26,18 +26,11 @@ export async function resolveNote(
   const segments = parseNotePath(relative);
   if (!segments) return null;
 
-  let dir = root;
-  for (const segment of segments.slice(0, -1)) {
-    try {
-      dir = await dir.getDirectoryHandle(segment);
-    } catch {
-      return null;
-    }
-  }
+  const dir = await walkFolders(root, segments.slice(0, -1));
+  if (!dir) return null;
 
-  const name = segments[segments.length - 1];
   try {
-    return await dir.getFileHandle(name);
+    return await dir.getFileHandle(segments[segments.length - 1]);
   } catch {
     // NotFoundError, or TypeMismatchError when a folder has that name.
     return null;

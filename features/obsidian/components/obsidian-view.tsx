@@ -48,6 +48,7 @@ export function ObsidianView() {
   const folder = params.get('folder') ?? '';
   const notePath = params.get('note');
   const query = params.get('q') ?? '';
+  const noteAt = noteLocation(notePath);
 
   const [state, setState] = useState<VaultState | null>(null);
   const [listing, setListing] = useState<{
@@ -175,8 +176,8 @@ export function ObsidianView() {
 
       <div className="flex items-center justify-between gap-2">
         <VaultBreadcrumb
-          folder={noteParent(notePath)}
-          note={notePath ? noteName(notePath) : undefined}
+          folder={noteAt.folder}
+          note={notePath ? noteAt.name : undefined}
         />
         <Button
           type="button"
@@ -192,7 +193,7 @@ export function ObsidianView() {
 
       {notePath ? (
         note?.path === notePath ? (
-          <NoteView note={note.note} name={noteName(notePath)} />
+          <NoteView note={note.note} name={noteAt.name} />
         ) : (
           LOADING('Reading the note…')
         )
@@ -213,15 +214,12 @@ export function ObsidianView() {
   );
 }
 
-/** The folder a note sits in, so the breadcrumb can show the way back. */
-function noteParent(notePath: string | null): string {
-  if (!notePath) return '';
-  const index = notePath.lastIndexOf('/');
-  return index === -1 ? '' : notePath.slice(0, index);
-}
-
-/** The note's name without its `.md`, as the list shows it. */
-function noteName(notePath: string): string {
-  const last = notePath.slice(notePath.lastIndexOf('/') + 1);
-  return last.replace(/\.md$/i, '');
+/**
+ * Where a note sits, for the breadcrumb: the folder above it and its name
+ * without `.md`. Splitting once keeps the two answers consistent.
+ */
+function noteLocation(notePath: string | null) {
+  const segments = notePath ? notePath.split('/') : [];
+  const name = segments.pop() ?? '';
+  return { folder: segments.join('/'), name: name.replace(/\.md$/i, '') };
 }

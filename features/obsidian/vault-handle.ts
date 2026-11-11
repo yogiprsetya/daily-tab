@@ -147,6 +147,7 @@ export async function loadVault(): Promise<VaultState> {
     query: (handle) => handle.queryPermission({ mode: 'read' }),
   });
 
+  // Deleting a key that was never stored is a no-op, so one call covers both cases.
   if (state.status === 'empty') await forgetVault();
   return state;
 }

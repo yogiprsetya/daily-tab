@@ -149,6 +149,9 @@ export function snippetOf(text: string, needle: string): string {
 
 export type ContentHit = SearchHit & { snippet: string };
 
+/** The remaining budget after the name matches, so both kinds share `MAX_RESULTS`. */
+type ContentBudget = { cache: TextCache; limit: number; skip: Set<string> };
+
 /**
  * Notes whose contents contain the query, appended after the name matches.
  * `limit` is what is left of `MAX_RESULTS`, so the combined list stays bounded.
@@ -157,30 +160,25 @@ export type ContentHit = SearchHit & { snippet: string };
 export async function searchContents(
   notes: NoteRef[],
   query: string,
-  options: { cache: TextCache; limit: number; skip: Set<string> }
+  { cache, limit, skip }: ContentBudget
 ): Promise<ContentHit[]> {
   const needle = normalize(query.trim());
-  if (needle.length < MIN_QUERY || options.limit <= 0) return [];
+  if (needle.length < MIN_QUERY || limit <= 0) return [];
 
   const hits: ContentHit[] = [];
   for (const note of notes) {
-    if (hits.length >= options.limit) break;
-    if (options.skip.has(note.path)) continue;
+    if (hits.length >= limit) break;
+    if (skip.has(note.path)) continue;
 
     let text: string;
     try {
-      text = await noteText(note, options.cache);
+      text = await noteText(note, cache);
     } catch {
       continue;
     }
-    if (!normalize(text).includes(needle)) continue;
-
-    hits.push({
-      path: note.path,
-      name: note.name,
-      folder: note.folder,
-      snippet: snippetOf(text, needle),
-    });
+    if (normalize(text).includes(needle)) {
+      hits.push({ ...note, snippet: snippetOf(text, needle) });
+    }
   }
   return hits;
 }
