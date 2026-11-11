@@ -8,20 +8,10 @@ const optionalPostgresUrl = z.preprocess(
   postgresUrl.optional()
 );
 
-// Only meaningful when the app runs on the owner's PC; never set in Vercel.
-const optionalAbsolutePath = z.preprocess(
-  (value) => (value === '' ? undefined : value),
-  z
-    .string()
-    .refine((value) => value.startsWith('/'), 'must be an absolute path')
-    .optional()
-);
-
 const envSchema = z.object({
   DATABASE_URL: postgresUrl,
   DATABASE_URL_MIGRATE: optionalPostgresUrl,
   TEST_DATABASE_URL: optionalPostgresUrl,
-  OBSIDIAN_VAULT_PATH: optionalAbsolutePath,
 });
 
 export type Env = z.infer<typeof envSchema>;

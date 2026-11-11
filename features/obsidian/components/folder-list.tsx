@@ -1,7 +1,7 @@
 import { FileText, Folder } from 'lucide-react';
 import Link from 'next/link';
+import type { Entry } from '../entries';
 import { obsidianHref } from '../href';
-import type { Entry } from '../vault';
 
 const ROW =
   'flex min-h-11 min-w-0 items-center gap-3 rounded-lg px-2 text-sm outline-none hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring';

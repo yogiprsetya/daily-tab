@@ -5,20 +5,29 @@ Previous modules: [archive/](archive/)
 
 ## Overview
 
-A read-only view of the Obsidian vault folder on the owner's PC: browse folders, read a note, and search by name and
-content. `OBSIDIAN_VAULT_PATH` turns it on; without it, as on Vercel, the page explains that the vault is only available
-locally. No database, migration or API routes; two new dependencies for Markdown.
+A read-only view of the Obsidian vault: browse folders, read a note, and search by name and content. The **browser**
+opens the vault folder through the File System Access API and remembers the handle in IndexedDB, so no server ever sees
+a file and no environment variable is involved. No database, migration, API route or server code; two new dependencies
+for Markdown, both in the client bundle.
+
+This replaces a server-side design that could not work: the app runs in WSL while the vault is at
+`D:\Documents\obs-vault`, and the server's `realpath` guard needs a POSIX path inside the app's own filesystem, so the
+page answered "Vault folder not found" for every configuration.
 
 ## Architecture Decisions
 
-- **One guard for every path.** `resolveInVault` in `vault.ts` turns a URL value into a real path inside the vault or
-  `null`, using `realpath` so a symlink cannot lead out. It is built and tested first, before anything reads a file.
-- **URL as state, as in bookmarks.** `?folder=`, `?note=` and `?q=` drive a server-rendered view; the search box only
-  replaces the URL after a pause.
-- **Real files in tests.** A fixture vault under `features/obsidian/fixtures/` (nested folders, hidden folder,
-  frontmatter, raw HTML, a symlink out, a large note) instead of mocking `fs`.
-- **Search keeps text in memory.** A module-level map of path → modified time and text. Each search lists the vault and
-  re-reads only changed notes, which keeps repeat searches fast on a slow `/mnt/c` mount.
+- **The picker is the trust boundary.** A `FileSystemDirectoryHandle` cannot leave the chosen folder — the browser
+  enforces that, so the escape tests in the old design are handled for free. What is left to validate is the shape of
+  `?folder=` and `?note=` (no `..`, no hidden names, folders and `.md` only), which `entries.ts` and `note.ts` do.
+- **One seam, fake handles in tests.** Every reader takes a `FileSystemDirectoryHandle` as its first argument and never
+  touches `window`. Tests pass a fake handle backed by the fixture tree read through `node:fs`, so the suite stays in
+  Vitest on Node with no browser and no Playwright. Only `vault-handle.ts` needs a browser, and it is about twenty lines.
+- **URL as state, as in bookmarks.** `?folder=`, `?note=` and `?q=` stay in the URL, but the view is a Client Component
+  reading `useSearchParams()`, so the page itself stays static and no note content is ever a server concern.
+- **Expect the folder to be forgotten.** Permission can lapse, and Obsidian's folder can move. `queryPermission` decides
+  between listing, "Allow access" and starting over, rather than failing with an error the owner cannot act on.
+- **Search keeps text in memory.** A module-level map of path → `lastModified` and text, inside the worker. Each search
+  re-reads only changed notes, which keeps repeat searches fast on a vault of several hundred notes.
 - **Markdown stays safe by construction.** `react-markdown` without `rehype-raw`, so raw HTML is text, and a
   `urlTransform` that keeps only `http`/`https` links.
 
@@ -26,41 +35,43 @@ locally. No database, migration or API routes; two new dependencies for Markdown
 
 ### Before starting
 
-- [x] Owner approves this plan
+- [ ] Owner approves the revised plan
 
 ### Foundation
 
-- [x] Task 1: Availability switch and the page shell
-- [x] Task 2: Safe paths and folder browsing
+- [ ] Task 1: Remove the server-side design
+- [ ] Task 2: Pick, remember and restore the vault folder
+- [ ] Task 3: Browse folders
 
-### Checkpoint A: Browse locally
+### Checkpoint A: The real vault lists
 
-- [ ] Gates and HTTP smoke on the fixture vault pass; owner browses the real vault
+- [ ] Gates pass; owner picks `obs-vault` once and sees the real folders after a reload
 
 ### Reading and search
 
-- [ ] Task 3: Read a note
-- [ ] Task 4: Search by note name
-- [ ] Task 5: Search note contents
+- [ ] Task 4: Read a note
+- [ ] Task 5: Search by note name
+- [ ] Task 6: Search note contents
 
 ### Checkpoint B: Works on the real vault (owner)
 
-- [ ] Gates pass; owner reads and searches the real vault at desktop and phone width
+- [ ] Gates pass; owner browses, reads and searches the real vault at desktop width
 
-- [ ] Task 6: README section
-- [ ] Task 7: Release (human-gated)
+- [ ] Task 7: README section
+- [ ] Task 8: Release (human-gated)
 
 ## Risks and Mitigations
 
-| Risk                                                    | Impact | Mitigation                                                                   |
-| ------------------------------------------------------- | ------ | ---------------------------------------------------------------------------- |
-| A crafted `?note=` reads a file outside the vault       | High   | One guard with `realpath`; every traversal form tested in Task 2             |
-| A note's HTML or `javascript:` link runs in the app     | High   | No `rehype-raw`; `urlTransform` allows `http`/`https` only; tested in Task 3 |
-| The build traces or bundles files from a runtime path   | Med    | Path read from env at request time; check build output in Task 1             |
-| Full-text search is slow on a large vault over `/mnt/c` | Med    | Text cache by modified time; 50-result cap; measured on the real vault       |
-| `OBSIDIAN_VAULT_PATH` is set in Vercel by mistake       | Low    | Missing folder shows "Vault folder not found" without the path               |
-| The vault path leaks in an error page or log            | Med    | Errors carry fixed messages; tested                                          |
+| Risk                                                           | Impact | Mitigation                                                                 |
+| -------------------------------------------------------------- | ------ | -------------------------------------------------------------------------- |
+| A note's HTML or `javascript:` link runs in the app            | High   | No `rehype-raw`; `urlTransform` allows `http`/`https` only; tested         |
+| Chrome drops the stored handle, or Obsidian's folder moves     | Med    | Three explicit states; `queryPermission` decides, never a dead end         |
+| The owner opens the app on Android and finds no vault          | Med    | Capability check before rendering, with an explanation instead of a button |
+| `FileSystemDirectoryHandle` types are missing from the DOM lib | Low    | One local type augmentation for `queryPermission`/`requestPermission`      |
+| Content search freezes the page on a large vault               | Med    | The scan runs in a worker; text cached by `lastModified`; 50-result cap    |
+| `react-markdown` in the client bundle grows the page           | Low    | Two routes share it via the module only; measured in Task 8                |
+| A stale `OBSIDIAN_VAULT_PATH` confuses the next reader         | Low    | Removed from `lib/env.ts` and from `.env.local` in Task 1                  |
 
 ## Parallelization
 
-Sequential: Tasks 3–5 all build on the guard and the view from Tasks 1–2.
+Sequential: Tasks 4–6 all build on the handle, the seam and the view from Tasks 2–3.

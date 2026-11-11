@@ -11,7 +11,7 @@ Single-user personal dashboard: Chrome New Tab on desktop, installed PWA on Andr
 | `shortcuts`        | Quick-access links (CRUD, ordering)                                                                                                                 | auth               |
 | `bookmarks`        | Bookmark manager inside the app (CRUD, grouping). No browser bookmark integration                                                                   | auth               |
 | `reading-list`     | Things to read (add, mark as read, group by topic)                                                                                                  | auth               |
-| `obsidian`         | Read-only view of the Obsidian vault folder on disk: browse, read, search; only when the app runs on the owner's PC                                 | auth               |
+| `obsidian`         | Read-only view of the Obsidian vault: the browser reads the folder the owner picks, then browse, read, search                                       | auth               |
 
 Build order: `platform` → `auth` → (`newtab-extension`, `shortcuts`, `todos`, `reading-list`, `bookmarks`, `obsidian`)
 
@@ -27,5 +27,6 @@ Each module has its own spec at the project root: `SPEC-<module-id>.md`.
 - Hosting: Vercel Hobby (cron jobs at most once per day).
 - Mobile: Android.
 - UI language: English.
-- Obsidian vault: read from its folder on the owner's PC (`OBSIDIAN_VAULT_PATH`), never from Google Drive. The
-  vault itself is still synced between devices by Remotely Save, outside this app.
+- Obsidian vault: the browser reads the folder the owner picks with the File System Access API, never a server and
+  never Google Drive. The vault itself is still synced between devices by Remotely Save, outside this app. Desktop
+  Chrome or Edge only; the API does not exist on Android or iOS.
