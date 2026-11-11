@@ -1,10 +1,10 @@
 'use client';
 
 import { Plus } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { ACTION } from '@/components/form-styles';
 import { Button } from '@/components/ui/button';
+import { useBookmarksInvalidate } from '../hooks';
 import { BookmarkDialog } from './bookmark-dialog';
 import type { FolderOption } from './types';
 
@@ -15,7 +15,7 @@ export function AddBookmarkButton({
   folders: FolderOption[];
   defaultFolderId: string | null;
 }) {
-  const router = useRouter();
+  const invalidate = useBookmarksInvalidate();
   const [open, setOpen] = useState(false);
 
   return (
@@ -37,7 +37,7 @@ export function AddBookmarkButton({
           onClose={() => setOpen(false)}
           onSaved={() => {
             setOpen(false);
-            router.refresh();
+            invalidate();
           }}
         />
       )}

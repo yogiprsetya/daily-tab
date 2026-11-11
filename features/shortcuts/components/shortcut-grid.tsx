@@ -1,11 +1,11 @@
 'use client';
 
 import { ChevronDown, ChevronUp, Pencil, Plus } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { SiteIcon } from '@/components/site-icon';
 import { apiRequest } from '@/lib/api-client';
 import { cn } from '@/lib/utils';
+import { useShortcutsInvalidate } from '../hooks';
 import { GRID } from './grid-styles';
 import { ShortcutDialog } from './shortcut-dialog';
 import type { ShortcutItem } from './types';
@@ -97,7 +97,7 @@ function ShortcutRows({
 }
 
 export function ShortcutGrid({ items }: { items: ShortcutItem[] }) {
-  const router = useRouter();
+  const invalidate = useShortcutsInvalidate();
   const [editing, setEditing] = useState(false);
   const [dialog, setDialog] = useState<DialogState>(null);
   const [movingId, setMovingId] = useState<string | null>(null);
@@ -112,7 +112,7 @@ export function ShortcutGrid({ items }: { items: ShortcutItem[] }) {
     });
     setMovingId(null);
 
-    if (result.ok) router.refresh();
+    if (result.ok) invalidate();
     else setError(result.message);
   }
 
@@ -176,7 +176,7 @@ export function ShortcutGrid({ items }: { items: ShortcutItem[] }) {
           onClose={() => setDialog(null)}
           onSaved={() => {
             setDialog(null);
-            router.refresh();
+            invalidate();
           }}
         />
       )}

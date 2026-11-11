@@ -1,18 +1,15 @@
+'use client';
+
+import { useSearchParams } from 'next/navigation';
 import { GroupManager } from '@/components/grouping/group-manager';
-import { requirePageSession } from '@/features/auth/require-session';
-import {
-  countUnread,
-  listRead,
-  listTopics,
-  listUnread,
-  resolveTopicFilter,
-  unreadWithoutTopic,
-} from '../dal';
-import { toItem } from '../optimistic';
+import { LoadError } from '@/components/load-error';
+import { useReadingItems, useTopics } from '../hooks';
+import { splitReading } from '../optimistic';
 import { parseTopicFilter } from '../validation';
 import { AddReadingButton } from './add-reading-button';
 import { ReadingFilter } from './reading-filter';
 import { ReadingList } from './reading-list';
+import { ReadingSkeleton } from './reading-skeleton';
 
 const TOPIC_COPY = {
   trigger: 'Manage topics',
@@ -22,25 +19,21 @@ const TOPIC_COPY = {
   newNameLabel: 'New topic name',
 };
 
-/** Reads the session, URL and database: render inside <Suspense>. */
-export async function ReadingView({
-  searchParams,
-}: {
-  searchParams: Promise<{ topic?: string | string[] }>;
-}) {
-  await requirePageSession();
-  const { topic } = await searchParams;
-  const filter = await resolveTopicFilter(parseTopicFilter(topic));
+/** Client-rendered: the page only gates the session, the data comes from SWR. */
+export function ReadingView() {
+  const params = useSearchParams();
+  const requested = parseTopicFilter(params.get('topic') ?? undefined);
+  const items = useReadingItems(requested);
+  const topics = useTopics();
 
-  const [unread, read, topics, total, withoutTopic] = await Promise.all([
-    listUnread(filter),
-    listRead(filter),
-    listTopics(),
-    countUnread(),
-    unreadWithoutTopic(),
-  ]);
+  if (items.error) return <LoadError message={items.error.message} />;
+  if (topics.error) return <LoadError message={topics.error.message} />;
+  if (!items.data || !topics.data) return <ReadingSkeleton />;
 
-  const topicOptions = topics.map(({ id, name }) => ({ id, name }));
+  // The server resolves an unknown topic to All; its answer wins.
+  const filter = items.data.filter;
+  const { unread, read } = splitReading(items.data.items);
+  const topicOptions = topics.data.items.map(({ id, name }) => ({ id, name }));
   const addLink = (
     <AddReadingButton
       topics={topicOptions}
@@ -54,14 +47,16 @@ export async function ReadingView({
         <div className="flex w-full items-start justify-between gap-3">
           <ReadingFilter
             filter={filter}
-            topics={topics}
-            total={total}
-            withoutTopic={withoutTopic}
+            topics={topics.data.items}
+            total={topics.data.total}
+            withoutTopic={topics.data.withoutTopic}
           />
           {addLink}
         </div>
 
         <GroupManager
+          feature="reading-topics"
+          itemFeature="reading-items"
           endpoint="/api/reading-topics"
           groups={topicOptions}
           copy={TOPIC_COPY}
@@ -69,8 +64,8 @@ export async function ReadingView({
       </div>
 
       <ReadingList
-        unread={unread.map(toItem)}
-        read={read.map(toItem)}
+        unread={unread}
+        read={read}
         topics={topicOptions}
         filtered={filter.kind !== 'all'}
         addAction={addLink}

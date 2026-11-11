@@ -39,7 +39,7 @@ filter; Home shows what is still pending so it is visible on every new tab.
 5. Security and data flow
    - Every Route Handler calls `requireSession()`; Server Components call `requirePageSession()`.
    - Lists render behind `<Suspense>` with skeletons, so the page frame stays instant.
-   - Mutations go through the API, then `router.refresh()`.
+   - Mutations go through the API, then `useInvalidate()` refreshes the todos and projects caches.
    - All controls are keyboard reachable and labelled; checkboxes have touch targets of at least 44px.
 
 ## API

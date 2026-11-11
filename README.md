@@ -84,6 +84,20 @@ lint-staged (ESLint + Prettier on staged files).
 - Query the database only from `db/` and `features/<module>/dal.ts` (both `server-only`).
 - Never run `drizzle-kit push` against the cloud database.
 
+## Data flow
+
+Every page keeps only its session gate on the server; lists and filter counts are fetched by Client
+Components through the API, so the page frame is static and arrives instantly.
+
+- **GET → SWR.** `lib/swr/` holds the provider, the fetcher and the cache keys. Results are cached for the
+  life of the tab: no revalidation on mount, window focus or reconnect.
+- **Mutations → invalidate.** After a successful `POST`, `PATCH` or `DELETE`, the component calls
+  `useInvalidate('todos', 'projects')` (feature names from `lib/swr/keys.ts`). Every cached list of those
+  features refetches, including filters that are not on screen; `keepPreviousData` keeps the current rows
+  visible meanwhile.
+- **Ticks stay optimistic.** `lib/use-list-overrides.ts` shows a checked todo or read item in its new
+  section right away, and holds it there until the refetched rows agree — a failed request drops it back.
+
 ## Authentication
 
 Single owner, static credentials from env. Spec: [SPEC-auth.md](SPEC-auth.md).

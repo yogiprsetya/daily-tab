@@ -148,10 +148,13 @@ vitest.config.mts
 
 ## Architecture decisions
 
-- **Single data path per operation.** `features/<module>/dal.ts` holds all queries. Server Components read
-  through the DAL directly. **All mutations go through Route Handlers** (`app/api/<module>`), which the UI
-  calls with `fetch` followed by `router.refresh()`. The same endpoints serve the Chrome extension and any
-  other client, which is what "api" in the stack means. No Server Actions, to avoid two wrappers per mutation.
+- **Single data path per operation.** `features/<module>/dal.ts` holds all queries. **All mutations go
+  through Route Handlers** (`app/api/<module>`). The UI reads lists with `GET` the same way: each page
+  keeps only the session gate on the server, and a Client Component fetches the data through SWR
+  (`lib/swr/`) so it is cached for the life of the tab. After a successful mutation the UI calls
+  `useInvalidate()` instead of `router.refresh()`, which refetches every cached list for that feature
+  (`lib/swr/invalidation.ts`). The same endpoints serve the Chrome extension and any other client, which
+  is what "api" in the stack means. No Server Actions, to avoid two wrappers per mutation.
 - **No `supabase-js`.** Supabase is used as Postgres only. `daily_tab` is never added to PostgREST's exposed
   schemas, so the anon key cannot reach app data.
 - **Cache Components.** DB reads are request-time data and sit behind `<Suspense>` inside each page, so the

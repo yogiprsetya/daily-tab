@@ -27,7 +27,8 @@ export async function GET(request: Request) {
   );
   const query = parseSearch(searchParams.get('q') ?? undefined);
 
-  return json({ items: await listBookmarks(filter, query) });
+  // `filter` is the resolved one, so an unknown folder reads as All.
+  return json({ items: await listBookmarks(filter, query), filter });
 }
 
 export async function POST(request: Request) {

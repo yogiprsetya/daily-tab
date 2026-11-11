@@ -1,18 +1,15 @@
+'use client';
+
+import { useSearchParams } from 'next/navigation';
 import { GroupManager } from '@/components/grouping/group-manager';
-import { requirePageSession } from '@/features/auth/require-session';
-import {
-  countPending,
-  listCompleted,
-  listPending,
-  listProjects,
-  pendingWithoutProject,
-  resolveFilter,
-} from '../dal';
-import { toItem } from '../optimistic';
+import { LoadError } from '@/components/load-error';
+import { useProjects, useTodos } from '../hooks';
+import { splitTodos, toItem } from '../optimistic';
 import { parseProjectFilter } from '../validation';
 import { AddTodoButton } from './add-todo-button';
 import { ProjectFilter } from './project-filter';
 import { TodoList } from './todo-list';
+import { TodosSkeleton } from './todos-skeleton';
 
 const PROJECT_COPY = {
   trigger: 'Manage projects',
@@ -22,26 +19,24 @@ const PROJECT_COPY = {
   newNameLabel: 'New project name',
 };
 
-/** Reads the session, URL and database: render inside <Suspense>. */
-export async function TodosView({
-  searchParams,
-}: {
-  searchParams: Promise<{ project?: string | string[] }>;
-}) {
-  await requirePageSession();
-  const { project } = await searchParams;
-  const filter = await resolveFilter(parseProjectFilter(project));
+/** Client-rendered: the page only gates the session, the data comes from SWR. */
+export function TodosView() {
+  const params = useSearchParams();
+  const requested = parseProjectFilter(params.get('project') ?? undefined);
+  const todos = useTodos(requested);
+  const projects = useProjects();
 
-  const [pending, completed, projects, total, withoutProject] =
-    await Promise.all([
-      listPending(filter),
-      listCompleted(filter),
-      listProjects(),
-      countPending(),
-      pendingWithoutProject(),
-    ]);
+  if (todos.error) return <LoadError message={todos.error.message} />;
+  if (projects.error) return <LoadError message={projects.error.message} />;
+  if (!todos.data || !projects.data) return <TodosSkeleton />;
 
-  const projectOptions = projects.map(({ id, name }) => ({ id, name }));
+  // The server resolves an unknown project to All; its answer wins.
+  const filter = todos.data.filter;
+  const { pending, completed } = splitTodos(todos.data.items);
+  const projectOptions = projects.data.items.map(({ id, name }) => ({
+    id,
+    name,
+  }));
 
   return (
     <>
@@ -49,9 +44,9 @@ export async function TodosView({
         <div className="flex w-full items-start justify-between gap-3">
           <ProjectFilter
             filter={filter}
-            projects={projects}
-            total={total}
-            withoutProject={withoutProject}
+            projects={projects.data.items}
+            total={projects.data.total}
+            withoutProject={projects.data.withoutProject}
           />
 
           <AddTodoButton
@@ -61,6 +56,8 @@ export async function TodosView({
         </div>
 
         <GroupManager
+          feature="projects"
+          itemFeature="todos"
           endpoint="/api/projects"
           groups={projectOptions}
           copy={PROJECT_COPY}

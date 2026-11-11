@@ -2,17 +2,26 @@ import { requireSession } from '@/features/auth/require-session';
 import { duplicateProject } from '@/features/todos/api-errors';
 import {
   DuplicateProjectError,
+  countPending,
   createProject,
   listProjects,
+  pendingWithoutProject,
 } from '@/features/todos/dal';
 import { createProjectBody } from '@/features/todos/validation';
 import { json, parseBody } from '@/lib/api';
 
+/** `total` and `withoutProject` feed the All and No project filter counts. */
 export async function GET() {
   const auth = await requireSession();
   if (!auth.ok) return auth.response;
 
-  return json({ items: await listProjects() });
+  const [items, total, withoutProject] = await Promise.all([
+    listProjects(),
+    countPending(),
+    pendingWithoutProject(),
+  ]);
+
+  return json({ items, total, withoutProject });
 }
 
 export async function POST(request: Request) {

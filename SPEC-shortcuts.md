@@ -35,8 +35,8 @@ app shows first on desktop and Android. There is no separate `/shortcuts` route.
    - Every Route Handler calls `requireSession()` first. The Server Component calls `requirePageSession()`.
    - The list renders behind `<Suspense>` with a skeleton of the same height as one tile row, so the day and
      date on Home stay instant.
-   - Mutations go through the API, then `router.refresh()`. A failed mutation shows an error and leaves the
-     list unchanged.
+   - Mutations go through the API, then `useInvalidate()` refreshes the shortcuts cache. A failed mutation
+     shows an error and leaves the list unchanged.
 
 ## API
 

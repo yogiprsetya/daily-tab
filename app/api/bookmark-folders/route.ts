@@ -2,17 +2,26 @@ import { requireSession } from '@/features/auth/require-session';
 import { duplicateFolder } from '@/features/bookmarks/api-errors';
 import {
   DuplicateFolderError,
+  countBookmarks,
+  countWithoutFolder,
   createFolder,
   listFolders,
 } from '@/features/bookmarks/dal';
 import { createFolderBody } from '@/features/bookmarks/validation';
 import { json, parseBody } from '@/lib/api';
 
+/** `total` and `withoutFolder` feed the All and No folder filter counts. */
 export async function GET() {
   const auth = await requireSession();
   if (!auth.ok) return auth.response;
 
-  return json({ items: await listFolders() });
+  const [items, total, withoutFolder] = await Promise.all([
+    listFolders(),
+    countBookmarks(),
+    countWithoutFolder(),
+  ]);
+
+  return json({ items, total, withoutFolder });
 }
 
 export async function POST(request: Request) {

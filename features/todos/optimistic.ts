@@ -7,7 +7,13 @@ export type TodoItem = {
   notes: string | null;
 };
 
-export type TodoLists = { pending: TodoItem[]; completed: TodoItem[] };
+/** A `GET /api/todos` row: the API sends `completedAt` rather than a flag. */
+export type TodoRow = TodoItem & { completedAt: string | null };
+
+export type TodoLists<T extends TodoItem = TodoItem> = {
+  pending: T[];
+  completed: T[];
+};
 
 /** Strips a database row down to what the client needs. */
 export const toItem = ({
@@ -19,17 +25,10 @@ export const toItem = ({
   notes,
 }: TodoItem): TodoItem => ({ id, title, projectId, projectName, url, notes });
 
-/** What the list shows between ticking a box and the server confirming it. */
-export function applyToggle(
-  state: TodoLists,
-  { id, completed }: { id: string; completed: boolean }
-): TodoLists {
-  const from = completed ? state.pending : state.completed;
-  const item = from.find((todo) => todo.id === id);
-  if (!item) return state;
-
-  const remaining = from.filter((todo) => todo.id !== id);
-  return completed
-    ? { pending: remaining, completed: [item, ...state.completed] }
-    : { pending: [...state.pending, item], completed: remaining };
+/** The GET returns pending oldest first, then completed newest first. */
+export function splitTodos(rows: TodoRow[]): TodoLists<TodoRow> {
+  return {
+    pending: rows.filter((row) => row.completedAt === null),
+    completed: rows.filter((row) => row.completedAt !== null),
+  };
 }

@@ -1,18 +1,19 @@
 'use client';
 
 import { Pencil } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { type ReactNode, useOptimistic, useState, useTransition } from 'react';
+import { type ReactNode, useState } from 'react';
 import { ICON_BUTTON } from '@/components/form-styles';
 import { SiteIcon } from '@/components/site-icon';
 import { Checkbox } from '@/components/ui/checkbox';
 import { apiRequest } from '@/lib/api-client';
 import { displayHost } from '@/lib/url';
+import { useListOverrides } from '@/lib/use-list-overrides';
 import { cn } from '@/lib/utils';
+import { useReadingInvalidate } from '../hooks';
 import {
+  byQueueOrder,
   type ReadingItem,
   type ReadingLists,
-  applyToggle,
 } from '../optimistic';
 import { ReadingDialog } from './reading-dialog';
 
@@ -87,29 +88,37 @@ export function ReadingList({
   filtered: boolean;
   addAction: ReactNode;
 }) {
-  const router = useRouter();
-  const [lists, toggleOptimistic] = useOptimistic(
+  const invalidate = useReadingInvalidate();
+  // A reopened row returns to its queue place (oldest first), which the
+  // override cannot know, so the unread list is re-sorted by createdAt.
+  const { lists, move, drop } = useListOverrides(
     { unread, read },
-    applyToggle
+    {
+      read: 'start',
+      unread: { sort: byQueueOrder },
+    }
   );
-  const [, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [editing, setEditing] = useState<ReadingItem | null>(null);
   const queueIsEmpty =
     !filtered && lists.unread.length === 0 && lists.read.length === 0;
 
-  function toggle(item: ReadingItem, nextRead: boolean) {
+  async function toggle(item: ReadingItem, nextRead: boolean) {
     setError(null);
-    startTransition(async () => {
-      toggleOptimistic({ id: item.id, read: nextRead });
-      const result = await apiRequest(`/api/reading-items/${item.id}`, {
-        method: 'PATCH',
-        body: { read: nextRead },
-      });
-      // Inside the transition, so the optimistic state holds until fresh data lands.
-      if (result.ok) router.refresh();
-      else setError(result.message);
+    // Shown at once, and held until the refetched rows land.
+    move(item.id, nextRead ? 'read' : 'unread');
+
+    const result = await apiRequest(`/api/reading-items/${item.id}`, {
+      method: 'PATCH',
+      body: { read: nextRead },
     });
+
+    if (result.ok) {
+      invalidate();
+      return;
+    }
+    drop(item.id);
+    setError(result.message);
   }
 
   return (
@@ -170,7 +179,7 @@ export function ReadingList({
           onClose={() => setEditing(null)}
           onSaved={() => {
             setEditing(null);
-            router.refresh();
+            invalidate();
           }}
         />
       )}
