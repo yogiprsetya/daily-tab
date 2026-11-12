@@ -2,17 +2,26 @@ import { requireSession } from '@/features/auth/require-session';
 import { duplicateTopic } from '@/features/reading-list/api-errors';
 import {
   DuplicateTopicError,
+  countUnread,
   createTopic,
   listTopics,
+  unreadWithoutTopic,
 } from '@/features/reading-list/dal';
 import { createTopicBody } from '@/features/reading-list/validation';
 import { json, parseBody } from '@/lib/api';
 
+/** `total` and `withoutTopic` feed the All and No topic filter counts. */
 export async function GET() {
   const auth = await requireSession();
   if (!auth.ok) return auth.response;
 
-  return json({ items: await listTopics() });
+  const [items, total, withoutTopic] = await Promise.all([
+    listTopics(),
+    countUnread(),
+    unreadWithoutTopic(),
+  ]);
+
+  return json({ items, total, withoutTopic });
 }
 
 export async function POST(request: Request) {

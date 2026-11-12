@@ -30,7 +30,8 @@ export async function GET(request: Request) {
     listRead(filter),
   ]);
 
-  return json({ items: [...unread, ...read] });
+  // `filter` is the resolved one, so an unknown topic reads as All.
+  return json({ items: [...unread, ...read], filter });
 }
 
 export async function POST(request: Request) {

@@ -1,14 +1,15 @@
 'use client';
 
 import { ExternalLink, Pencil } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { useOptimistic, useState, useTransition } from 'react';
+import { useState } from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { ICON_BUTTON } from '@/components/form-styles';
 import { apiRequest } from '@/lib/api-client';
 import { displayHost } from '@/lib/url';
+import { useListOverrides } from '@/lib/use-list-overrides';
 import { cn } from '@/lib/utils';
-import { type TodoItem, type TodoLists, applyToggle } from '../optimistic';
+import { useTodosInvalidate } from '../hooks';
+import type { TodoItem, TodoLists } from '../optimistic';
 import { TodoDialog } from './todo-dialog';
 
 function TodoRow({
@@ -97,27 +98,33 @@ export function TodoList({
   projects?: { id: string; name: string }[];
   emptyLabel?: string;
 }) {
-  const router = useRouter();
-  const [lists, toggleOptimistic] = useOptimistic(
+  const invalidate = useTodosInvalidate();
+  // Newly completed rows go on top: the server sorts completed newest first.
+  const { lists, move, drop } = useListOverrides(
     { pending, completed },
-    applyToggle
+    {
+      completed: 'start',
+    }
   );
-  const [, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [editing, setEditing] = useState<TodoItem | null>(null);
 
-  function toggle(todo: TodoItem, nextCompleted: boolean) {
+  async function toggle(todo: TodoItem, nextCompleted: boolean) {
     setError(null);
-    startTransition(async () => {
-      toggleOptimistic({ id: todo.id, completed: nextCompleted });
-      const result = await apiRequest(`/api/todos/${todo.id}`, {
-        method: 'PATCH',
-        body: { completed: nextCompleted },
-      });
-      // Inside the transition, so the optimistic state holds until fresh data lands.
-      if (result.ok) router.refresh();
-      else setError(result.message);
+    // Shown at once, and held until the refetched rows land.
+    move(todo.id, nextCompleted ? 'completed' : 'pending');
+
+    const result = await apiRequest(`/api/todos/${todo.id}`, {
+      method: 'PATCH',
+      body: { completed: nextCompleted },
     });
+
+    if (result.ok) {
+      invalidate();
+      return;
+    }
+    drop(todo.id);
+    setError(result.message);
   }
 
   const onEdit = (todo: TodoItem) =>
@@ -176,7 +183,7 @@ export function TodoList({
           onClose={() => setEditing(null)}
           onSaved={() => {
             setEditing(null);
-            router.refresh();
+            invalidate();
           }}
         />
       )}

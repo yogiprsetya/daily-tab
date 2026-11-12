@@ -1,11 +1,11 @@
 'use client';
 
 import { Pencil } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { ICON_BUTTON } from '@/components/form-styles';
 import { SiteIcon } from '@/components/site-icon';
 import { displayHost } from '@/lib/url';
+import { useBookmarksInvalidate } from '../hooks';
 import { BookmarkDialog } from './bookmark-dialog';
 import type { BookmarkItem, FolderOption } from './types';
 
@@ -66,7 +66,7 @@ export function BookmarkList({
   showFolder: boolean;
   emptyLabel: string;
 }) {
-  const router = useRouter();
+  const invalidate = useBookmarksInvalidate();
   const [editing, setEditing] = useState<BookmarkItem | null>(null);
 
   if (bookmarks.length === 0) {
@@ -94,7 +94,7 @@ export function BookmarkList({
           onClose={() => setEditing(null)}
           onSaved={() => {
             setEditing(null);
-            router.refresh();
+            invalidate();
           }}
         />
       )}

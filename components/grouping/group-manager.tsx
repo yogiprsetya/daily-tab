@@ -1,7 +1,6 @@
 'use client';
 
 import { Check, Pencil, Settings2, Trash2, X } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import { type FormEvent, useState } from 'react';
 import { ACTION, FIELD, ICON_BUTTON } from '@/components/form-styles';
 import { Button } from '@/components/ui/button';
@@ -14,6 +13,8 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { apiRequest } from '@/lib/api-client';
+import { useInvalidate } from '@/lib/swr/invalidation';
+import type { Feature } from '@/lib/swr/keys';
 import { cn } from '@/lib/utils';
 
 type Group = { id: string; name: string };
@@ -120,15 +121,21 @@ function GroupRow({
 }
 
 export function GroupManager({
+  feature,
+  itemFeature,
   endpoint,
   groups,
   copy,
 }: {
+  /** Cache group holding the groups themselves. */
+  feature: Feature;
+  /** Cache group holding the items, whose group names and counts also change. */
+  itemFeature: Feature;
   endpoint: string;
   groups: Group[];
   copy: GroupManagerCopy;
 }) {
-  const router = useRouter();
+  const invalidate = useInvalidate();
   const [open, setOpen] = useState(false);
   const [renamingId, setRenamingId] = useState<string | null>(null);
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
@@ -142,7 +149,8 @@ export function GroupManager({
     setPending(false);
 
     if (result.ok) {
-      router.refresh();
+      // Deleting a group moves its items to "No group", so both change.
+      invalidate(feature, itemFeature);
       return true;
     }
     setError(result.fieldErrors.name ?? result.message);

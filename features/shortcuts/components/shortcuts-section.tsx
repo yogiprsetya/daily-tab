@@ -1,15 +1,20 @@
-import { requirePageSession } from '@/features/auth/require-session';
-import { listShortcuts } from '../dal';
-import { ShortcutGrid } from './shortcut-grid';
+'use client';
 
-/** Reads the session and the database: render inside <Suspense>. */
-export async function ShortcutsSection() {
-  await requirePageSession();
-  const rows = await listShortcuts();
+import { LoadError } from '@/components/load-error';
+import { useShortcuts } from '../hooks';
+import { ShortcutGrid } from './shortcut-grid';
+import { ShortcutsSkeleton } from './shortcuts-skeleton';
+
+/** A client section: the page frame stays static while SWR loads the tiles. */
+export function ShortcutsSection() {
+  const { data, error } = useShortcuts();
+
+  if (error) return <LoadError message={error.message} />;
+  if (!data) return <ShortcutsSkeleton />;
 
   return (
     <ShortcutGrid
-      items={rows.map(({ id, title, url }) => ({ id, title, url }))}
+      items={data.items.map(({ id, title, url }) => ({ id, title, url }))}
     />
   );
 }

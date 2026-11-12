@@ -1,10 +1,10 @@
 'use client';
 
 import { Plus } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { ACTION } from '@/components/form-styles';
 import { Button } from '@/components/ui/button';
+import { useReadingInvalidate } from '../hooks';
 import { ReadingDialog } from './reading-dialog';
 
 export function AddReadingButton({
@@ -14,7 +14,7 @@ export function AddReadingButton({
   topics: { id: string; name: string }[];
   defaultTopicId: string | null;
 }) {
-  const router = useRouter();
+  const invalidate = useReadingInvalidate();
   const [open, setOpen] = useState(false);
 
   return (
@@ -36,7 +36,7 @@ export function AddReadingButton({
           onClose={() => setOpen(false)}
           onSaved={() => {
             setOpen(false);
-            router.refresh();
+            invalidate();
           }}
         />
       )}

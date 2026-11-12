@@ -38,7 +38,7 @@ the app on desktop and Android. There is no browser integration or import (owner
 5. Security and data flow
    - Every Route Handler calls `requireSession()`; the page calls `requirePageSession()`.
    - The list renders behind `<Suspense>`, so the page frame stays instant.
-   - Mutations go through the API, then `router.refresh()`.
+   - Mutations go through the API, then `useInvalidate()` refreshes the bookmarks and folders caches.
    - All controls are keyboard reachable, labelled, and at least 44px tall.
 
 ## API

@@ -1,19 +1,27 @@
+'use client';
+
 import Link from 'next/link';
-import { requirePageSession } from '@/features/auth/require-session';
-import { countPending, listPending } from '../dal';
+import { LoadError } from '@/components/load-error';
+import { useProjects, useTodos } from '../hooks';
 import { toItem } from '../optimistic';
 import { SECTION_HEADING } from './styles';
 import { TodoList } from './todo-list';
+import { PendingSkeleton } from './todos-skeleton';
 
 const HOME_LIMIT = 5;
 
-/** Reads the session and the database: render inside <Suspense>. */
-export async function PendingSection() {
-  await requirePageSession();
-  const [pending, total] = await Promise.all([
-    listPending({ kind: 'all' }, HOME_LIMIT),
-    countPending(),
-  ]);
+/** Reads the same caches as /todos, so a tick here is reflected there too. */
+export function PendingSection() {
+  const todos = useTodos({ kind: 'all' });
+  const projects = useProjects();
+
+  if (todos.error) return <LoadError message={todos.error.message} />;
+  if (!todos.data || !projects.data) return <PendingSkeleton />;
+
+  const total = projects.data.total;
+  const pending = todos.data.items
+    .filter((row) => row.completedAt === null)
+    .slice(0, HOME_LIMIT);
 
   return (
     <>

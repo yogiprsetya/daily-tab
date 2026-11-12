@@ -23,10 +23,13 @@ export function parseEnv(source: Record<string, string | undefined>): Env {
     // Only variable names and generic reasons: values may contain credentials.
     const problems = result.error.issues.map((issue) => {
       const name = issue.path.join('.');
+      // Custom messages are fixed strings, so they never contain the value.
       const reason =
         issue.code === 'invalid_type'
           ? 'is missing'
-          : 'must be a postgres:// or postgresql:// URL';
+          : issue.code === 'custom'
+            ? issue.message
+            : 'must be a postgres:// or postgresql:// URL';
       return `- ${name} ${reason}`;
     });
     throw new Error(`Invalid environment variables:\n${problems.join('\n')}`);

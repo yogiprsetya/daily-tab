@@ -44,7 +44,7 @@ as read. Items that have been read stay available as a history. Used on desktop 
 5. Security and data flow
    - Every Route Handler calls `requireSession()`; the page calls `requirePageSession()`.
    - The list renders behind `<Suspense>`, so the page frame stays instant.
-   - Mutations go through the API, then `router.refresh()`.
+   - Mutations go through the API, then `useInvalidate()` refreshes the items and topics caches.
    - All controls are keyboard reachable, labelled, and at least 44px tall.
 
 ## API

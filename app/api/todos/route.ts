@@ -19,7 +19,8 @@ export async function GET(request: Request) {
   const value = new URL(request.url).searchParams.get('project') ?? undefined;
   const filter = await resolveFilter(parseProjectFilter(value));
 
-  return json({ items: await listTodos(filter) });
+  // `filter` is the resolved one, so an unknown project reads as All.
+  return json({ items: await listTodos(filter), filter });
 }
 
 export async function POST(request: Request) {

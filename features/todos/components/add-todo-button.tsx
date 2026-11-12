@@ -1,10 +1,10 @@
 'use client';
 
 import { Plus } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { ACTION } from '@/components/form-styles';
 import { Button } from '@/components/ui/button';
+import { useTodosInvalidate } from '../hooks';
 import { TodoDialog } from './todo-dialog';
 
 export function AddTodoButton({
@@ -14,7 +14,7 @@ export function AddTodoButton({
   projects: { id: string; name: string }[];
   defaultProjectId: string | null;
 }) {
-  const router = useRouter();
+  const invalidate = useTodosInvalidate();
   const [open, setOpen] = useState(false);
 
   return (
@@ -36,7 +36,7 @@ export function AddTodoButton({
           onClose={() => setOpen(false)}
           onSaved={() => {
             setOpen(false);
-            router.refresh();
+            invalidate();
           }}
         />
       )}
