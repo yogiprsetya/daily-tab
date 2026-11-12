@@ -171,10 +171,10 @@ export function ObsidianView() {
   }
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex min-w-0 flex-col gap-4">
       <VaultSearch initialQuery={query} />
 
-      <div className="flex items-center justify-between gap-2">
+      <div className="flex min-w-0 items-center justify-between gap-2">
         <VaultBreadcrumb
           folder={noteAt.folder}
           note={notePath ? noteAt.name : undefined}
@@ -191,24 +191,55 @@ export function ObsidianView() {
         </Button>
       </div>
 
-      {notePath ? (
-        note?.path === notePath ? (
-          <NoteView note={note.note} name={noteAt.name} />
-        ) : (
-          LOADING('Reading the note…')
-        )
-      ) : query.trim().length >= MIN_QUERY ? (
+      {query.trim().length >= MIN_QUERY ? (
         hits?.query === query ? (
           <SearchResults hits={hits.hits} />
         ) : (
           LOADING('Searching notes…')
         )
-      ) : listing?.folder !== folder ? (
-        LOADING('Reading the folder…')
-      ) : listing.entries ? (
-        <FolderList entries={listing.entries} />
       ) : (
-        NOT_FOUND
+        <section
+          aria-label="Notes workspace"
+          className="grid min-w-0 overflow-hidden rounded-md border border-border bg-card md:min-h-[min(68vh,760px)] md:grid-cols-[minmax(220px,280px)_minmax(0,1fr)]"
+        >
+          <aside className="min-w-0 border-b border-border bg-muted/30 md:border-r md:border-b-0">
+            <div className="border-b border-border px-3 py-2">
+              <p className="text-xs font-medium text-muted-foreground">
+                Vault files
+              </p>
+            </div>
+            <div className="max-h-72 overflow-y-auto p-2 md:max-h-[min(68vh,760px)]">
+              {listing?.folder !== folder ? (
+                LOADING('Reading the folder…')
+              ) : listing.entries ? (
+                <FolderList
+                  entries={listing.entries}
+                  selectedPath={notePath}
+                  currentFolder={folder}
+                  root={state.handle}
+                />
+              ) : (
+                NOT_FOUND
+              )}
+            </div>
+          </aside>
+          <main className="min-w-0 p-4 sm:p-6">
+            {notePath ? (
+              note?.path === notePath ? (
+                <NoteView note={note.note} name={noteAt.name} />
+              ) : (
+                LOADING('Reading the note…')
+              )
+            ) : (
+              <div className="flex min-h-48 flex-col justify-center px-2 py-8 text-center md:min-h-full">
+                <p className="text-base font-medium">Choose a note to read</p>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Browse the vault or search by title and note content.
+                </p>
+              </div>
+            )}
+          </main>
+        </section>
       )}
     </div>
   );
