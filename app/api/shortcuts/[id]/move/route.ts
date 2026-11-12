@@ -2,6 +2,7 @@ import { requireSession } from '@/features/auth/require-session';
 import { listShortcuts, moveShortcut } from '@/features/shortcuts/dal';
 import { moveShortcutBody } from '@/features/shortcuts/validation';
 import { apiError, isUuid, json, parseBody } from '@/lib/api';
+import { invalidateData } from '@/lib/server-cache';
 
 const notFound = () => apiError('not_found', 'Shortcut not found');
 
@@ -20,5 +21,6 @@ export async function POST(
 
   if (!(await moveShortcut(id, body.data.direction))) return notFound();
 
+  invalidateData('shortcuts');
   return json({ items: await listShortcuts() });
 }

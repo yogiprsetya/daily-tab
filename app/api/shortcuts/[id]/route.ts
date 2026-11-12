@@ -2,6 +2,7 @@ import { requireSession } from '@/features/auth/require-session';
 import { removeShortcut, updateShortcut } from '@/features/shortcuts/dal';
 import { updateShortcutBody } from '@/features/shortcuts/validation';
 import { apiError, isUuid, json, parseBody } from '@/lib/api';
+import { invalidateData } from '@/lib/server-cache';
 
 const notFound = () => apiError('not_found', 'Shortcut not found');
 
@@ -19,6 +20,7 @@ export async function PATCH(
   if (!body.ok) return body.response;
 
   const row = await updateShortcut(id, body.data);
+  if (row) invalidateData('shortcuts');
   return row ? json(row) : notFound();
 }
 
@@ -32,5 +34,6 @@ export async function DELETE(
   const { id } = await ctx.params;
   if (!isUuid(id) || !(await removeShortcut(id))) return notFound();
 
+  invalidateData('shortcuts');
   return new Response(null, { status: 204 });
 }

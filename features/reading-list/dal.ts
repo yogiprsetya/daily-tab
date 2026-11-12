@@ -1,4 +1,5 @@
 import 'server-only';
+import { cacheLife, cacheTag } from 'next/cache';
 import {
   and,
   asc,
@@ -52,19 +53,28 @@ function selectItems() {
     .leftJoin(readingTopics, eq(readingItems.topicId, readingTopics.id));
 }
 
-export function listUnread(filter: TopicFilter) {
-  return selectItems()
+export async function listUnread(filter: TopicFilter) {
+  'use cache';
+  cacheLife('max');
+  cacheTag('data:reading-items', 'data:reading-topics');
+  return await selectItems()
     .where(and(isNull(readingItems.readAt), matchesFilter(filter)))
     .orderBy(asc(readingItems.createdAt), asc(readingItems.title));
 }
 
-export function listRead(filter: TopicFilter) {
-  return selectItems()
+export async function listRead(filter: TopicFilter) {
+  'use cache';
+  cacheLife('max');
+  cacheTag('data:reading-items', 'data:reading-topics');
+  return await selectItems()
     .where(and(isNotNull(readingItems.readAt), matchesFilter(filter)))
     .orderBy(desc(readingItems.readAt), asc(readingItems.title));
 }
 
 export async function countUnread(): Promise<number> {
+  'use cache';
+  cacheLife('max');
+  cacheTag('data:reading-items');
   const [row] = await db
     .select({ total: count() })
     .from(readingItems)
@@ -73,6 +83,9 @@ export async function countUnread(): Promise<number> {
 }
 
 export async function unreadWithoutTopic(): Promise<number> {
+  'use cache';
+  cacheLife('max');
+  cacheTag('data:reading-items');
   const [row] = await db
     .select({ total: count() })
     .from(readingItems)
@@ -84,6 +97,9 @@ export async function unreadWithoutTopic(): Promise<number> {
 export async function resolveTopicFilter(
   filter: TopicFilter
 ): Promise<TopicFilter> {
+  'use cache';
+  cacheLife('max');
+  cacheTag('data:reading-topics');
   if (filter.kind !== 'topic') return filter;
   const [row] = await db
     .select({ id: readingTopics.id })
@@ -131,8 +147,11 @@ export async function removeReadingItem(id: string): Promise<boolean> {
   return rows.length > 0;
 }
 
-export function listTopics() {
-  return db
+export async function listTopics() {
+  'use cache';
+  cacheLife('max');
+  cacheTag('data:reading-topics', 'data:reading-items');
+  return await db
     .select({
       ...getTableColumns(readingTopics),
       unreadCount: count(readingItems.id),

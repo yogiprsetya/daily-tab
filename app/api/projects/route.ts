@@ -9,6 +9,7 @@ import {
 } from '@/features/todos/dal';
 import { createProjectBody } from '@/features/todos/validation';
 import { json, parseBody } from '@/lib/api';
+import { invalidateData } from '@/lib/server-cache';
 
 /** `total` and `withoutProject` feed the All and No project filter counts. */
 export async function GET() {
@@ -32,7 +33,9 @@ export async function POST(request: Request) {
   if (!body.ok) return body.response;
 
   try {
-    return json(await createProject(body.data.name), { status: 201 });
+    const project = await createProject(body.data.name);
+    invalidateData('projects', 'todos');
+    return json(project, { status: 201 });
   } catch (error) {
     if (error instanceof DuplicateProjectError) return duplicateProject();
     throw error;

@@ -1,4 +1,5 @@
 import 'server-only';
+import { cacheLife, cacheTag } from 'next/cache';
 import {
   and,
   asc,
@@ -53,8 +54,11 @@ function matchesSearch(query: string | undefined) {
   );
 }
 
-export function listBookmarks(filter: FolderFilter, query?: string) {
-  return db
+export async function listBookmarks(filter: FolderFilter, query?: string) {
+  'use cache';
+  cacheLife('max');
+  cacheTag('data:bookmarks', 'data:bookmark-folders');
+  return await db
     .select({
       ...getTableColumns(bookmarks),
       folderName: bookmarkFolders.name,
@@ -66,11 +70,17 @@ export function listBookmarks(filter: FolderFilter, query?: string) {
 }
 
 export async function countBookmarks(): Promise<number> {
+  'use cache';
+  cacheLife('max');
+  cacheTag('data:bookmarks');
   const [row] = await db.select({ total: count() }).from(bookmarks);
   return row.total;
 }
 
 export async function countWithoutFolder(): Promise<number> {
+  'use cache';
+  cacheLife('max');
+  cacheTag('data:bookmarks');
   const [row] = await db
     .select({ total: count() })
     .from(bookmarks)
@@ -82,6 +92,9 @@ export async function countWithoutFolder(): Promise<number> {
 export async function resolveFolderFilter(
   filter: FolderFilter
 ): Promise<FolderFilter> {
+  'use cache';
+  cacheLife('max');
+  cacheTag('data:bookmark-folders');
   if (filter.kind !== 'folder') return filter;
   const [row] = await db
     .select({ id: bookmarkFolders.id })
@@ -118,8 +131,11 @@ export async function removeBookmark(id: string): Promise<boolean> {
   return rows.length > 0;
 }
 
-export function listFolders() {
-  return db
+export async function listFolders() {
+  'use cache';
+  cacheLife('max');
+  cacheTag('data:bookmark-folders', 'data:bookmarks');
+  return await db
     .select({
       ...getTableColumns(bookmarkFolders),
       bookmarkCount: count(bookmarks.id),

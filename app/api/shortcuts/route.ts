@@ -2,6 +2,7 @@ import { requireSession } from '@/features/auth/require-session';
 import { createShortcut, listShortcuts } from '@/features/shortcuts/dal';
 import { createShortcutBody } from '@/features/shortcuts/validation';
 import { json, parseBody } from '@/lib/api';
+import { invalidateData } from '@/lib/server-cache';
 
 export async function GET() {
   const auth = await requireSession();
@@ -17,5 +18,7 @@ export async function POST(request: Request) {
   const body = await parseBody(request, createShortcutBody);
   if (!body.ok) return body.response;
 
-  return json(await createShortcut(body.data), { status: 201 });
+  const shortcut = await createShortcut(body.data);
+  invalidateData('shortcuts');
+  return json(shortcut, { status: 201 });
 }

@@ -1,4 +1,5 @@
 import 'server-only';
+import { cacheLife, cacheTag } from 'next/cache';
 import {
   type SQL,
   and,
@@ -54,6 +55,9 @@ export function listCompleted(filter: ProjectFilter) {
 }
 
 export async function listTodos(filter: ProjectFilter) {
+  'use cache';
+  cacheLife('max');
+  cacheTag('data:todos');
   const [pending, completed] = await Promise.all([
     listPending(filter),
     listCompleted(filter),
@@ -62,6 +66,9 @@ export async function listTodos(filter: ProjectFilter) {
 }
 
 export async function countPending(): Promise<number> {
+  'use cache';
+  cacheLife('max');
+  cacheTag('data:todos');
   const [row] = await db
     .select({ total: count() })
     .from(todos)
@@ -70,6 +77,9 @@ export async function countPending(): Promise<number> {
 }
 
 export async function pendingWithoutProject(): Promise<number> {
+  'use cache';
+  cacheLife('max');
+  cacheTag('data:todos');
   const [row] = await db
     .select({ total: count() })
     .from(todos)
@@ -81,6 +91,9 @@ export async function pendingWithoutProject(): Promise<number> {
 export async function resolveFilter(
   filter: ProjectFilter
 ): Promise<ProjectFilter> {
+  'use cache';
+  cacheLife('max');
+  cacheTag('data:projects');
   if (filter.kind !== 'project') return filter;
   const [row] = await db
     .select({ id: projects.id })
@@ -133,8 +146,11 @@ export async function removeTodo(id: string): Promise<boolean> {
   return rows.length > 0;
 }
 
-export function listProjects() {
-  return db
+export async function listProjects() {
+  'use cache';
+  cacheLife('max');
+  cacheTag('data:projects', 'data:todos');
+  return await db
     .select({
       ...getTableColumns(projects),
       pendingCount:

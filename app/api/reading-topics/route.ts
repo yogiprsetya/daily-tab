@@ -9,6 +9,7 @@ import {
 } from '@/features/reading-list/dal';
 import { createTopicBody } from '@/features/reading-list/validation';
 import { json, parseBody } from '@/lib/api';
+import { invalidateData } from '@/lib/server-cache';
 
 /** `total` and `withoutTopic` feed the All and No topic filter counts. */
 export async function GET() {
@@ -32,7 +33,9 @@ export async function POST(request: Request) {
   if (!body.ok) return body.response;
 
   try {
-    return json(await createTopic(body.data.name), { status: 201 });
+    const topic = await createTopic(body.data.name);
+    invalidateData('reading-topics', 'reading-items');
+    return json(topic, { status: 201 });
   } catch (error) {
     if (error instanceof DuplicateTopicError) return duplicateTopic();
     throw error;

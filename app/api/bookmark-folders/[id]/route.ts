@@ -10,6 +10,7 @@ import {
 } from '@/features/bookmarks/dal';
 import { updateFolderBody } from '@/features/bookmarks/validation';
 import { isUuid, json, parseBody } from '@/lib/api';
+import { invalidateData } from '@/lib/server-cache';
 
 export async function PATCH(
   request: Request,
@@ -26,6 +27,7 @@ export async function PATCH(
 
   try {
     const row = await updateFolder(id, body.data.name);
+    if (row) invalidateData('bookmark-folders', 'bookmarks');
     return row ? json(row) : folderNotFound();
   } catch (error) {
     if (error instanceof DuplicateFolderError) return duplicateFolder();
@@ -43,5 +45,6 @@ export async function DELETE(
   const { id } = await ctx.params;
   if (!isUuid(id) || !(await removeFolder(id))) return folderNotFound();
 
+  invalidateData('bookmark-folders', 'bookmarks');
   return new Response(null, { status: 204 });
 }

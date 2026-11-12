@@ -7,6 +7,7 @@ import {
 } from '@/features/todos/dal';
 import { updateProjectBody } from '@/features/todos/validation';
 import { isUuid, json, parseBody } from '@/lib/api';
+import { invalidateData } from '@/lib/server-cache';
 
 export async function PATCH(
   request: Request,
@@ -23,6 +24,7 @@ export async function PATCH(
 
   try {
     const row = await updateProject(id, body.data.name);
+    if (row) invalidateData('projects', 'todos');
     return row ? json(row) : projectNotFound();
   } catch (error) {
     if (error instanceof DuplicateProjectError) return duplicateProject();
@@ -40,5 +42,6 @@ export async function DELETE(
   const { id } = await ctx.params;
   if (!isUuid(id) || !(await removeProject(id))) return projectNotFound();
 
+  invalidateData('projects', 'todos');
   return new Response(null, { status: 204 });
 }

@@ -11,6 +11,7 @@ import {
   parseProjectFilter,
 } from '@/features/todos/validation';
 import { json, parseBody } from '@/lib/api';
+import { invalidateData } from '@/lib/server-cache';
 
 export async function GET(request: Request) {
   const auth = await requireSession();
@@ -31,7 +32,9 @@ export async function POST(request: Request) {
   if (!body.ok) return body.response;
 
   try {
-    return json(await createTodo(body.data), { status: 201 });
+    const todo = await createTodo(body.data);
+    invalidateData('todos', 'projects');
+    return json(todo, { status: 201 });
   } catch (error) {
     if (error instanceof UnknownProjectError) return unknownProject();
     throw error;

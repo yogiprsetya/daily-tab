@@ -10,6 +10,7 @@ import {
 } from '@/features/reading-list/dal';
 import { updateTopicBody } from '@/features/reading-list/validation';
 import { isUuid, json, parseBody } from '@/lib/api';
+import { invalidateData } from '@/lib/server-cache';
 
 export async function PATCH(
   request: Request,
@@ -26,6 +27,7 @@ export async function PATCH(
 
   try {
     const row = await updateTopic(id, body.data.name);
+    if (row) invalidateData('reading-topics', 'reading-items');
     return row ? json(row) : topicNotFound();
   } catch (error) {
     if (error instanceof DuplicateTopicError) return duplicateTopic();
@@ -43,5 +45,6 @@ export async function DELETE(
   const { id } = await ctx.params;
   if (!isUuid(id) || !(await removeTopic(id))) return topicNotFound();
 
+  invalidateData('reading-topics', 'reading-items');
   return new Response(null, { status: 204 });
 }

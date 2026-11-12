@@ -16,6 +16,7 @@ import {
   parseTopicFilter,
 } from '@/features/reading-list/validation';
 import { json, parseBody } from '@/lib/api';
+import { invalidateData } from '@/lib/server-cache';
 
 export async function GET(request: Request) {
   const auth = await requireSession();
@@ -42,7 +43,9 @@ export async function POST(request: Request) {
   if (!body.ok) return body.response;
 
   try {
-    return json(await createReadingItem(body.data), { status: 201 });
+    const item = await createReadingItem(body.data);
+    invalidateData('reading-items', 'reading-topics');
+    return json(item, { status: 201 });
   } catch (error) {
     if (error instanceof DuplicateReadingItemError) {
       return duplicateReadingItem();

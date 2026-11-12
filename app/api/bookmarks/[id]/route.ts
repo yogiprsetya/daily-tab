@@ -12,6 +12,7 @@ import {
 } from '@/features/bookmarks/dal';
 import { updateBookmarkBody } from '@/features/bookmarks/validation';
 import { isUuid, json, parseBody } from '@/lib/api';
+import { invalidateData } from '@/lib/server-cache';
 
 export async function PATCH(
   request: Request,
@@ -28,6 +29,7 @@ export async function PATCH(
 
   try {
     const row = await updateBookmark(id, body.data);
+    if (row) invalidateData('bookmarks', 'bookmark-folders');
     return row ? json(row) : bookmarkNotFound();
   } catch (error) {
     if (error instanceof DuplicateBookmarkError) return duplicateBookmark();
@@ -46,5 +48,6 @@ export async function DELETE(
   const { id } = await ctx.params;
   if (!isUuid(id) || !(await removeBookmark(id))) return bookmarkNotFound();
 
+  invalidateData('bookmarks', 'bookmark-folders');
   return new Response(null, { status: 204 });
 }

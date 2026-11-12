@@ -1,12 +1,16 @@
 import 'server-only';
+import { cacheLife, cacheTag } from 'next/cache';
 import { asc, eq, sql } from 'drizzle-orm';
 import { db } from '@/db';
 import { shortcuts } from './schema';
 
 const ORDER = [asc(shortcuts.position), asc(shortcuts.createdAt)];
 
-export function listShortcuts() {
-  return db
+export async function listShortcuts() {
+  'use cache';
+  cacheLife('max');
+  cacheTag('data:shortcuts');
+  return await db
     .select()
     .from(shortcuts)
     .orderBy(...ORDER);

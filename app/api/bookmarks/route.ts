@@ -16,6 +16,7 @@ import {
   parseSearch,
 } from '@/features/bookmarks/validation';
 import { json, parseBody } from '@/lib/api';
+import { invalidateData } from '@/lib/server-cache';
 
 export async function GET(request: Request) {
   const auth = await requireSession();
@@ -39,7 +40,9 @@ export async function POST(request: Request) {
   if (!body.ok) return body.response;
 
   try {
-    return json(await createBookmark(body.data), { status: 201 });
+    const bookmark = await createBookmark(body.data);
+    invalidateData('bookmarks', 'bookmark-folders');
+    return json(bookmark, { status: 201 });
   } catch (error) {
     if (error instanceof DuplicateBookmarkError) return duplicateBookmark();
     if (error instanceof UnknownFolderError) return unknownFolder();

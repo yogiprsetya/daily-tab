@@ -7,6 +7,7 @@ import {
 } from '@/features/todos/dal';
 import { updateTodoBody } from '@/features/todos/validation';
 import { isUuid, json, parseBody } from '@/lib/api';
+import { invalidateData } from '@/lib/server-cache';
 
 export async function PATCH(
   request: Request,
@@ -23,6 +24,7 @@ export async function PATCH(
 
   try {
     const row = await updateTodo(id, body.data);
+    if (row) invalidateData('todos', 'projects');
     return row ? json(row) : todoNotFound();
   } catch (error) {
     if (error instanceof UnknownProjectError) return unknownProject();
@@ -40,5 +42,6 @@ export async function DELETE(
   const { id } = await ctx.params;
   if (!isUuid(id) || !(await removeTodo(id))) return todoNotFound();
 
+  invalidateData('todos', 'projects');
   return new Response(null, { status: 204 });
 }

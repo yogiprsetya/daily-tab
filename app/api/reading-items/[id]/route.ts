@@ -12,6 +12,7 @@ import {
 } from '@/features/reading-list/dal';
 import { updateReadingItemBody } from '@/features/reading-list/validation';
 import { isUuid, json, parseBody } from '@/lib/api';
+import { invalidateData } from '@/lib/server-cache';
 
 export async function PATCH(
   request: Request,
@@ -28,6 +29,7 @@ export async function PATCH(
 
   try {
     const row = await updateReadingItem(id, body.data);
+    if (row) invalidateData('reading-items', 'reading-topics');
     return row ? json(row) : readingItemNotFound();
   } catch (error) {
     if (error instanceof DuplicateReadingItemError) {
@@ -50,5 +52,6 @@ export async function DELETE(
     return readingItemNotFound();
   }
 
+  invalidateData('reading-items', 'reading-topics');
   return new Response(null, { status: 204 });
 }
