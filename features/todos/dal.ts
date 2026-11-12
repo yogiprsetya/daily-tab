@@ -74,7 +74,7 @@ export async function pendingWithoutProject(): Promise<number> {
     .select({ total: count() })
     .from(todos)
     .where(and(isNull(todos.completedAt), isNull(todos.projectId)));
-  return row.total;
+  return row?.total ?? 0;
 }
 
 /** A filter on a project that no longer exists behaves as All. */

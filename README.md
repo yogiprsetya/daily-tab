@@ -135,35 +135,6 @@ Shown on Home; "Edit" switches to rows with move, edit and delete. Spec: [SPEC-s
 - Completed todos stay in the collapsed Completed section until deleted by hand.
 - Home shows the 5 oldest pending todos.
 
-## Obsidian
-
-`/obsidian` browses an Obsidian vault read-only: folders, notes and search by name and by text. Spec:
-[SPEC-obsidian.md](SPEC-obsidian.md).
-
-**How it reads the vault.** The browser reads it, not the server. On first visit the page asks you to pick the
-vault folder; the browser's own folder dialog opens and the page remembers that folder as a
-`FileSystemDirectoryHandle` in IndexedDB (database `daily-tab`, store `obsidian-vault`, key `handle`). Only the
-handle is stored — never note text, never a path, which the browser does not expose anyway. Everything the page
-reads stays on your machine: the Network tab shows no request while browsing, reading or searching.
-
-- **Requires Chrome or Edge on a desktop.** The File System Access API is unavailable on Android, iOS, Safari
-  and Firefox, so the page explains that instead of showing a button. The Android PWA keeps working for every
-  other module.
-- **You pick the folder once per browser profile.** Chrome asks again after a restart; the page then shows
-  "Allow access" and one click resumes. The handle is lost when you clear site data, switch profiles, move or
-  rename the folder, or change origin (`localhost`, `127.0.0.1` and the deployed URL are separate).
-- **Origin matters more than the server.** Because nothing is read server-side, `pnpm dev`, `pnpm start` and
-  the deployed site behave the same way, and there is no vault environment variable. `OBSIDIAN_VAULT_PATH` was
-  removed: a server in WSL could not reach a vault on `D:\`.
-- **Nothing is written.** The picker asks for `mode: 'read'`, and no write, rename or delete call exists in the
-  module.
-- **What is shown:** folders first, then notes, each by name ignoring case, with hidden names (`.obsidian`,
-  `.trash`) left out. A note renders as GitHub-flavoured Markdown — frontmatter hidden, raw HTML shown as text,
-  and only `http`/`https` links become links. A note over 1 MB is not shown.
-- **Search** matches note names first, then note contents, with a one-line snippet and at most 50 results. The
-  text scan runs in a Web Worker and caches note text by `lastModified`, so a repeat search only re-reads notes
-  that changed.
-
 ## Chrome extension
 
 [extension/](extension/) shows the deployed app on every new tab, in a full-page frame, and adds a toolbar

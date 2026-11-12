@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { LoadError } from '@/components/load-error';
 import { useProjects, useTodos } from '../hooks';
 import { toItem } from '../optimistic';
-import { SECTION_HEADING } from './styles';
 import { TodoList } from './todo-list';
 import { PendingSkeleton } from './todos-skeleton';
 
@@ -26,7 +25,10 @@ export function PendingSection() {
   return (
     <>
       <div className="flex min-h-11 items-center justify-between gap-2">
-        <h2 id="pending-heading" className={SECTION_HEADING}>
+        <h2
+          id="pending-heading"
+          className="text-base font-medium tracking-tight"
+        >
           Pending tasks
         </h2>
         <Link
@@ -36,7 +38,9 @@ export function PendingSection() {
           View all ({total})
         </Link>
       </div>
-      <TodoList pending={pending.map(toItem)} completed={[]} />
+      <div className="rounded-xl border border-border bg-card p-3 sm:p-4">
+        <TodoList pending={pending.map(toItem)} completed={[]} />
+      </div>
     </>
   );
 }

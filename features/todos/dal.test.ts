@@ -104,6 +104,10 @@ describe('listing', () => {
     expect(await countPending()).toBe(2);
     expect(await pendingWithoutProject()).toBe(1);
   });
+
+  it('returns zero when no pending todos exist without a project', async () => {
+    expect(await pendingWithoutProject()).toBe(0);
+  });
 });
 
 describe('resolveFilter', () => {

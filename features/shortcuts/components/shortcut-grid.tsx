@@ -124,7 +124,7 @@ export function ShortcutGrid({ items }: { items: ShortcutItem[] }) {
       <div className="flex min-h-11 items-center justify-between gap-2">
         <h2
           id="shortcuts-heading"
-          className="text-sm font-medium text-muted-foreground"
+          className="text-base font-medium tracking-tight"
         >
           Shortcuts
         </h2>
@@ -158,7 +158,11 @@ export function ShortcutGrid({ items }: { items: ShortcutItem[] }) {
           </button>
         </div>
       )}
-      {hasItems && !editing && <ShortcutTiles items={items} />}
+      {hasItems && !editing && (
+        <div className="rounded-xl border border-border bg-card p-2 sm:p-3">
+          <ShortcutTiles items={items} />
+        </div>
+      )}
       {hasItems && editing && (
         <ShortcutRows
           items={items}
