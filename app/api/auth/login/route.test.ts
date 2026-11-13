@@ -12,8 +12,8 @@ vi.mock('next/server', async (importOriginal) => ({
   connection: vi.fn(async () => {}),
 }));
 
-const RIGHT = { email: 'owner@example.com', pin: '482913' }; // vitest.config.mts
-const WRONG = { email: 'owner@example.com', pin: '000000' };
+const RIGHT = { pin: '482913' }; // vitest.config.mts
+const WRONG = { pin: '000000' };
 
 function login(body: unknown, ip = '203.0.113.5') {
   return POST(
@@ -55,12 +55,6 @@ describe('POST /api/auth/login', () => {
     ]);
   });
 
-  it('accepts the email with different case', async () => {
-    const res = await login({ ...RIGHT, email: 'OWNER@example.com' });
-
-    expect(res.status).toBe(200);
-  });
-
   it('returns a generic 401 for a wrong PIN and records the failure', async () => {
     const res = await login(WRONG);
 
@@ -68,15 +62,9 @@ describe('POST /api/auth/login', () => {
     expect(res.headers.get('set-cookie')).toBeNull();
     expect((await res.json()).error).toEqual({
       code: 'unauthorized',
-      message: 'Email or PIN is incorrect',
+      message: 'PIN is incorrect',
     });
     expect(await attempts()).toMatchObject([{ succeeded: false }]);
-  });
-
-  it('gives the same answer for a wrong email', async () => {
-    const res = await login({ ...RIGHT, email: 'someone@example.com' });
-
-    expect((await res.json()).error.message).toBe('Email or PIN is incorrect');
   });
 
   it('refuses the 6th attempt from an IP, even with the right PIN, without recording it', async () => {
@@ -92,7 +80,7 @@ describe('POST /api/auth/login', () => {
   });
 
   it('rejects an invalid body without echoing the PIN', async () => {
-    const res = await login({ email: 'owner@example.com', pin: 482913 });
+    const res = await login({ pin: 482913 });
 
     expect(res.status).toBe(400);
     expect(await res.text()).not.toContain('482913');
@@ -100,7 +88,7 @@ describe('POST /api/auth/login', () => {
   });
 
   it('rejects malformed JSON', async () => {
-    const res = await login('{"email":');
+    const res = await login('{"pin":');
 
     expect(res.status).toBe(400);
   });

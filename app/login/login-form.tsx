@@ -30,7 +30,6 @@ export function LoginForm() {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({
-          email: form.get('email'),
           pin: form.get('pin'),
         }),
       });
@@ -46,7 +45,7 @@ export function LoginForm() {
         res.status === 429
           ? retryMessage(res.headers.get('retry-after'))
           : res.status === 401
-            ? 'Email or PIN is incorrect.'
+            ? 'PIN is incorrect.'
             : 'Something went wrong. Try again.'
       );
     } catch {
@@ -61,23 +60,6 @@ export function LoginForm() {
   return (
     <form onSubmit={onSubmit} className="flex flex-col gap-4" noValidate>
       <div className="flex flex-col gap-2">
-        <Label htmlFor="email" className="text-sm">
-          Email
-        </Label>
-        <Input
-          id="email"
-          name="email"
-          type="email"
-          autoComplete="username"
-          autoCapitalize="none"
-          spellCheck={false}
-          required
-          autoFocus
-          className={FIELD}
-        />
-      </div>
-
-      <div className="flex flex-col gap-2">
         <Label htmlFor="pin" className="text-sm">
           PIN
         </Label>
@@ -90,6 +72,7 @@ export function LoginForm() {
           pattern="[0-9]*"
           autoComplete="current-password"
           required
+          autoFocus
           className={`${FIELD} tracking-widest`}
         />
       </div>

@@ -5,7 +5,7 @@ Module id: `auth` (see [CAPABILITY-MAP.md](CAPABILITY-MAP.md)) · Depends on: `p
 
 ## Objective
 
-Lock the whole app behind a single static identity (email + PIN from env vars) so that only the owner can
+Lock the whole app behind a single static PIN from env vars so that only the owner can
 see or change data on the public URL https://daily-tab.vercel.app. Logging in should be rare: a session
 lasts 30 days and is extended every time the app is used. Guessing the PIN must be impractical even though
 the URL is public.
@@ -16,13 +16,15 @@ call `requireSession()`.
 ### Acceptance criteria
 
 1. Login
-   - `/login` shows an email field and a numeric PIN field (`inputMode="numeric"`,
-     `autocomplete="username"` / `"current-password"` so password managers work).
-   - Correct email + PIN sets the session cookie and navigates to the `next` path (default `/`).
-   - Wrong email or PIN shows one generic message ("Email or PIN is incorrect"); the response never says
-     which field was wrong.
-   - Visiting `/login` with a valid session redirects to `/`.
-   - `next` only accepts same-origin relative paths (`/…`, not `//…` or absolute URLs).
+
+- `/login` shows a numeric PIN field (`inputMode="numeric"`,
+  `autocomplete="username"` / `"current-password"` so password managers work).
+- Correct PIN sets the session cookie and navigates to the `next` path (default `/`).
+- Wrong PIN shows one generic message ("PIN is incorrect"); the response never says
+  which field was wrong.
+- Visiting `/login` with a valid session redirects to `/`.
+- `next` only accepts same-origin relative paths (`/…`, not `//…` or absolute URLs).
+
 2. Session
    - Stateless signed cookie: HS256 JWT via `jose`, payload `{ sub: 'owner' }` + `iat`/`exp`, no PII.
    - Cookie `dt_session`: `HttpOnly`, `Secure`, `SameSite=Lax`, `Path=/`, `Max-Age` 30 days.
@@ -57,12 +59,13 @@ call `requireSession()`.
    - Logout button: bottom of the nav rail, so desktop only (≥1024px). Owner decision 2026-11-08: phones have
      no logout; a session ends after 30 days unused, or by rotating `AUTH_SECRET`.
 7. Credentials
-   - `AUTH_EMAIL` (valid email, compared case-insensitively after trim), `AUTH_PIN` (digits only, at least
-     6), `AUTH_SECRET` (at least 32 characters). Missing or invalid values fail with a message naming the
-     variable, never its value.
-   - Email and PIN are compared in constant time (SHA-256 both sides, then `timingSafeEqual`).
-   - The PIN is stored as-is in env, not hashed: a 6-digit PIN has 10⁶ values, so a hash is cracked
-     instantly offline and adds no real protection. The rate limits are the protection.
+
+- `AUTH_PIN` (digits only, at least
+  6), `AUTH_SECRET` (at least 32 characters). Missing or invalid values fail with a message naming the
+  variable, never its value.
+- The PIN is compared in constant time (SHA-256 both sides, then `timingSafeEqual`).
+- The PIN is stored as-is in env, not hashed: a 6-digit PIN has 10⁶ values, so a hash is cracked
+  instantly offline and adds no real protection. The rate limits are the protection.
 
 ## Tech Stack
 
@@ -84,7 +87,6 @@ openssl rand -base64 32  # generate AUTH_SECRET
 
 | Name          | Where         | Purpose                                          |
 | ------------- | ------------- | ------------------------------------------------ |
-| `AUTH_EMAIL`  | local, Vercel | The only accepted login email                    |
 | `AUTH_PIN`    | local, Vercel | The only accepted PIN (≥ 6 digits)               |
 | `AUTH_SECRET` | local, Vercel | HS256 signing key (≥ 32 chars); rotate to revoke |
 
@@ -106,7 +108,7 @@ features/auth/
   config.ts                       Zod-parsed AUTH_* vars (server-only, lazy)
   session.ts                      signSession, verifySession, needsRefresh, cookie builders (pure: proxy uses it)
   require-session.ts              requireSession() for Route Handlers (server-only, reads cookies())
-  credentials.ts                  constant-time email + PIN check
+  credentials.ts                  constant-time PIN check
   rate-limit.ts                   DAL over login_attempts (server-only)
   schema.ts                       dailyTab.table('login_attempts', …)
   request.ts                      clientIp(), safeNextPath(), isSameOrigin()
@@ -187,7 +189,7 @@ export async function GET() {
 - [x] `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build` pass.
 - [x] Local: unauthenticated `/`, `/todos` → 307 `/login?next=…`; `/api/health` → 200;
       `/manifest.webmanifest` and `/icons/icon-192.png` → 200 without a session.
-- [x] Local: login with the right email + PIN reaches `next`; wrong PIN shows the generic message.
+- [x] Local: login with the right PIN reaches `next`; wrong PIN shows the generic message.
 - [x] 6th failed attempt from one IP within 15 min → 429 with `Retry-After`; correct PIN is also refused
       while limited.
 - [x] `POST /api/auth/login` with `Origin: https://evil.example` → 403.

@@ -38,7 +38,6 @@ export default defineConfig({
     env: {
       DATABASE_URL: testDatabaseUrl,
       // Fixed fake credentials: tests must never see the real AUTH_* values.
-      AUTH_EMAIL: 'owner@example.com',
       AUTH_PIN: '482913',
       AUTH_SECRET: 'test-only-secret-0123456789abcdef',
     },

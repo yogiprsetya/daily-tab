@@ -30,7 +30,7 @@ can be shared with other projects: this app keeps every object in the `daily_tab
    - `DATABASE_URL`: `postgresql://postgres:postgres@127.0.0.1:54322/postgres` for the default local stack.
    - `TEST_DATABASE_URL`: same server, database `daily_tab_test`. It must differ from `DATABASE_URL`; the test
      config refuses to run otherwise.
-   - `AUTH_EMAIL`, `AUTH_PIN` (digits only, at least 6), `AUTH_SECRET` (generate with
+   - `AUTH_PIN` (digits only, at least 6), `AUTH_SECRET` (generate with
      `openssl rand -base64 32`). See [Authentication](#authentication). Tests use their own fake values.
 
 3. Create the test database once:
@@ -52,7 +52,7 @@ can be shared with other projects: this app keeps every object in the `daily_tab
    curl localhost:3000/api/health   # {"status":"ok","db":"ok"}
    ```
 
-   Then open http://localhost:3000 and sign in with `AUTH_EMAIL` and `AUTH_PIN`.
+   Then open http://localhost:3000 and sign in with `AUTH_PIN`.
 
 ## Scripts
 
@@ -186,7 +186,7 @@ render icon-maskable 512 public/icons/icon-maskable-512.png
    ```
 
 2. In Vercel, set `DATABASE_URL` to the **transaction pooler** (port 6543). The client already uses
-   `prepare: false`, which that pooler requires. Also set `AUTH_EMAIL`, `AUTH_PIN` and `AUTH_SECRET`;
+   `prepare: false`, which that pooler requires. Also set `AUTH_PIN` and `AUTH_SECRET`;
    without them every request fails, because the proxy cannot verify sessions.
 3. Deploy, then check `https://<deployment>/api/health`.
 4. On Android, open the deployed URL in Chrome and choose "Install app".

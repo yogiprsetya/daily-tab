@@ -12,7 +12,6 @@ import { sessionCookie, signSession } from '@/features/auth/session';
 import { apiError, parseBody } from '@/lib/api';
 
 const loginBody = z.object({
-  email: z.string().max(320),
   pin: z.string().max(64),
 });
 
@@ -38,7 +37,7 @@ export async function POST(request: Request) {
   const valid = checkCredentials(body.data, config);
   await recordAttempt(ip, valid, now);
 
-  if (!valid) return apiError('unauthorized', 'Email or PIN is incorrect');
+  if (!valid) return apiError('unauthorized', 'PIN is incorrect');
 
   const { token } = await signSession(config.secret, now);
   const res = NextResponse.json({ ok: true });
