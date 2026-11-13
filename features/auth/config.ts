@@ -5,7 +5,7 @@ import { z } from 'zod';
 // so they are undefined in any browser bundle anyway.
 
 const schema = z.object({
-  AUTH_PIN: z.string().regex(/^\d{6,}$/),
+  AUTH_PIN: z.string().min(6).max(6),
   AUTH_SECRET: z.string().min(32),
 });
 
