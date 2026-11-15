@@ -26,6 +26,13 @@ export function useTodos(filter: ProjectFilter) {
   );
 }
 
+export function useHomeTodos() {
+  const epoch = useFeatureEpoch('todos');
+  return useSWR<TodosResponse>(
+    featureKey('todos', epoch, '/api/todos?project=&preview=1')
+  );
+}
+
 export function useProjects() {
   const epoch = useFeatureEpoch('projects');
   return useSWR<ProjectsResponse>(

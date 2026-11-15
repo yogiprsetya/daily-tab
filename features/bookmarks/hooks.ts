@@ -33,6 +33,17 @@ export function useBookmarks(filter: FolderFilter, query: string | undefined) {
   );
 }
 
+export function useHomeBookmarks() {
+  const epoch = useFeatureEpoch('bookmarks');
+  return useSWR<BookmarksResponse>(
+    featureKey(
+      'bookmarks',
+      epoch,
+      queryPath('/api/bookmarks', { folder: '', limit: '4' })
+    )
+  );
+}
+
 export function useFolders() {
   const epoch = useFeatureEpoch('bookmark-folders');
   return useSWR<FoldersResponse>(

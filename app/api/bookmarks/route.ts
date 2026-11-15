@@ -27,9 +27,11 @@ export async function GET(request: Request) {
     parseFolderFilter(searchParams.get('folder') ?? undefined)
   );
   const query = parseSearch(searchParams.get('q') ?? undefined);
+  const limitValue = searchParams.get('limit');
+  const limit = limitValue === '4' ? 4 : undefined;
 
   // `filter` is the resolved one, so an unknown folder reads as All.
-  return json({ items: await listBookmarks(filter, query), filter });
+  return json({ items: await listBookmarks(filter, query, limit), filter });
 }
 
 export async function POST(request: Request) {

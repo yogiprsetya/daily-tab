@@ -2,25 +2,21 @@
 
 import Link from 'next/link';
 import { LoadError } from '@/components/load-error';
-import { useProjects, useTodos } from '../hooks';
+import { useHomeTodos, useProjects } from '../hooks';
 import { toItem } from '../optimistic';
 import { TodoList } from './todo-list';
 import { PendingSkeleton } from './todos-skeleton';
 
-const HOME_LIMIT = 5;
-
 /** Reads the same caches as /todos, so a tick here is reflected there too. */
 export function PendingSection() {
-  const todos = useTodos({ kind: 'all' });
+  const todos = useHomeTodos();
   const projects = useProjects();
 
   if (todos.error) return <LoadError message={todos.error.message} />;
-  if (!todos.data || !projects.data) return <PendingSkeleton />;
+  if (!todos.data) return <PendingSkeleton />;
 
-  const total = projects.data.total;
-  const pending = todos.data.items
-    .filter((row) => row.completedAt === null)
-    .slice(0, HOME_LIMIT);
+  const total = projects.data?.total;
+  const pending = todos.data.items;
 
   return (
     <>
@@ -35,7 +31,7 @@ export function PendingSection() {
           href="/todos"
           className="-mr-3 flex min-h-11 items-center rounded-lg px-3 text-sm text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
         >
-          View all ({total})
+          View all{total === undefined ? '' : ` (${total})`}
         </Link>
       </div>
       <div className="rounded-xl border border-border bg-card p-3 sm:p-4">

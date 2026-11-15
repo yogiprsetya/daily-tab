@@ -65,6 +65,13 @@ export async function listTodos(filter: ProjectFilter) {
   return [...pending, ...completed];
 }
 
+export async function listPendingPreview(filter: ProjectFilter, limit: number) {
+  'use cache';
+  cacheLife('max');
+  cacheTag('data:todos');
+  return await listPending(filter, limit);
+}
+
 export async function countPending(): Promise<number> {
   'use cache';
   cacheLife('max');

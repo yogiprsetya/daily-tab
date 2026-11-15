@@ -30,6 +30,13 @@ export function useReadingItems(filter: TopicFilter) {
   );
 }
 
+export function useHomeReadingItems() {
+  const epoch = useFeatureEpoch('reading-items');
+  return useSWR<ReadingItemsResponse>(
+    featureKey('reading-items', epoch, '/api/reading-items?topic=&preview=1')
+  );
+}
+
 export function useTopics() {
   const epoch = useFeatureEpoch('reading-topics');
   return useSWR<TopicsResponse>(

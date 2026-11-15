@@ -3,11 +3,8 @@
 import Link from 'next/link';
 import { LoadError } from '@/components/load-error';
 import { SiteIcon } from '@/components/site-icon';
-import { useBookmarks } from '@/features/bookmarks/hooks';
-import { parseFolderFilter } from '@/features/bookmarks/validation';
-import { useReadingItems } from '@/features/reading-list/hooks';
-import { splitReading } from '@/features/reading-list/optimistic';
-import { parseTopicFilter } from '@/features/reading-list/validation';
+import { useHomeBookmarks } from '@/features/bookmarks/hooks';
+import { useHomeReadingItems } from '@/features/reading-list/hooks';
 
 function CollectionCard({
   title,
@@ -46,8 +43,8 @@ function CollectionSkeleton({ label }: { label: string }) {
 }
 
 export function HomeCollections() {
-  const bookmarks = useBookmarks(parseFolderFilter(undefined), undefined);
-  const reading = useReadingItems(parseTopicFilter(undefined));
+  const bookmarks = useHomeBookmarks();
+  const reading = useHomeReadingItems();
 
   return (
     <>
@@ -62,7 +59,7 @@ export function HomeCollections() {
           </p>
         ) : (
           <ul className="flex flex-col divide-y divide-border">
-            {bookmarks.data.items.slice(0, 4).map((item) => (
+            {bookmarks.data.items.map((item) => (
               <li
                 key={item.id}
                 className="flex min-h-14 min-w-0 items-center gap-3 py-2"
@@ -87,30 +84,28 @@ export function HomeCollections() {
           <LoadError message={reading.error.message} />
         ) : !reading.data ? (
           <CollectionSkeleton label="reading queue" />
-        ) : splitReading(reading.data.items).unread.length === 0 ? (
+        ) : reading.data.items.length === 0 ? (
           <p className="py-3 text-sm text-muted-foreground">
             Nothing unread right now.
           </p>
         ) : (
           <ul className="flex flex-col divide-y divide-border">
-            {splitReading(reading.data.items)
-              .unread.slice(0, 4)
-              .map((item) => (
-                <li
-                  key={item.id}
-                  className="flex min-h-14 min-w-0 items-center gap-3 py-2"
+            {reading.data.items.map((item) => (
+              <li
+                key={item.id}
+                className="flex min-h-14 min-w-0 items-center gap-3 py-2"
+              >
+                <SiteIcon title={item.title} url={item.url} />
+                <a
+                  href={item.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="min-w-0 flex-1 truncate rounded text-sm font-medium outline-none hover:underline focus-visible:ring-2 focus-visible:ring-ring"
                 >
-                  <SiteIcon title={item.title} url={item.url} />
-                  <a
-                    href={item.url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="min-w-0 flex-1 truncate rounded text-sm font-medium outline-none hover:underline focus-visible:ring-2 focus-visible:ring-ring"
-                  >
-                    {item.title}
-                  </a>
-                </li>
-              ))}
+                  {item.title}
+                </a>
+              </li>
+            ))}
           </ul>
         )}
       </CollectionCard>

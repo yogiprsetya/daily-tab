@@ -62,6 +62,16 @@ export async function listUnread(filter: TopicFilter) {
     .orderBy(asc(readingItems.createdAt), asc(readingItems.title));
 }
 
+export async function listUnreadPreview(filter: TopicFilter, limit: number) {
+  'use cache';
+  cacheLife('max');
+  cacheTag('data:reading-items', 'data:reading-topics');
+  return await selectItems()
+    .where(and(isNull(readingItems.readAt), matchesFilter(filter)))
+    .orderBy(asc(readingItems.createdAt), asc(readingItems.title))
+    .limit(limit);
+}
+
 export async function listRead(filter: TopicFilter) {
   'use cache';
   cacheLife('max');

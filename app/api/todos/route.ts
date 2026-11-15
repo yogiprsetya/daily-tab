@@ -3,6 +3,7 @@ import { unknownProject } from '@/features/todos/api-errors';
 import {
   UnknownProjectError,
   createTodo,
+  listPendingPreview,
   listTodos,
   resolveFilter,
 } from '@/features/todos/dal';
@@ -17,8 +18,13 @@ export async function GET(request: Request) {
   const auth = await requireSession();
   if (!auth.ok) return auth.response;
 
-  const value = new URL(request.url).searchParams.get('project') ?? undefined;
+  const { searchParams } = new URL(request.url);
+  const value = searchParams.get('project') ?? undefined;
   const filter = await resolveFilter(parseProjectFilter(value));
+
+  if (searchParams.get('preview') === '1') {
+    return json({ items: await listPendingPreview(filter, 5), filter });
+  }
 
   // `filter` is the resolved one, so an unknown project reads as All.
   return json({ items: await listTodos(filter), filter });

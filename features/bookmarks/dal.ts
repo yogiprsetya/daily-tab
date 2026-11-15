@@ -54,11 +54,15 @@ function matchesSearch(query: string | undefined) {
   );
 }
 
-export async function listBookmarks(filter: FolderFilter, query?: string) {
+export async function listBookmarks(
+  filter: FolderFilter,
+  query?: string,
+  limit?: number
+) {
   'use cache';
   cacheLife('max');
   cacheTag('data:bookmarks', 'data:bookmark-folders');
-  return await db
+  const queryBuilder = db
     .select({
       ...getTableColumns(bookmarks),
       folderName: bookmarkFolders.name,
@@ -67,6 +71,9 @@ export async function listBookmarks(filter: FolderFilter, query?: string) {
     .leftJoin(bookmarkFolders, eq(bookmarks.folderId, bookmarkFolders.id))
     .where(and(matchesFilter(filter), matchesSearch(query)))
     .orderBy(desc(bookmarks.createdAt), asc(bookmarks.title));
+  return limit === undefined
+    ? await queryBuilder
+    : await queryBuilder.limit(limit);
 }
 
 export async function countBookmarks(): Promise<number> {

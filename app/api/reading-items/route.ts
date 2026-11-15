@@ -9,6 +9,7 @@ import {
   createReadingItem,
   listRead,
   listUnread,
+  listUnreadPreview,
   resolveTopicFilter,
 } from '@/features/reading-list/dal';
 import {
@@ -26,6 +27,9 @@ export async function GET(request: Request) {
   const filter = await resolveTopicFilter(
     parseTopicFilter(searchParams.get('topic') ?? undefined)
   );
+  if (searchParams.get('preview') === '1') {
+    return json({ items: await listUnreadPreview(filter, 4), filter });
+  }
   const [unread, read] = await Promise.all([
     listUnread(filter),
     listRead(filter),
