@@ -1,6 +1,7 @@
 'use client';
 
 import { SWRConfig } from 'swr';
+import { useMemo } from 'react';
 import { fetcher } from './fetcher';
 import { createPersistentCache } from './persistent-cache';
 
@@ -9,13 +10,18 @@ import { createPersistentCache } from './persistent-cache';
  * reconnect. `useInvalidate()` refreshes them after a mutation.
  */
 export function SwrProvider({ children }: { children: React.ReactNode }) {
+  const cache = useMemo(
+    () =>
+      typeof window === 'undefined'
+        ? undefined
+        : createPersistentCache(window.localStorage),
+    []
+  );
+
   return (
     <SWRConfig
       value={{
-        provider: (cache) =>
-          typeof window === 'undefined'
-            ? cache
-            : createPersistentCache(window.localStorage),
+        provider: (defaultCache) => cache ?? defaultCache,
         fetcher,
         revalidateIfStale: false,
         revalidateOnFocus: false,
