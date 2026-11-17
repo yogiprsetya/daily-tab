@@ -2,6 +2,7 @@
 
 import { useCallback, useSyncExternalStore } from 'react';
 import type { Feature } from './keys';
+import { createEpochStore } from './epochs';
 
 /**
  * A feature's cache generation, kept outside React so every mounted hook reads
@@ -9,15 +10,9 @@ import type { Feature } from './keys';
  * SWR for a key it has never seen, so a fetch runs and fills a new entry. That
  * covers lists under other filters too, which `mutate` alone would leave stale.
  */
-const epochs: Record<Feature, number> = {
-  todos: 0,
-  projects: 0,
-  shortcuts: 0,
-  bookmarks: 0,
-  'bookmark-folders': 0,
-  'reading-items': 0,
-  'reading-topics': 0,
-};
+const epochStore = createEpochStore(
+  typeof window === 'undefined' ? undefined : window.localStorage
+);
 
 const listeners = new Map<Feature, Set<() => void>>();
 
@@ -35,7 +30,7 @@ export function useFeatureEpoch(feature: Feature): number {
     },
     [feature]
   );
-  const snapshot = useCallback(() => epochs[feature], [feature]);
+  const snapshot = useCallback(() => epochStore.get(feature), [feature]);
   return useSyncExternalStore(subscribe, snapshot, snapshot);
 }
 
@@ -47,7 +42,7 @@ export function useFeatureEpoch(feature: Feature): number {
 export function useInvalidate() {
   return useCallback((...features: Feature[]) => {
     for (const feature of features) {
-      epochs[feature] += 1;
+      epochStore.bump(feature);
       for (const listener of listeners.get(feature) ?? []) listener();
     }
   }, []);
