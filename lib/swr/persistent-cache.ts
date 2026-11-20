@@ -25,7 +25,11 @@ export function createPersistentCache(storage: Storage): Cache {
 
   const persist = () => {
     try {
-      storage.setItem(CACHE_KEY, JSON.stringify(Array.from(cache.entries())));
+      const entries = Array.from(cache, ([key, state]) => {
+        const { error: _error, ...persistedState } = state;
+        return [key, persistedState];
+      });
+      storage.setItem(CACHE_KEY, JSON.stringify(entries));
     } catch {
       // Persistence is best-effort (for example, storage quota may be full).
     }

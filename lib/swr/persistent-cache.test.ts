@@ -42,6 +42,19 @@ describe('createPersistentCache', () => {
     ).toBeUndefined();
   });
 
+  it('does not restore serialized SWR errors', () => {
+    const storage = createStorage();
+    const cache = createPersistentCache(storage);
+    cache.set('serialized-key', {
+      data: { items: ['cached'] },
+      error: new Error('request failed'),
+    });
+
+    const restored = createPersistentCache(storage).get('serialized-key');
+    expect(restored?.data).toEqual({ items: ['cached'] });
+    expect(restored?.error).toBeUndefined();
+  });
+
   it('starts with an empty cache when saved JSON is invalid', () => {
     expect(createPersistentCache(createStorage('{')).keys()).toEqual([]);
   });
